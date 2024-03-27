@@ -1,10 +1,15 @@
 {% extends "layout.html" %}
 {% block content %}
+<div class="row mb-4">
+    <div class="col-md-12 text-center">
+        <img src="{{ url_for('static', filename='images/DrugRepurposing-ICON-2b.svg') }}" alt="Drug Repurposing Icon" style="max-width: 100px;"> <!-- Adjust size/style as needed -->
+    </div>
+</div>
 <h3>Existing disease graphs</h3>
 Choose an existing disease graph from the list below.
 The date shows the creation of the graph.
 If the disease of interest not in list, or a newer version is wanted, create a new graph with the input box at the bottom of this page. 
-</br></br>
+<br><br>
 <ul>
 {% for folder in folders %}
     <li><a href="{{ url_for('symptoms_from_folder', diseasename=folder) }}">{{ folder }} </a></li>

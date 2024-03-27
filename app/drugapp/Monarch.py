@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-Module for Monarch network preparation and management
+MODULE FOR MONARCH NETWORK PREPARATION AND MANAGEMENT
 
-Created on Sat May 7 11:51:22 2022
+Last modified on Wed March 27 10:30:00 2024
 
-@author: Carmen Reep
+@authors: Núria Queralt Rosinach, Carmen Reep, Niccolò Bianchi
 """
 
 import requests
 import sys,os
+import json. # to save the latest .json returned by the API
 import datetime
+import logging  # to check for running variables
 import pandas as pd
 from biothings_client import get_client
 from tqdm import tqdm
@@ -18,6 +20,21 @@ from tqdm import tqdm
 # timestamp
 today = datetime.date.today()
 curr_year = int(str(today)[:4])
+
+
+# logging configuration
+base_data_directory = os.path.join(os.getcwd(), 'drugapp', 'data')
+log_directory = os.path.join(base_data_directory, 'logs')
+log_filename = datetime.now().strftime('monarch_app_%Y-%m-%d.log')
+log_file_path = os.path.join(log_directory, log_filename)
+os.makedirs(log_directory, exist_ok=True)
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(levelname)s: %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    handlers=[
+                        logging.FileHandler(log_file_path),
+                        logging.StreamHandler()  # Enables logging to stderr.
+                    ])
 
 
 def read_connections(filename):
@@ -31,14 +48,19 @@ def read_connections(filename):
     path = os.getcwd() + '/monarch'
     csv_path = path + '/' + filename
     network_df = pd.read_csv('{}'.format(csv_path))
-    print('\n* This is the size of the data structure: {}'.format(network_df.shape))
-    print('* These are the attributes: {}'.format(network_df.columns))
-    print('* This is the first record:\n{}'.format(network_df.head(1)))
+    #print('\n* This is the size of the data structure: {}'.format(network_df.shape))
+    #print('* These are the attributes: {}'.format(network_df.columns))
+    #print('* This is the first record:\n{}'.format(network_df.head(1)))
+    logging.info(f"Reading monarch connections CSV from: {csv_path}")
+    logging.indo(f"DataFrame: {network_df}")
+    logging.info(f"DataFrame size: {network_df.shape}")
+    logging.info(f"DataFrame attributes: {network_df.columns.tolist()}")
+    logging.info(f"First record in the DataFrame:\n{network_df.head(1)}")
 
     return network_df
 
 
-# retrieve subnetwork from Monarch knowledge graph
+## RETRIEVE SUBNETWORK FROM MONARCH KNOWLEDGE GRAPH
 
 def hit_monarch_api(node = 'HGNC:4851', rows = 2000):
     """
@@ -54,18 +76,32 @@ def hit_monarch_api(node = 'HGNC:4851', rows = 2000):
     :return: two api response objects: 'out' and 'in' response objects, in this order.
     """
     
-    # api address
-    biolink = 'https://api.monarchinitiative.org/api/association'
+    # API address
+    #biolink = 'https://api-biolink.monarchinitiative.org/api/association'  #biolink
+    biolink = 'https://api-v3.monarchinitiative.org/v3/api/association'  #V3
+    node_new = node.split(':')
+    node_call = node_new[0]+'%3A'+node_new[1]
     
     # parameters
     parameters = {'fl_excludes_evidence': False, 'rows': rows}
     # out edges: from/
-    r_out = requests.get('{}/from/{}'.format(biolink,node),params=parameters)
+    #r_out = requests.get('{}/from/{}'.format(biolink,node_call),params=parameters)
+    #out_url = f'{biolink}/from/{node_call}'  #biolink
+    out_url = f'{biolink}?subject={node_call}'  #V3
+    r_out = requests.get(out_url, params=parameters)
+    logging.info(f"Out edges request URL: {out_url} with parameters {parameters}")
+    logging.info(f"Out edges response status: {r_out.status_code}")
 
     # in edges: to/
-    r_in = requests.get('{}/to/{}'.format(biolink,node),params=parameters)
+    #r_in = requests.get('{}/to/{}'.format(biolink,node_call),params=parameters)
+    #in_url = f'{biolink}/to/{node_call}'  #biolink
+    in_url = f'{biolink}?object={node_call}'  #V3
+    r_in = requests.get(in_url, params=parameters)
+    logging.info(f"In edges request URL: {in_url} with parameters {parameters}")
+    logging.info(f"In edges response status: {r_in.status_code}")
 
     return r_out, r_in
+
 
 def get_disease_name_id(disease_input_ID = 'OMIM:143100'):
     """
@@ -76,18 +112,46 @@ def get_disease_name_id(disease_input_ID = 'OMIM:143100'):
     :return: two strings, name and ID respectively
     """
     # api address
-    biolink = 'https://api.monarchinitiative.org/api/association'
+    biolink = 'https://api-biolink.monarchinitiative.org/api/association'
     
     # parameters
     parameters = {'fl_excludes_evidence': False, 'rows': 1}
-    # out edges: from/
-    r_out_disease = requests.get('{}/from/{}'.format(biolink,disease_input_ID),params=parameters)
+    ## out edges: from/
+    #r_out_disease = requests.get('{}/from/{}'.format(biolink,disease_input_ID),params=parameters)
 
-    for association in r_out_disease.json()['associations']:
-        disease_name = association['subject']['label']
-        disease_id = association['subject']['id']
-    
+    request_url = f'{biolink}/from/{disease_input_ID}'
+    logging.info(f"Making API call to: {request_url}")
+    r_out_disease = requests.get(request_url, params=parameters)
+    #for association in r_out_disease.json()['associations']:
+    #    disease_name = association['subject']['label']
+    #    disease_id = association['subject']['id']
+
+    response_json = r_out_disease.json()
+    #print(response_json)
+    #if 'associations' in response_json:
+    #    for association in response_json['associations']:
+    #        disease_name = association['subject']['label']
+    #        disease_id = association['subject']['id']
+    #else:
+    #    print("Warning: 'associations' key not found in response.")
+        if 'associations' in response_json:
+        for association in response_json['associations']:
+            disease_name = association['subject']['label']
+            disease_id = association['subject']['id']
+    else:
+        logging.warning("Warning: 'associations' key not found in response.")
+        return None, None
         
+    # ADDITIONAL STEP TO CHECK THE .json FILE
+    #with open('api_response.json', 'w') as json_file:
+    #    json.dump(response_json, json_file)
+    data_directory_path = os.path.join(os.getcwd(), 'drugapp', 'data')
+    json_file_path = os.path.join(data_directory_path, 'api_response.json')
+    os.makedirs(data_directory_path, exist_ok=True)
+    with open(json_file_path, 'w') as json_file:
+        json.dump(response_json, json_file)
+    logging.info(f"API response saved to {json_file_path}")
+
     return disease_name, disease_id
 
 
@@ -109,6 +173,24 @@ def get_edges_objects(r_out, r_in):
     obj_l = list()
     ref_l = list()
 
+    ## ADDITIONAL CODE
+    #biolink = 'https://api-biolink.monarchinitiative.org/api/association'
+    #response = requests.get(biolink, params=parameters)
+    #if response.status_code == 200:
+    #    response_json = response.json()
+    #    if 'associations' in response_json:
+    #
+    #        ## out edges: from/
+    #        r_out = requests.get('{}/from/{}'.format(biolink,node),params=parameters)
+    #    
+    #        # in edges: to/
+    #        r_in = requests.get('{}/to/{}'.format(biolink,node),params=parameters)
+    #
+    #    else:
+    #        print("Warning: 'associations' key not found in response.")
+    #else:
+    #    print(f"API call failed with status code {response.status_code}")
+
     # compose list of dictionaries
     for associations in [r_out.json()['associations'], r_in.json()['associations']]:
         for association in associations:
@@ -123,6 +205,16 @@ def get_edges_objects(r_out, r_in):
             else:
                 pub_l.append('NA')
             ref_l.append('|'.join(pub_l))
+
+    logging.info("Prepared Monarch API object responses.")
+    logging.info(f"Subjects list length: {len(sub_l)}")
+    logging.debug(f"Subjects sample: {sub_l[:2]}")
+    logging.info(f"Relations list length: {len(rel_l)}")
+    logging.debug(f"Relations sample: {rel_l[:2]}")
+    logging.info(f"Objects list length: {len(obj_l)}")
+    logging.debug(f"Objects sample: {obj_l[:2]}")
+    logging.info(f"References list length: {len(ref_l)}")
+    logging.debug(f"References sample: {ref_l[:2]}")
 
     return sub_l, rel_l, obj_l, ref_l
 
@@ -148,6 +240,10 @@ def get_edges(sub_l, rel_l, obj_l, ref_l, attribute='id'):
         ref = ref_l[i]
         edges.add((sub, rel, obj, ref))
 
+    logging.info(f"Generated edges set with {len(edges)} edges.")
+    sample_edges = list(edges)[:5]
+    logging.debug(f"Sample edges: {sample_edges}")
+
     return edges
 
 
@@ -159,8 +255,14 @@ def keep_edges(keep, new):
     :return: updated edges set
     """
 
+    logging.info(f"Before adding: keep set size = {len(keep)}, new set size = {len(new)}")
+
     for edge in new:
         keep.add(edge)
+
+    logging.info(f"After adding: keep set size = {len(keep)}")
+    sample_edges = list(keep)[:5]
+    logging.debug(f"Sample edges from the updated keep set: {sample_edges}")
 
     return keep
 
@@ -182,6 +284,9 @@ def keep_nodes(keep, edges, seed):
     :return: updated nodes set
     """
 
+    logging.info(f"Before filtering: keep set size = {len(keep)}")
+    initial_size = len(keep)
+
     for (sub, rel, obj, ref) in edges:
         if 'PMID' in sub or 'PMID' in obj:
             continue
@@ -197,6 +302,10 @@ def keep_nodes(keep, edges, seed):
             keep.add(sub)
         if obj not in seed:
             keep.add(obj)
+
+    logging.info(f"After filtering: keep set size = {len(keep)}; added {len(keep) - initial_size} new nodes")
+    sample_nodes = list(keep)[:5]
+    logging.debug(f"Sample nodes from the updated keep set: {sample_nodes}")
 
     return keep
 
@@ -219,11 +328,23 @@ def get_neighbours(seed):
             keepEdges = keep_edges(keepEdges, edges)
             keepNodes = keep_nodes(keepNodes, edges, seedNodes)
 
+        #except (ValueError, KeyError):
+        #    pass
+        #except:
+        #    print('error: {}'.format(sys.exc_info()[0]))
+        #    print(node)
         except (ValueError, KeyError):
-            pass
-        except:
-            print('error: {}'.format(sys.exc_info()[0]))
-            print(node)
+            logging.warning(f"Skipping node {node} due to ValueError or KeyError.")
+        except Exception as e:
+            logging.error(f"An error occurred for node {node}: {e}")
+
+    logging.info(f"Final keepNodes set size: {len(keepNodes)}")
+    sample_nodes = list(keepNodes)[:5]
+    logging.debug(f"Sample nodes from keepNodes set: {sample_nodes}")
+
+    logging.info(f"Final keepEdges set size: {len(keepEdges)}")
+    sample_edges = list(keepEdges)[:5]
+    logging.debug(f"Sample edges from keepEdges set: {sample_edges}")
 
     return keepNodes, keepEdges
 
@@ -241,6 +362,10 @@ def filter_edges(nodes, edges):
     for (start, pred, stop, ref) in edges:
         if {start, stop} <= nodes: # is {..} a subset of {..}
             keep.add((start, pred, stop, ref))
+
+    logging.info(f"Filtered edges set size: {len(keep)}")
+    sample_keep = list(keep)[:5]
+    logging.debug(f"Sample of filtered edges: {sample_keep}")
 
     return keep
 
@@ -273,6 +398,11 @@ def add_attributes(sub_l, rel_l, obj_l, edges):
                                refs)
                               )
                 break
+
+    logging.info(f"Metaedges set size: {len(metaedges)}")
+    sample_metaedges = list(metaedges)[:5]
+    logging.debug(f"Sample of metaedges: {sample_metaedges}")
+
     return metaedges
 
 
@@ -301,6 +431,10 @@ def keep_node_type(edges, seed, nodeType='ortho'):
             if obj not in seed:
                 keep.add(obj)
 
+    logging.info(f"Kept nodes set size: {len(keep)}")
+    sample_keep_nodes = list(keep)[:5]
+    logging.debug(f"Sample of kept nodes: {sample_keep_nodes}")
+
     return keep
 
 
@@ -327,6 +461,10 @@ def get_connections(nodes):
             print('error: {}'.format(sys.exc_info()[0]))
             print(node)
 
+    logging.info(f"Final edges set size: {len(keep)}")
+    sample_keep_edges = list(keep)[:5]
+    logging.debug(f"Sample of final kept edges: {sample_keep_edges}")
+
     return keep
 
 
@@ -339,6 +477,8 @@ def get_neighbours_list(seed_list):
     :return: neighbours list
     """
 
+    logging.info("Starting get_neighbours_list() function.")
+
     # print executing function
     print('\nThe function "get_neighbours_list()" is running. Its runtime may take some minutes. '
           'If you interrupt the process, you will lose all the nodes retrieved '
@@ -346,9 +486,14 @@ def get_neighbours_list(seed_list):
 
     # get first layer of neighbour nodes
     neighbours, relations = get_neighbours(seed_list)
+    neighbours_list = list(neighbours)
     print('\nFinished get_neighbours_list().\n')
 
-    return list(neighbours)
+    llogging.info(f"Neighbours list size: {len(neighbours_list)}")
+    sample_neighbours = neighbours_list[:5]
+    logging.debug(f"Sample of neighbours: {sample_neighbours}")
+
+    return neighbours_list
 
 
 def get_orthopheno_list(seed_list):
@@ -357,6 +502,8 @@ def get_orthopheno_list(seed_list):
     :param seed_list: gene list, where each gene is the identifier string like 'HGNC:4851'
     :return: orthopheno list
     """
+
+    logging.info("Starting get_orthopheno_list() function.")
 
     # print executing function
     print('\nThe function "get_orthopheno_list()" is running. Its runtime may take some hours. '
@@ -377,9 +524,14 @@ def get_orthopheno_list(seed_list):
 
     nodes = set()
     nodes.update(orthologs, phenotypes)
+    nodes_list = list(nodes)
     print('\nFinished get_orthopheno_list().\n')
 
-    return list(nodes)
+    logging.info(f"Orthopheno list size: {len(nodes_list)}")
+    sample_nodes = nodes_list[:5]
+    logging.debug(f"Sample of orthopheno nodes: {sample_nodes}")
+
+    return nodes_list
 
 
 def extract_edges(gene_list):
@@ -389,6 +541,8 @@ def extract_edges(gene_list):
     :param gene_list: gene list
     :return: edges (as tuples) set
     """
+
+    logging.info("Starting extract_edges() function with gene list.")
 
     # print executing function
     print('\nThe function "extract_edges()" is running. Its runtime may take some hours. '
@@ -402,6 +556,10 @@ def extract_edges(gene_list):
     network = get_connections(nodes)
     print('\nFinished extract_edges(). To save the retrieved Monarch edges use the function "print_network()".\n')
 
+    logging.info(f"Extracted network size: {len(network)}")
+    sample_network = list(network)[:5]
+    logging.debug(f"Sample of extracted network edges: {sample_network}")
+
     return network
 
 
@@ -411,15 +569,30 @@ def _print_network2(network, filename):
 
     # print output file
     path = os.getcwd() + '/monarch'
-    if not os.path.isdir(path): os.makedirs(path)
-    with open('{}/{}_v{}.csv'.format(path, filename, today), 'w') as f:
-        f.write(
-            'subject_id,subject_label,subject_uri,subject_category,relation_id,relation_label,relation_uri,object_id,object_label,object_uri,object_category,reference_id_list\n')
+    if not os.path.isdir(path):
+        os.makedirs(path)
+    #with open('{}/{}_v{}.csv'.format(path, filename, today), 'w') as f:
+    #    f.write(
+    #        'subject_id,subject_label,subject_uri,subject_category,relation_id,relation_label,relation_uri,object_id,object_label,object_uri,object_category,reference_id_list\n')
+    #    for edge in network:
+    #        edge = ['None' if t is None else '"{}"'.format(str(t)) for t in edge]
+    #        f.write('{}\n'.format(','.join(edge)))
+    file_path = f"{path}/{filename}_v{today}.csv"
+    with open(file_path, 'w') as f:
+        f.write('subject_id,subject_label,subject_uri,subject_category,relation_id,relation_label,relation_uri,object_id,object_label,object_uri,object_category,reference_id_list\n')
         for edge in network:
-            edge = ['None' if t is None else '"{}"'.format(str(t)) for t in edge]
-            f.write('{}\n'.format(','.join(edge)))
+            edge_str = ['None' if t is None else f'"{str(t)}"' for t in edge]
+            f.write(f"{','.join(edge_str)}\n")
 
-    return print("\nFile '{}/{}_v{}.csv' saved.".format(path, filename, today))
+    logging.info(f"Monarch network saved to CSV file: {file_path}")
+    sample_data = [','.join(['None' if t is None else f'"{str(t)}"' for t in edge]) for edge in network[:5]]
+    logging.debug("Sample data being saved to CSV:")
+    for line in sample_data:
+        logging.debug(line)
+    logging.debug(f"Number of edges saved: {len(network)}")
+
+    # commented out since the file is saved elsewhere in the function
+    #return print("\nFile '{}/{}_v{}.csv' saved.".format(path, filename, today))
 
 
 def print_network(network, filename):
@@ -458,12 +631,23 @@ def print_network(network, filename):
     df.drop(df[df['object_id'].str.contains('coriell', case=False)].index, inplace=True)
     df.drop(df[df['subject_id'].str.contains('coriell', case=False)].index, inplace=True)
 
-    # print output file
+    ## print output file
+    #path = os.getcwd() + '/monarch'
+    #if not os.path.isdir(path): os.makedirs(path)
+    #df.to_csv('{}/{}_v{}.csv'.format(path, filename, today), index=False)
     path = os.getcwd() + '/monarch'
-    if not os.path.isdir(path): os.makedirs(path)
-    df.to_csv('{}/{}_v{}.csv'.format(path, filename, today), index=False)
+    if not os.path.isdir(path):
+        os.makedirs(path)
+    file_path = f'{path}/{filename}_v{today}.csv'
+    df.to_csv(file_path, index=False)
 
-    return print("\nSaving Monarch edges at: '{}/{}_v{}.csv'...\n".format(path, filename, today))
+    logging.debug("Sample data from DataFrame being saved to CSV:")
+    sample_df = df.head(5).to_csv(index=False, line_terminator='\n')
+    logging.debug(sample_df)
+    logging.info(f"Monarch edges saved at: {file_path}")
+
+    # commented out since the file is saved elsewhere in the function
+    #return print("\nSaving Monarch edges at: '{}/{}_v{}.csv'...\n".format(path, filename, today))
 
 
 def print_nodes(nodes, filename):
@@ -476,11 +660,23 @@ def print_nodes(nodes, filename):
 
     # print output file
     path = os.getcwd() + '/monarch'
-    if not os.path.isdir(path): os.makedirs(path)
-    with open('{}/{}_v{}.csv'.format(path, filename, today), 'w') as f:
-        f.write('{}\n'.format('\n'.join(list(nodes))))
+    if not os.path.isdir(path):
+        os.makedirs(path)
+    #with open('{}/{}_v{}.csv'.format(path, filename, today), 'w') as f:
+    #    f.write('{}\n'.format('\n'.join(list(nodes))))
+    file_path = f'{path}/{filename}_v{today}.csv'
+    with open(file_path, 'w') as f:
+        f.write('\n'.join([str(node) for node in nodes]))
 
-    return print("\nFile '{}/{}_v{}.csv' saved.".format(path, filename, today))
+    logging.info(f"Nodes saved to CSV file: {file_path}")
+    sample_nodes = nodes[:5]
+    logging.debug("Sample nodes saved to CSV:")
+    for node in sample_nodes:
+        logging.debug(node)
+    logging.info(f"File '{file_path}' saved.")
+
+    # commented out since the file is saved elsewhere in the function
+    #return print("\nFile '{}/{}_v{}.csv' saved.".format(path, filename, today))
 
 
 def expand_edges(seed_list):
@@ -493,6 +689,8 @@ def expand_edges(seed_list):
     :return: edges set
     """
 
+    logging.info("Starting expand_edges() function.")
+
     # get 1shell list of nodes or neighbors
     neighbours, relations = get_neighbours(seed_list)
 
@@ -501,6 +699,12 @@ def expand_edges(seed_list):
 
     # get connections for network nodes
     network = get_connections(nodes)
+
+    logging.info(f"Expanded network contains {len(network)} edges.")
+    sample_edges = list(network)[:5]
+    logging.debug("Sample edges from expanded network:")
+    for edge in sample_edges:
+        logging.debug(edge)
 
     return network
 
@@ -516,6 +720,8 @@ def orthopheno_expand_edges(seed_list):
     :return: edges set
     """
 
+    logging.info("Starting orthopheno_expand_edges() function.")
+
     # get ortholog-phenotypes list
     orthophenoList = get_orthopheno_list(seed_list)
 
@@ -524,6 +730,12 @@ def orthopheno_expand_edges(seed_list):
 
     # get connections for network nodes
     network = get_connections(nodes)
+
+    logging.info(f"Orthopheno expanded network contains {len(network)} edges.")
+    sample_edges = list(network)[:5]
+    logging.debug("Sample edges from orthopheno expanded network:")
+    for edge in sample_edges:
+        logging.debug(edge)
 
     return network
 
@@ -721,18 +933,28 @@ def build_edges(edges_df, edges_fname):
 
     # save edges file
     df = pd.DataFrame(edges_l)
-    print('df',df.shape)
-    path = os.getcwd() + '/monarch'
-    df = df[['subject_id', 'property_id', 'object_id', 'reference_uri', 'reference_supporting_text', 'reference_date', \
-             'property_label', 'property_description', 'property_uri']]
-    df.fillna('NA').to_csv('{}/{}_v{}.csv'.format(path,edges_fname,today), index=False)
-
-    # print info
-    print('\n* This is the size of the edges file data structure: {}'.format(pd.DataFrame(edges_l).shape))
-    print('* These are the edges attributes: {}'.format(pd.DataFrame(edges_l).columns))
-    print('* This is the first record:\n{}'.format(pd.DataFrame(edges_l).head(1)))
-    print('\nThe Monarch network edges are built and saved at: {}/monarch_edges_v{}.csv\n'.format(path,today))
-    print('\nFinished build_edges().\n')
+    #print('df',df.shape)
+    #path = os.getcwd() + '/monarch'
+    #df = df[['subject_id', 'property_id', 'object_id', 'reference_uri', 'reference_supporting_text', 'reference_date', \
+    #         'property_label', 'property_description', 'property_uri']]
+    #df.fillna('NA').to_csv('{}/{}_v{}.csv'.format(path,edges_fname,today), index=False)
+    #print('\n* This is the size of the edges file data structure: {}'.format(pd.DataFrame(edges_l).shape))
+    #print('* These are the edges attributes: {}'.format(pd.DataFrame(edges_l).columns))
+    #print('* This is the first record:\n{}'.format(pd.DataFrame(edges_l).head(1)))
+    #print('\nThe Monarch network edges are built and saved at: {}/monarch_edges_v{}.csv\n'.format(path,today))
+    #print('\nFinished build_edges().\n')
+    logging.info("Edges DataFrame created for building network.")
+    logging.info(f"DataFrame size: {df.shape}")
+    logging.info(f"DataFrame columns: {df.columns.tolist()}")
+    sample_df = df.head(1)
+    logging.debug(f"Sample data from the DataFrame:\n{sample_df.to_string(index=False)}")
+    file_path = f'{path}/{edges_fname}_v{today}.csv'
+    df.fillna('NA').to_csv(file_path, index=False)
+    logging.info(f"Monarch network edges file has been built and saved.")
+    logging.info(f"File saved at: {file_path}")
+    logging.info(f"DataFrame size (rows, columns): {df.shape}")
+    logging.info(f"DataFrame columns: {df.columns.tolist()}")
+    logging.debug(f"First record in the DataFrame:\n{sample_df.to_string(index=False)}")
 
     return df
 
@@ -860,16 +1082,24 @@ def build_nodes(edges_df, nodes_fname):
     df = pd.DataFrame(nodes_l)
     df = df[['id', 'semantic_groups', 'uri', 'preflabel', 'name', 'synonyms', 'description']]
     path = os.getcwd() + '/monarch'
-    df.fillna('NA').to_csv('{}/{}_v{}.csv'.format(path,nodes_fname, today), index=False)
-
-    # print info
-    print('\n* This is the size of the nodes file data structure: {}'.format(pd.DataFrame(nodes_l).shape))
-    print('* These are the nodes attributes: {}'.format(pd.DataFrame(nodes_l).columns))
-    print('* This is the first record:\n{}'.format(pd.DataFrame(nodes_l).head(1)))
-    print('\nThe Monarch network nodes are built and saved at: {}/monarch_nodes_v{}.csv\n'.format(path,today))
-    print('\nFinished build_nodes().\n')
+    #df.fillna('NA').to_csv('{}/{}_v{}.csv'.format(path,nodes_fname, today), index=False)
+    file_path = f'{path}/{nodes_fname}_v{today}.csv'
+    df.fillna('NA').to_csv(file_path, index=False)
+    #print('\n* This is the size of the nodes file data structure: {}'.format(pd.DataFrame(nodes_l).shape))
+    #print('* These are the nodes attributes: {}'.format(pd.DataFrame(nodes_l).columns))
+    #print('* This is the first record:\n{}'.format(pd.DataFrame(nodes_l).head(1)))
+    #print('\nThe Monarch network nodes are built and saved at: {}/monarch_nodes_v{}.csv\n'.format(path,today))
+    #print('\nFinished build_nodes().\n')
+    logging.info("Nodes DataFrame created for building network.")
+    logging.info(f"DataFrame size: {df.shape}")
+    logging.info(f"DataFrame columns: {df.columns.tolist()}")
+    sample_df = df.head(1)
+    logging.debug(f"Sample data from the DataFrame:\n{sample_df.to_string(index=False)}")
+    logging.info(f"Monarch network nodes file has been built and saved.")
+    logging.info(f"File saved at: {file_path}")
 
     return df
+
 
 def get_symptoms_disease(disease_id, monarch_edges_csv, monarch_nodes_csv):
     """
@@ -887,11 +1117,19 @@ def get_symptoms_disease(disease_id, monarch_edges_csv, monarch_nodes_csv):
 
     # find all nodes that are one step away from disease and have as relation 'has phenotype' (='RO:0002200')
     df_symptoms = edges_df.loc[(edges_df['subject_id'] == disease_id) & (edges_df['property_id'] == 'RO:0002200')]
-    
     symptoms_id_lst = df_symptoms['object_id'].tolist()
+
     #get names of symptoms
     symptoms_name_lst = nodes_df.loc[nodes_df['id'].isin(symptoms_id_lst), 'preflabel'].to_list()
+
+    logging.info(f"Total number of symptoms found for disease ID {disease_id}: {len(symptoms_name_lst)}")
+    sample_symptoms = symptoms_name_lst[:5]
+    logging.info("Sample symptoms (or complete list if fewer than 5):")
+    for symptom in sample_symptoms:
+        logging.info(symptom)
+
     return symptoms_name_lst
+
 
 def symptom_list_specified_folder(input_folder = 'Huntington disease (2022-06-23)'):
     """
@@ -902,20 +1140,38 @@ def symptom_list_specified_folder(input_folder = 'Huntington disease (2022-06-23
     """
     date_str = input_folder[-11:-1] # get the date from the disease name
     date = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
+    logging.info(f"Processing folder: {input_folder} with date: {date}")
+
     #change directory to the folder
-    os.chdir(os.getcwd() +'/drugapp/data/' + input_folder)
+    #os.chdir(os.getcwd() +'/drugapp/data/' + input_folder)
+    new_path = os.getcwd() +'/drugapp/data/' + input_folder
+    os.chdir(new_path)
+    logging.info(f"Changed directory to: {new_path}")
 
     # find the disease ID that was previously written in a txt file
-    with open(os.getcwd()+"/disease_id.txt", 'r') as file:
+    #with open(os.getcwd()+"/disease_id.txt", 'r') as file:
+    #    file_text = file.read()
+    #    input_number, disease_id, disease_name = file_text.split(';')
+    disease_id_file_path = os.path.join(new_path, "disease_id.txt")
+    with open(disease_id_file_path, 'r') as file:
         file_text = file.read()
         input_number, disease_id, disease_name = file_text.split(';')
+    logging.info(f"Read disease information: ID={disease_id}, Name={disease_name}, Input Number={input_number}")
 
     monarch_fname_edges = './monarch/monarch_edges_disease_v{}.csv'.format(date)
     monarch_fname_nodes = './monarch/monarch_nodes_disease_v{}.csv'.format(date)
     
     # get list of symptoms for disease to ask user
     symptoms_name_lst=get_symptoms_disease(disease_id, monarch_fname_edges, monarch_fname_nodes)
+
+    logging.info(f"Symptoms list size for {disease_name}: {len(symptoms_name_lst)}")
+    sample_symptoms = symptoms_name_lst[:5]
+    logging.info("Sample symptoms (or complete list if fewer than 5):")
+    for symptom in sample_symptoms:
+        logging.info(symptom)
+
     return symptoms_name_lst, date, input_number
+
 
 def symptom_list_today():
     """
@@ -924,21 +1180,35 @@ def symptom_list_today():
     :return: symptom name list, date of creation of files required, disease name
     """
     date=today
+    logging.info(f"Generating symptom list for today: {date}")
     
     # find the disease ID that was previously written in a txt file
-    with open(os.getcwd()+"/disease_id.txt", 'r') as file:
+    #with open(os.getcwd()+"/disease_id.txt", 'r') as file:
+    #    file_text = file.read()
+    #    input_number, disease_id, disease_name = file_text.split(';')
+    disease_id_file_path = os.path.join(os.getcwd(), "disease_id.txt")
+    with open(disease_id_file_path, 'r') as file:
         file_text = file.read()
         input_number, disease_id, disease_name = file_text.split(';')
+    logging.info(f"Read disease information for today: ID={disease_id}, Name={disease_name}, Input Number={input_number}")
 
-    disease_name_date = disease_name+' ({})'.format(date)
-    
+    #disease_name_date = disease_name+' ({})'.format(date)
+    disease_name_date = f"{disease_name} ({date})"
+
     monarch_fname_edges = './monarch/monarch_edges_disease_v{}.csv'.format(date)
     monarch_fname_nodes = './monarch/monarch_nodes_disease_v{}.csv'.format(date)
     
     # get list of symptoms for disease to ask user
     symptoms_name_lst=get_symptoms_disease(disease_id, monarch_fname_edges, monarch_fname_nodes)
+
+    logging.info(f"Symptoms list size for {disease_name_date}: {len(symptoms_name_lst)}")
+    sample_symptoms = symptoms_name_lst[:5]
+    logging.info("Sample symptoms (or complete list if fewer than 5):")
+    for symptom in sample_symptoms:
+        logging.info(symptom)
     
     return symptoms_name_lst, date, disease_name_date
+
 
 def run_monarch(input_number = '143100'):
     """
@@ -950,13 +1220,18 @@ def run_monarch(input_number = '143100'):
     
     # turn input number into input ID
     input_id = 'OMIM:'+input_number
+    # NOTE: change so that it can take different kinds of URI
         
     # get the disease name (str)
     disease_name, disease_id = get_disease_name_id(disease_input_ID = input_id)
     
     # make folder for HD and change cwd to this folder
     new_path = os.getcwd() + '/drugapp/data/'+disease_name+' ({})'.format(today)
-    os.makedirs(new_path)
+
+    # check if directory exists, if not create it, then change directory to it
+    #os.makedirs(new_path)
+    if not os.path.exists(new_path):
+        os.makedirs(new_path)
     os.chdir(new_path)
 
     # save disease_ID as text file
@@ -979,6 +1254,7 @@ def run_monarch(input_number = '143100'):
     monarch_connections = read_connections(file)
     build_edges(monarch_connections, edges_fname = 'monarch_edges_disease')
     build_nodes(monarch_connections, nodes_fname = 'monarch_nodes_disease')
+
 
 def run_monarch_symptom(input_symptom, date):
     """
@@ -1008,7 +1284,7 @@ def run_monarch_symptom(input_symptom, date):
     file = 'monarch_orthopeno_network_symptom_v{}.csv'.format(today)
     monarch_connections = read_connections(file)
     build_edges(monarch_connections, edges_fname='monarch_edges_symptom')
-    build_nodes(monarch_connections, nodes_fname = 'monarch_nodes_symptom')    
+    build_nodes(monarch_connections, nodes_fname = 'monarch_nodes_symptom')
 
 
 

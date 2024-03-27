@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <!-- Favicon for iOS Safari and Classic Browsers -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
+    
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
@@ -16,6 +21,7 @@
         <title>Drug Repurposing</title>
     {% endif %}
 </head>
+
 <body>
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
@@ -57,6 +63,13 @@
         </div>
       </div>
     </main>
+
+    <footer class="container">
+      <p class="text-muted small">
+        Font "Source Code Pro" by Adobe, licensed under the <a href="https://openfontlicense.org" target="_blank">SIL Open Font License</a>.<br>
+        Icon image by Niccolò Bianchi. © [2024] All rights reserved.
+      </p>
+    </footer>
 
 
     <!-- Optional JavaScript -->

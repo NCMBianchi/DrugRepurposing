@@ -1,0 +1,117 @@
+@font-face {
+  font-family: 'Source Code Pro';
+  src: url('/static/fonts/SourceCodePro-Regular.woff2') format('woff2'),
+       url('/static/fonts/SourceCodePro-Regular.woff') format('woff'),
+       url('/static/fonts/SourceCodePro-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Source Code Pro';
+  src: url('/static/fonts/SourceCodePro-SemiBold.woff2') format('woff2'),
+       url('/static/fonts/SourceCodePro-SemiBold.woff') format('woff'),
+       url('/static/fonts/SourceCodePro-SemiBold.ttf') format('truetype');
+  font-weight: 600; /* SemiBold */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  src: url('/static/fonts/NotoSans-Regular.woff2') format('woff2'),
+       url('/static/fonts/NotoSans-Regular.woff') format('woff'),
+       url('/static/fonts/NotoSans-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  src: url('/static/fonts/NotoSans-SemiBold.woff2') format('woff2'),
+       url('/static/fonts/NotoSans-SemiBold.woff') format('woff'),
+       url('/static/fonts/NotoSans-SemiBold.ttf') format('truetype');
+  font-weight: 600; /* SemiBold */
+  font-style: normal;
+}
+
+
+
+body {
+  background: white;
+  color: #07304C;
+  margin-top: 5rem;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+  color: #07304C;
+}
+
+.bg-steel {
+  background-color: #FFE8B6;
+}
+
+.site-header .navbar-nav .nav-link {
+  color: white;
+}
+
+.site-header .navbar-nav .nav-link:hover {
+  color: ##FEBE76;
+}
+
+.site-header .navbar-nav .nav-link.active {
+  font-weight: 500;
+}
+
+.content-section {
+  background: #ffffff;
+  padding: 10px 20px;
+  border: 1px solid #dddddd;
+  border-radius: 3px;
+  margin-bottom: 20px;
+}
+
+
+
+.btn {
+
+  color: #07304C;
+  border: none;
+  outline: none;
+  border-radius: 3px;
+  cursor: pointer;
+
+}
+
+.btn:hover {
+  background: #8EE4AF;
+  color: #07304C;
+}
+
+.mystyle {
+    font-size: 11pt; 
+    font-family: Arial;
+    border-collapse: collapse; 
+    text-align: left;
+    border: 1px solid #dddddd;
+	border-radius: 3px;
+
+}
+
+.mystyle thead th {
+  background-color: #F8F8F8;
+  color: #05386B;
+}
+
+.mystyle td, th {
+    padding: 5px;
+    border-bottom: 1px solid #ddd;
+}
+
+
+
+
+.mystyle tr:hover {
+    cursor: pointer;
+    background-color: #F8F8F8
+}

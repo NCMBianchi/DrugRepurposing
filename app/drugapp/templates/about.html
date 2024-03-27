@@ -1,13 +1,14 @@
 {% extends "layout.html" %}
 {% block content %}
     <h1>About Page</h1>
-	A Masters project by Carmen Reep.<br><br>
-	This drug repurposing app finds candidate compounds for a symptom of a specific rare disease.<br>
-	For this, it uses a workflow that has four main steps:<br><br>
+	A <a href="https://github.com/NCMBianchi/DrugRepurposing" target="_blank">MSc project</a> by Niccolò Bianchi, based on the works of Carmen Reep (<a href="https://github.com/carmenreep/DrugRepurposing" target="_blank">DrugRepurposing</a>) and Nuria Queralt Rosinach (<a href="https://github.com/SuLab/bioknowledge-reviewer" target="_blank">BioKnowledge reviewer</a>).<br><br>
+	This updated drug repurposing app finds candidate compounds for a symptom of a specific rare disease –emphasising the role of negative associations.<br>
+	For this, it uses a workflow that has five main steps:<br><br>
 	<ol>
-	<li>Creation of an RDF knowledge graph by selecting a subnetwork from Monarch Initiative, adding drugs using the DGIdb database, creating drug-drug edges based on drug compound structure similarity.<br><br>
+	<li>Creation of an RDF knowledge graph by selecting a subnetwork from Monarch Initiative's new v3 API (i.e. <a href="https://api.monarchinitiative.org/v3/docs" target="_blank">FastAPI</a>), adding drugs using the DGIdb database, creating drug-drug edges based on drug compound structure similarity.<br><br>
 	<li>Graph embedding using RDF2Vec.<br><br>
 	<li>Creation of edge representations (=training/test data) by fusing drug and gene feature vectors.<br><br>
+	<li>Training a <b><i>[SURE machine learning model in order to assess information on negative links between edges, to account for information regarding associations that are known to be absent]</b></i>.<br><br>
 	<li>Training an XGBoost machine learning model which is evaluated using repeated stratified 10-fold cross validation, where the best model is used to predict unknown drug-gene interactions of interest.
 	</ol>
 {% endblock content %}
