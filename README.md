@@ -1,7 +1,13 @@
 # DrugRepurposing
 
+I am currently making changes to this tool due to changes to Monarch API, which is an integral part of the tool's pipeline. The tool is <b>currently not working</b> neither in the old version (support to the old Biolink API was discontinued on March 27th 2024, although it was even planned to be discontinued since March 20th 2023 –so it had one extra year of life), nor the new one as some minor changes are still required.
+
+Moreover, the new API <b>no longer supports OMIM</b> as an input seed for queries, only their own URIs (<i>e.g.</i> MONDO).
+
+![README_image-1](https://github.com/NCMBianchi/DrugRepurposing/assets/111352723/3ae0e0a8-7367-4ec8-b804-3b0633272d83)
+
+## Original Description by Carmen Reep
 Automated drug repurposing workflow for rare diseases using Flask.
-A Masters project by Carmen Reep.
 
 This drug repurposing app finds candidate compounds for a symptom of a specific rare disease.
 For this, it uses a workflow that has four main steps:
@@ -26,8 +32,11 @@ On every page (home, symptom, prediction), we added the option to select a previ
 ### Docker
 Build docker image: <code>docker build --tag drugapp .</code>
 
+This might take a while (5-20min depending on your internet connection) due to the entire image size being almost 8GB due to some very big python packages.
+
 Run the image: <code>docker run -d -p 5000:5000 --name drugapp drugapp</code>
-### Without docker
-Download the `app` folder, then run the Flask app with <code>python run.py</code>. 
+
+### <s>Without docker</s> (no longer suggested: requires out-of-date python packages)
+<s>Download the `app` folder, then run the Flask app with <code>python run.py</code>. </s>
 
 
