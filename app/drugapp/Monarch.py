@@ -9,7 +9,7 @@ Last modified on Wed March 27 10:30:00 2024
 
 import requests
 import sys,os
-import json. # to save the latest .json returned by the API
+import json  # to save the latest .json returned by the API
 import datetime
 import logging  # to check for running variables
 import pandas as pd
@@ -25,7 +25,7 @@ curr_year = int(str(today)[:4])
 # logging configuration
 base_data_directory = os.path.join(os.getcwd(), 'drugapp', 'data')
 log_directory = os.path.join(base_data_directory, 'logs')
-log_filename = datetime.now().strftime('monarch_app_%Y-%m-%d.log')
+log_filename = datetime.datetime.now().strftime('monarch_app_%Y-%m-%d.log')
 log_file_path = os.path.join(log_directory, log_filename)
 os.makedirs(log_directory, exist_ok=True)
 logging.basicConfig(level=logging.DEBUG,
@@ -134,7 +134,7 @@ def get_disease_name_id(disease_input_ID = 'OMIM:143100'):
     #        disease_id = association['subject']['id']
     #else:
     #    print("Warning: 'associations' key not found in response.")
-        if 'associations' in response_json:
+    if 'associations' in response_json:
         for association in response_json['associations']:
             disease_name = association['subject']['label']
             disease_id = association['subject']['id']
@@ -489,7 +489,7 @@ def get_neighbours_list(seed_list):
     neighbours_list = list(neighbours)
     print('\nFinished get_neighbours_list().\n')
 
-    llogging.info(f"Neighbours list size: {len(neighbours_list)}")
+    logging.info(f"Neighbours list size: {len(neighbours_list)}")
     sample_neighbours = neighbours_list[:5]
     logging.debug(f"Sample of neighbours: {sample_neighbours}")
 
@@ -1210,7 +1210,8 @@ def symptom_list_today():
     return symptoms_name_lst, date, disease_name_date
 
 
-def run_monarch(input_number = '143100'):
+#def run_monarch(input_number = '143100'):
+def run_monarch(input_id = 'MONDO:0007739'):
     """
     This function runs the whole Monarch script and saves nodes and edges files.
 
@@ -1218,9 +1219,9 @@ def run_monarch(input_number = '143100'):
     :return: nodes and edges files in /monarch folder
     """
     
-    # turn input number into input ID
-    input_id = 'OMIM:'+input_number
-    # NOTE: change so that it can take different kinds of URI
+    ## turn input number into input ID
+    #input_id = 'OMIM:'+input_number
+    # NOTE: changed so that it can take different kinds of URI
         
     # get the disease name (str)
     disease_name, disease_id = get_disease_name_id(disease_input_ID = input_id)
