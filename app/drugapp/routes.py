@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, url_for, request, session,redirect
 from drugapp import app
-from drugapp.forms import Symptoms, MIMPhenoType
+from drugapp.forms import Symptoms, URIphenotype
 from drugapp.Monarch import *
 from drugapp.DGIdb import *
 from drugapp.drugsimilarity import *
@@ -66,9 +66,9 @@ def config():
     path_sorted = sorted(Path(path).iterdir(), key=os.path.getmtime, reverse=True) # make sure latest folder is at the top
     folderlist = [os.path.basename(d) for d in path_sorted] # make sure folders in 'data' are shown, which are the diseases
     
-    form = MIMPhenoType()
+    form = URIphenotype()
     if form.validate_on_submit(): # if a mim number is inserted
-        input_number = form.MIMPhenoType.data
+        input_number = form.URIphenotype.data
         run_monarch(input_number)
         symptoms_name_lst, date, diseasename = symptom_list_today()
         session['symptoms_name_lst'] = symptoms_name_lst

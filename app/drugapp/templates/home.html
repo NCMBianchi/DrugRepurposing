@@ -22,17 +22,17 @@ If the disease of interest not in list, or a newer version is wanted, create a n
 				<h3>Create new disease graph</h3>
                 (Note: this may take a while. Please be patient.)
 				<div class="form-group">
-                    {{ form.MIMPhenoType.label(class="form-control-label") }}
+                    {{ form.URIphenotype.label(class="form-control-label") }}
 
-                    {% if form.MIMPhenoType.errors %}
-                        {{ form.MIMPhenoType(class="form-control form-control-lg is-invalid") }}
+                    {% if form.URIphenotype.errors %}
+                        {{ form.URIphenotype(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form.MIMPhenoType.errors %}
+                            {% for error in form.URIphenotype.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.MIMPhenoType(class="form-control form-control-lg") }}
+                        {{ form.URIphenotype(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
           </fieldset>

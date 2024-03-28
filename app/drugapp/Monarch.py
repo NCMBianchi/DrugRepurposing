@@ -103,23 +103,26 @@ def hit_monarch_api(node = 'HGNC:4851', rows = 2000):
     return r_out, r_in
 
 
-def get_disease_name_id(disease_input_ID = 'OMIM:143100'):
+def get_disease_name_id(disease_input_ID = 'MONDO:0007739'):
     """
-    This function finds the disease name and disease ID of the input OMIM ID.
+    This function finds the disease name and disease ID of the input URI ID.
     It returns two strings, name and ID respectively.
 
     :param disease_ID: The input ID of the disease
     :return: two strings, name and ID respectively
     """
     # api address
-    biolink = 'https://api-biolink.monarchinitiative.org/api/association'
+    biolink = 'https://api-v3.monarchinitiative.org/v3/api/association'
     
     # parameters
     parameters = {'fl_excludes_evidence': False, 'rows': 1}
     ## out edges: from/
     #r_out_disease = requests.get('{}/from/{}'.format(biolink,disease_input_ID),params=parameters)
 
-    request_url = f'{biolink}/from/{disease_input_ID}'
+    disease_input_ID_new = disease_input_ID.split(':')
+    disease_input_ID_call = disease_input_ID_new[0]+'%3A'+disease_input_ID_new[1]
+    #request_url = f'{biolink}/from/{disease_input_ID}'  #biolink
+    request_url = f'{biolink}?subject={disease_input_ID_call}'  #V3
     logging.info(f"Making API call to: {request_url}")
     r_out_disease = requests.get(request_url, params=parameters)
     #for association in r_out_disease.json()['associations']:
@@ -134,12 +137,11 @@ def get_disease_name_id(disease_input_ID = 'OMIM:143100'):
     #        disease_id = association['subject']['id']
     #else:
     #    print("Warning: 'associations' key not found in response.")
-    if 'associations' in response_json:
-        for association in response_json['associations']:
-            disease_name = association['subject']['label']
-            disease_id = association['subject']['id']
+    if 'items' in response_json and response_json['items']:
+        disease_name = response_json['items'][0]['subject_label']
+        disease_id = response_json['items'][0]['subject']
     else:
-        logging.warning("Warning: 'associations' key not found in response.")
+        logging.warning("Warning: 'associations' key not found in response or no associations present.")
         return None, None
         
     # ADDITIONAL STEP TO CHECK THE .json FILE
@@ -1237,7 +1239,8 @@ def run_monarch(input_id = 'MONDO:0007739'):
 
     # save disease_ID as text file
     text_file = open(os.getcwd()+"/disease_id.txt", "w")
-    text_file.write(input_number + ';' + disease_id + ';'+ disease_name)
+    #text_file.write(input_number + ';' + disease_id + ';'+ disease_name)
+    text_file.write(disease_id + ';'+ disease_name)
     text_file.close()
     
     #build monarch network
