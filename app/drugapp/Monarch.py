@@ -12,6 +12,7 @@ import sys,os
 import json  # to save the latest .json returned by the API
 import datetime
 import logging  # to check for running variables
+import inspect  # to chec for running functions
 import pandas as pd
 from biothings_client import get_client
 from tqdm import tqdm
@@ -36,13 +37,19 @@ logging.basicConfig(level=logging.DEBUG,
                         logging.StreamHandler()  # Enables logging to stderr.
                     ])
 
+def current_function_name():
+    return inspect.currentframe().f_back.f_code.co_name
 
-def read_connections(filename):
+
+
+def read_connections(filename):  #bioknowledgeReviewer
     """
     This function reads monarch_connections CSV file.
     :param filename: complete path to the monarch connections csv file string
     :return: monarch edges dataframe
     """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
 
     # monarch network
     path = os.getcwd() + '/monarch'
@@ -62,7 +69,7 @@ def read_connections(filename):
 
 ## RETRIEVE SUBNETWORK FROM MONARCH KNOWLEDGE GRAPH
 
-def hit_monarch_api(node = 'HGNC:4851', rows = 2000):
+def hit_monarch_api(node = 'HGNC:4851', rows = 2000):  #bioknowledgeReviewer
     """
     This function performs api calls to Monarch to retrieve out and in edges from a query node.
     It retrieves entities plus associations via the BioLink API service.
@@ -75,6 +82,8 @@ def hit_monarch_api(node = 'HGNC:4851', rows = 2000):
     :param rows: the maximum number of results to return (integer). Default: 2000.
     :return: two api response objects: 'out' and 'in' response objects, in this order.
     """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
     
     # API address
     #biolink = 'https://api-biolink.monarchinitiative.org/api/association'  #biolink
@@ -111,6 +120,9 @@ def get_disease_name_id(disease_input_ID = 'MONDO:0007739'):
     :param disease_ID: The input ID of the disease
     :return: two strings, name and ID respectively
     """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
+
     # api address
     biolink = 'https://api-v3.monarchinitiative.org/v3/api/association'
     
@@ -157,7 +169,7 @@ def get_disease_name_id(disease_input_ID = 'MONDO:0007739'):
     return disease_name, disease_id
 
 
-def get_edges_objects(r_out, r_in):
+def get_edges_objects(r_out, r_in):  #bioknowledgeReviewer
     """
     This function prepares the api object responses from Monarch.
     It returns four lists, one for subjects, relations, objects, and references.
@@ -168,6 +180,8 @@ def get_edges_objects(r_out, r_in):
     :param r_in: BioLink API 'in' response object
     :return: subjects, relations, objects and references lists (in this order)
     """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
 
     # variables
     sub_l = list()
@@ -194,16 +208,17 @@ def get_edges_objects(r_out, r_in):
     #    print(f"API call failed with status code {response.status_code}")
 
     # compose list of dictionaries
-    for associations in [r_out.json()['associations'], r_in.json()['associations']]:
+    #for associations in [r_out.json()['associations'], r_in.json()['associations']]:
+    for associations in [r_out.json()['items'], r_in.json()['items']]:
         for association in associations:
             pub_l = list()
-            sub_l.append(association['subject'])
-            rel_l.append(association['relation'])
-            obj_l.append(association['object'])
+            sub_l.append({'id': association['subject'], 'label': association['subject_label']})
+            rel_l.append({'id': association['predicate'], 'label': association['predicate']}) #######relation -> only label given
+            obj_l.append({'id': association['object'], 'label': association['object_label']})
             # add references to each association as a list of strings
             if association['publications']:
                 for publication in association['publications']:
-                    pub_l.append(publication['id'])
+                    pub_l.append(publication)#['id']) -> only id is given in new version
             else:
                 pub_l.append('NA')
             ref_l.append('|'.join(pub_l))
@@ -221,7 +236,7 @@ def get_edges_objects(r_out, r_in):
     return sub_l, rel_l, obj_l, ref_l
 
 
-def get_edges(sub_l, rel_l, obj_l, ref_l, attribute='id'):
+def get_edges(sub_l, rel_l, obj_l, ref_l, attribute='id'):  #bioknowledgeReviewer
     """
     This function builds edges using a user-specified attribute for each node.
     It returns a set of edges, where edges are tuples.
@@ -233,6 +248,9 @@ def get_edges(sub_l, rel_l, obj_l, ref_l, attribute='id'):
     :param attribute: object attribute, default 'id'
     :return: edges (as tuples) set
     """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
+
     edges = set()
     # compose tuple
     for i in range(len(sub_l)):
@@ -249,13 +267,15 @@ def get_edges(sub_l, rel_l, obj_l, ref_l, attribute='id'):
     return edges
 
 
-def keep_edges(keep, new):
+def keep_edges(keep, new):  #bioknowledgeReviewer
     """
     This function adds edges from a new set to a keep set.
     :param keep: edges set
     :param new: edges set
     :return: updated edges set
     """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
 
     logging.info(f"Before adding: keep set size = {len(keep)}, new set size = {len(new)}")
 
@@ -269,7 +289,7 @@ def keep_edges(keep, new):
     return keep
 
 
-def keep_nodes(keep, edges, seed):
+def keep_nodes(keep, edges, seed):  #bioknowledgeReviewer
     """
     This function collects nodes from the edges that are not in the nodes query list to keep nodes set.
     It filters out: PMID nodes, and nodes related by provenance:
@@ -286,6 +306,8 @@ def keep_nodes(keep, edges, seed):
     :return: updated nodes set
     """
 
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
+
     logging.info(f"Before filtering: keep set size = {len(keep)}")
     initial_size = len(keep)
 
@@ -296,14 +318,15 @@ def keep_nodes(keep, edges, seed):
             rel = 'None'
         if 'dc:source' in rel:
             continue
-        if 'IAO:0000136' in rel:  # is about
+        if 'IAO:0000136' in rel:  # is about (?)
             continue
-        if 'IAO:0000142' in rel:  # mentions
+        if 'IAO:0000142' in rel:  # mentions (?)
             continue
         if sub not in seed:
             keep.add(sub)
         if obj not in seed:
             keep.add(obj)
+    # https://bioportal.bioontology.org/ontologies/IAO
 
     logging.info(f"After filtering: keep set size = {len(keep)}; added {len(keep) - initial_size} new nodes")
     sample_nodes = list(keep)[:5]
@@ -312,12 +335,14 @@ def keep_nodes(keep, edges, seed):
     return keep
 
 
-def get_neighbours(seed):
+def get_neighbours(seed):  #bioknowledgeReviewer
     """
     This function gets the first layer of neighbours and relations.
     :param seed: query nodes list
     :return: nodes set, edges set (in this order)
     """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}. This might take a while.")
 
     keepNodes = set()
     keepEdges = set()
@@ -335,7 +360,7 @@ def get_neighbours(seed):
         #except:
         #    print('error: {}'.format(sys.exc_info()[0]))
         #    print(node)
-        except (ValueError, KeyError):
+        except (ValueError, KeyError):  # (!!!) where it seems to break
             logging.warning(f"Skipping node {node} due to ValueError or KeyError.")
         except Exception as e:
             logging.error(f"An error occurred for node {node}: {e}")
@@ -351,7 +376,7 @@ def get_neighbours(seed):
     return keepNodes, keepEdges
 
 
-def filter_edges(nodes, edges):
+def filter_edges(nodes, edges):  #bioknowledgeReviewer
     """
     This function filters down edges with both nodes in a nodes list.
 
@@ -359,6 +384,9 @@ def filter_edges(nodes, edges):
     :param edges: edges set
     :return: filtered edges set
     """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
+
     nodes = set(nodes)
     keep = set()
     for (start, pred, stop, ref) in edges:
@@ -372,7 +400,7 @@ def filter_edges(nodes, edges):
     return keep
 
 
-def add_attributes(sub_l, rel_l, obj_l, edges):
+def add_attributes(sub_l, rel_l, obj_l, edges):  #bioknowledgeReviewer
     """
     This function adds 'label', 'iri', 'category' attribute to each entity in the edge.
     :param sub_l: subjects (object) list
@@ -382,21 +410,23 @@ def add_attributes(sub_l, rel_l, obj_l, edges):
     :return: metaedges set
     """
 
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
+
     metaedges = set()
     for (sub_id, rel_id, obj_id, refs) in edges:
         for i in range(len(sub_l)):
             if sub_l[i]['id'] == sub_id and rel_l[i]['id'] == rel_id and obj_l[i]['id'] == obj_id:
                 metaedges.add((sub_l[i]['id'],
                                sub_l[i]['label'],
-                               sub_l[i]['iri'],
+                               #sub_l[i]['iri'],  # temporary removed for testing
                                sub_l[i]['category'][0], # add [0] because category is in a list
                                rel_l[i]['id'],
                                rel_l[i]['label'],
-                               rel_l[i]['iri'],
+                               #rel_l[i]['iri'],
                                obj_l[i]['id'],
                                obj_l[i]['label'],
-                               obj_l[i]['iri'],
-                               obj_l[i]['category'][0],
+                               #obj_l[i]['iri'],
+                               #obj_l[i]['category'][0],
                                refs)
                               )
                 break
@@ -408,7 +438,7 @@ def add_attributes(sub_l, rel_l, obj_l, edges):
     return metaedges
 
 
-def keep_node_type(edges, seed, nodeType='ortho'):
+def keep_node_type(edges, seed, nodeType='ortho'):  #bioknowledgeReviewer
     """
     This function keeps specific node types for objects in edges.
 
@@ -419,9 +449,12 @@ def keep_node_type(edges, seed, nodeType='ortho'):
     :return: nodes set
     """
 
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
+
     propertyList = ['RO:HOM0000017', 'RO:HOM0000020']
     if nodeType == 'pheno':
         propertyList = ['RO:0002200', 'RO:0002607', 'RO:0002326', 'GENO:0000840']
+    # https://github.com/monarch-initiative/dipper/issues/378 apparently they no longer are in OWL
 
     keep = set()
     for (sub, rel, obj, ref) in edges:
@@ -440,12 +473,14 @@ def keep_node_type(edges, seed, nodeType='ortho'):
     return keep
 
 
-def get_connections(nodes):
+def get_connections(nodes):  #bioknowledgeReviewer
     """
     This function returns associations retrieved from Monarch among a list of query nodes.
     :param nodes: the query nodes list
     :return: edges set
-    """""
+    """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}. This might take a while.")
 
     keep = set()
     for node in tqdm(nodes):
@@ -461,7 +496,7 @@ def get_connections(nodes):
             pass
         except:
             print('error: {}'.format(sys.exc_info()[0]))
-            print(node)
+            #print(node)
 
     logging.info(f"Final edges set size: {len(keep)}")
     sample_keep_edges = list(keep)[:5]
@@ -472,14 +507,14 @@ def get_connections(nodes):
 
 # NETWORK MANAGEMENT FUNCTIONS
 
-def get_neighbours_list(seed_list):
+def get_neighbours_list(seed_list):  #bioknowledgeReviewer
     """
     This function returns the first explicit layer of neighbours from a list of query nodes.
     :param seed_list: biomedical entities list, where each entity is the identifier string like 'HGNC:4851'
     :return: neighbours list
     """
 
-    logging.info("Starting get_neighbours_list() function.")
+    logging.info(f"NOW RUNNING: {current_function_name()}. This might take a while.")
 
     # print executing function
     print('\nThe function "get_neighbours_list()" is running. Its runtime may take some minutes. '
@@ -498,14 +533,14 @@ def get_neighbours_list(seed_list):
     return neighbours_list
 
 
-def get_orthopheno_list(seed_list):
+def get_orthopheno_list(seed_list):  #bioknowledgeReviewer
     """
     This function returns orthologs-phenotypes nodes in ortho-pheno relationships for a list of query genes.
     :param seed_list: gene list, where each gene is the identifier string like 'HGNC:4851'
     :return: orthopheno list
     """
 
-    logging.info("Starting get_orthopheno_list() function.")
+    logging.info(f"NOW RUNNING: {current_function_name()}. This might take a while.")
 
     # print executing function
     print('\nThe function "get_orthopheno_list()" is running. Its runtime may take some hours. '
@@ -536,7 +571,7 @@ def get_orthopheno_list(seed_list):
     return nodes_list
 
 
-def extract_edges(gene_list):
+def extract_edges(gene_list):  #bioknowledgeReviewer
     """
     This function returns the Monarch network from a list of query nodes. It retrieves connectivity from Monarch, i.e. \
     edges from Monarch between query nodes.
@@ -544,7 +579,7 @@ def extract_edges(gene_list):
     :return: edges (as tuples) set
     """
 
-    logging.info("Starting extract_edges() function with gene list.")
+    logging.info(f"NOW RUNNING: {current_function_name()}. This might take a while.")
 
     # print executing function
     print('\nThe function "extract_edges()" is running. Its runtime may take some hours. '
@@ -565,9 +600,11 @@ def extract_edges(gene_list):
     return network
 
 
-def _print_network2(network, filename):
+def _print_network2(network, filename):  #bioknowledgeReviewer
     """This function saves the Monarch expanded network into a CSV file. this function save connections file format into
     get-monarch-connections/"""
+
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
 
     # print output file
     path = os.getcwd() + '/monarch'
@@ -597,7 +634,7 @@ def _print_network2(network, filename):
     #return print("\nFile '{}/{}_v{}.csv' saved.".format(path, filename, today))
 
 
-def print_network(network, filename):
+def print_network(network, filename):  #bioknowledgeReviewer
     """
     This function saves the Monarch network into a CSV file. It only prints connections file format only.
     :param network: monarch edges dataframe
@@ -605,33 +642,36 @@ def print_network(network, filename):
     :return: None object
     """
 
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
+
     # transform set of tuples to list of dictionaries
     edges = list()
     for tuple in network:
         row = dict()
         row['subject_id'] = tuple[0]
         row['subject_label'] = tuple[1]
-        row['subject_uri'] = tuple[2]
+        #row['subject_uri'] = tuple[2]  # temporary removed for testing
         row['subject_category'] = tuple[3]
         row['relation_id'] = tuple[4]
         row['relation_label'] = tuple[5]
-        row['relation_uri'] = tuple[6]
+        #row['relation_uri'] = tuple[6]
         row['object_id'] = tuple[7]
         row['object_label'] = tuple[8]
-        row['object_uri'] = tuple[9]
-        row['object_category'] = tuple[10]
+        #row['object_uri'] = tuple[9]
+        #row['object_category'] = tuple[10]
         row['reference_id_list'] = tuple[11]
         edges.append(row)
     
     df=pd.DataFrame(edges).fillna('None')
     
-    # change every 'model' node that does not have 'Coriell' as prefix to genotype
-    df.loc[(df['subject_category'] == 'model') &  (df['subject_id'].str.contains('zfin|mgi|flybase|wormbase', case=False)), 'subject_category'] = 'genotype'
-    df.loc[(df['object_category'] == 'model') &  (df['object_id'].str.contains('zfin|mgi|flybase|wormbase', case=False)), 'object_category'] = 'genotype'
-
-    # remove every row that has Coriell in either subject or object id
-    df.drop(df[df['object_id'].str.contains('coriell', case=False)].index, inplace=True)
-    df.drop(df[df['subject_id'].str.contains('coriell', case=False)].index, inplace=True)
+    ## change every 'model' node that does not have 'Coriell' as prefix to genotype
+    #df.loc[(df['subject_category'] == 'model') &  (df['subject_id'].str.contains('zfin|mgi|flybase|wormbase', case=False)), 'subject_category'] = 'genotype'
+    #df.loc[(df['object_category'] == 'model') &  (df['object_id'].str.contains('zfin|mgi|flybase|wormbase', case=False)), 'object_category'] = 'genotype'
+    #
+    ## remove every row that has Coriell in either subject or object id
+    #df.drop(df[df['object_id'].str.contains('coriell', case=False)].index, inplace=True)
+    #df.drop(df[df['subject_id'].str.contains('coriell', case=False)].index, inplace=True)
+    # (!!!) Removed this section for testing
 
     ## print output file
     #path = os.getcwd() + '/monarch'
@@ -652,13 +692,15 @@ def print_network(network, filename):
     #return print("\nSaving Monarch edges at: '{}/{}_v{}.csv'...\n".format(path, filename, today))
 
 
-def print_nodes(nodes, filename):
+def print_nodes(nodes, filename):  #bioknowledgeReviewer
     """
     This function saves Monarch nodes into a CSV file.
     :param nodes: nodes list
     :param filename: file name without path and extension, e.g. 'monarch_nodes'
     :return: None object
     """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
 
     # print output file
     path = os.getcwd() + '/monarch'
@@ -668,7 +710,8 @@ def print_nodes(nodes, filename):
     #    f.write('{}\n'.format('\n'.join(list(nodes))))
     file_path = f'{path}/{filename}_v{today}.csv'
     with open(file_path, 'w') as f:
-        f.write('\n'.join([str(node) for node in nodes]))
+        #f.write('\n'.join([str(node) for node in nodes]))
+        f.write('{}\n'.format('\n'.join(list(nodes))))  # modified for testing
 
     logging.info(f"Nodes saved to CSV file: {file_path}")
     sample_nodes = nodes[:5]
@@ -681,7 +724,7 @@ def print_nodes(nodes, filename):
     #return print("\nFile '{}/{}_v{}.csv' saved.".format(path, filename, today))
 
 
-def expand_edges(seed_list):
+def expand_edges(seed_list):  #bioknowledgeReviewer
     """
     This function returns the Monarch network expanded with the first layer of neighbors from a list of query nodes.
     This function builds monarch 1shell network.
@@ -691,7 +734,7 @@ def expand_edges(seed_list):
     :return: edges set
     """
 
-    logging.info("Starting expand_edges() function.")
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
 
     # get 1shell list of nodes or neighbors
     neighbours, relations = get_neighbours(seed_list)
@@ -711,7 +754,7 @@ def expand_edges(seed_list):
     return network
 
 
-def orthopheno_expand_edges(seed_list):
+def orthopheno_expand_edges(seed_list):  #bioknowledgeReviewer
     """
     This function returns the Monarch network expanded with the orthologs and the ortholog associated phenotypes from
      a list of query nodes.
@@ -722,7 +765,7 @@ def orthopheno_expand_edges(seed_list):
     :return: edges set
     """
 
-    logging.info("Starting orthopheno_expand_edges() function.")
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
 
     # get ortholog-phenotypes list
     orthophenoList = get_orthopheno_list(seed_list)
@@ -744,14 +787,15 @@ def orthopheno_expand_edges(seed_list):
 
 # BUILD NETWORK
 
-def build_edges(edges_df, edges_fname):
+def build_edges(edges_df, edges_fname):  #bioknowledgeReviewer
     """
     This function builds the edges network with the graph schema.
     :param edges_df: network dataframe from the extract_edges() function
     :return: graph edges object as a list of dictionaries, where every dictionary is a record
     """
 
-    print('\nThe function "build_edges()" is running...')
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
+
     ## variables
     # if edges_df is not a df, it is a set of tuples, then convert to a df
     if isinstance(edges_df, set):
@@ -760,40 +804,72 @@ def build_edges(edges_df, edges_fname):
             record = dict()
             record['subject_id'] = tuple[0]
             record['subject_label'] = tuple[1]
-            record['subject_uri'] = tuple[2]
-            record['subject_category'] = tuple[3]
-            record['relation_id'] = tuple[4]
-            record['relation_label'] = tuple[5]
-            record['relation_uri'] = tuple[6]
-            record['object_id'] = tuple[7]
-            record['object_label'] = tuple[8]
-            record['object_uri'] = tuple[9]
-            record['object_category'] = tuple[10]
-            record['reference_id_list'] = tuple[11]
+            #record['subject_uri'] = tuple[2]  # removed for testing
+            #record['subject_category'] = tuple[3]
+            #record['relation_id'] = tuple[4]  # tuple id modified according to previous steps
+            record['relation_id'] = tuple[2]
+            #record['relation_label'] = tuple[5]
+            record['relation_label'] = tuple[3]
+            #record['relation_uri'] = tuple[6]
+            #record['object_id'] = tuple[7]
+            record['object_id'] = tuple[4]
+            #record['object_label'] = tuple[8]
+            record['object_label'] = tuple[5]
+            #record['object_uri'] = tuple[9]
+            #record['object_category'] = tuple[10]
+            #record['reference_id_list'] = tuple[11]
+            record['reference_id_list'] = tuple[6]
             connections_l.append(record)
 
         edges_df = pd.DataFrame(connections_l)
 
 
+    ## generate static variable: uriPrefixes_dct (url references)  # PREVIOUS VERSION
+    #uriPrefixes_dct = {
+    #    'pmid': 'https://www.ncbi.nlm.nih.gov/pubmed/',  
+    #    'react': 'http://reactome.org/content/detail/',  
+    #    'zfin': 'http://zfin.org/',
+    #    'go_ref': 'http://purl.obolibrary.org/obo/go/references/',  
+    #    'mgi': 'http://www.informatics.jax.org/accession/MGI:',  
+    #    'flybase': 'http://flybase.org/reports/',
+    #    'wormbase': 'http://www.wormbase.org/resources/paper/',
+    #    'hpo': 'http://compbio.charite.de/hpoweb/showterm?id=HP:',
+    #    'isbn-10': 'ISBN-10:',
+    #    'isbn-13': 'ISBN-13:',
+    #    'mondo': 'http://purl.obolibrary.org/obo/MONDO_',  
+    #    'rgd': 'https://rgd.mcw.edu/rgdweb/report/reference/main.html?id=', 
+    #    'omim': 'http://omim.org/entry/',  
+    #    'sgd_ref': 'https://db.yeastgenome.org/reference/',  
+    #    'genereviews': 'https://www.ncbi.nlm.nih.gov/books/',  
+    #    'omia': 'http://omia.angis.org.au/',  
+    #    'hgnc': 'https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:', 
+    #}
+
     # generate static variable: uriPrefixes_dct (url references)
     uriPrefixes_dct = {
-        'pmid': 'https://www.ncbi.nlm.nih.gov/pubmed/',  
-        'react': 'http://reactome.org/content/detail/',  
+        'pmid': 'https://www.ncbi.nlm.nih.gov/pubmed/',  # 'http://identifiers.org/pubmed/',
+        'react': 'http://reactome.org/content/detail/',  # 'http://identifiers.org/reactome/',
         'zfin': 'http://zfin.org/',
-        'go_ref': 'http://purl.obolibrary.org/obo/go/references/',  
-        'mgi': 'http://www.informatics.jax.org/accession/MGI:',  
+        'go_ref': 'http://purl.obolibrary.org/obo/go/references/',  # 'http://identifiers.org/go.ref/GO_REF:',
+        'mgi': 'http://www.informatics.jax.org/accession/MGI:',  # 'http://identifiers.org/mgi/MGI:'
         'flybase': 'http://flybase.org/reports/',
         'wormbase': 'http://www.wormbase.org/resources/paper/',
         'hpo': 'http://compbio.charite.de/hpoweb/showterm?id=HP:',
         'isbn-10': 'ISBN-10:',
         'isbn-13': 'ISBN-13:',
-        'mondo': 'http://purl.obolibrary.org/obo/MONDO_',  
-        'rgd': 'https://rgd.mcw.edu/rgdweb/report/reference/main.html?id=', 
-        'omim': 'http://omim.org/entry/',  
-        'sgd_ref': 'https://db.yeastgenome.org/reference/',  
-        'genereviews': 'https://www.ncbi.nlm.nih.gov/books/',  
-        'omia': 'http://omia.angis.org.au/',  
-        'hgnc': 'https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:', 
+        #'isbn-10': 'https://www.wikidata.org/wiki/Special:BookSources/',
+        #'isbn-13': 'https://www.wikidata.org/wiki/Special:BookSources/'
+        'mondo': 'http://purl.obolibrary.org/obo/MONDO_',  # http://purl.obolibrary.org/obo/MONDO_0009026
+        'rgd': 'https://rgd.mcw.edu/rgdweb/report/reference/main.html?id=', \
+        # https://rgd.mcw.edu/rgdweb/report/reference/main.html?id=1600115
+        'omim': 'http://omim.org/entry/',  # http://omim.org/entry/61527
+        'sgd_ref': 'https://db.yeastgenome.org/reference/',  # https://db.yeastgenome.org/reference/S000124036
+        'genereviews': 'https://www.ncbi.nlm.nih.gov/books/',  # https://www.ncbi.nlm.nih.gov/books/NBK1526/
+        'omia': 'http://omia.angis.org.au/',  # http://omia.angis.org.au/000214/9913
+        'hgnc': 'https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:', \
+        # https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:7132
+        'orpha': 'Go to ORPHANET web site (https://www.orpha.net/) and in the search field introduce the Orpha number: '
+                 'ORPHA:' # no entry in monarch for that edge
     }
 
     # generate static variable: dbPrefixes_dct (source/database references)
@@ -878,48 +954,50 @@ def build_edges(edges_df, edges_fname):
         rel_label = 'NA' if edge.relation_label is None or str(edge.relation_label) == 'nan'  or str(edge.relation_label) == 'None' else edge.relation_label
         rel_uri = 'NA' if edge.relation_uri is None or str(edge.relation_uri) == 'nan'  or str(edge.relation_uri) == 'None' else edge.relation_uri
         rel_def = 'NA'
-        
-        # make sure there are no 'NA' relation ids
-        if rel_id == 'NA':
-            if edge.object_category == 'genotype': # if object is genotype, relation is 'has genotype'
-                rel_id = 'GENO:0000222'
-                rel_label = 'has_genotype'
-                rel_uri = 'http://purl.obolibrary.org/obo/GENO_0000222'
-            else:
-                rel_id = 'RO:0002610' # else (gene, model objects), relation is 'correlated with'
-                rel_label = 'correlated with'
-                rel_uri = 'http://purl.obolibrary.org/obo/RO_0002610'
-        
-        # change every 'contributes to' to 'contributes to condition'
-        if rel_id == 'RO:0002326':
-            rel_id = 'RO:0003304'
-            rel_label = 'contributes to condition'
-            rel_uri = 'http://purl.obolibrary.org/obo/RO_0003304'
-        
-        # change every 'is causal germline mutation in' and 'is causal germline mutation partially giving rise to' and 'pathogenic for condition' to 'causes condition'
-        if rel_id == 'RO:0004013' or rel_id == 'RO:0004016' or rel_id == 'GENO:0000840':
-            rel_id = 'RO:0003303'
-            rel_label = 'causes condition'
-            rel_uri = 'http://purl.obolibrary.org/obo/RO_0003303'
+        # "or str(edge.subject_id) == 'None'" section missing in the original code, but I doubt it's a problem
 
-        # change every 'in orthology relationship with' to 'in 1 to 1 orthology relationship with'
-        if rel_id == 'RO:HOM0000017':
-            rel_id = 'RO:HOM0000020'
-            rel_label = 'in 1 to 1 orthology relationship with'
-            rel_uri = 'http://purl.obolibrary.org/obo/RO_HOM0000020'  
-        
-        # if 'genotype' -->'has phenotype' --> 'disease', change 'has phenotype' to 'has role in modelling'
-        if edge.subject_category == 'genotype' and edge.object_category == 'disease' and rel_id == 'RO:0002200':
-            rel_id = 'RO:0003301'
-            rel_label = 'has role in modeling'
-            rel_uri = 'http://purl.obolibrary.org/obo/RO_0003301'
-        
-        # change every 'is reference allele of' to 'is allele of'
-        if rel_id == 'GENO:0000610':
-            rel_id = 'GENO:0000408'
-            rel_label = 'is_allele_of'
-            rel_uri = 'http://purl.obolibrary.org/obo/GENO_0000408'
-        
+        ## make sure there are no 'NA' relation ids
+        #if rel_id == 'NA':
+        #    if edge.object_category == 'genotype': # if object is genotype, relation is 'has genotype'
+        #        rel_id = 'GENO:0000222'
+        #        rel_label = 'has_genotype'
+        #        rel_uri = 'http://purl.obolibrary.org/obo/GENO_0000222'
+        #    else:
+        #        rel_id = 'RO:0002610' # else (gene, model objects), relation is 'correlated with'
+        #        rel_label = 'correlated with'
+        #        rel_uri = 'http://purl.obolibrary.org/obo/RO_0002610'
+        #
+        ## change every 'contributes to' to 'contributes to condition'
+        #if rel_id == 'RO:0002326':
+        #    rel_id = 'RO:0003304'
+        #    rel_label = 'contributes to condition'
+        #    rel_uri = 'http://purl.obolibrary.org/obo/RO_0003304'
+        #
+        ## change every 'is causal germline mutation in' and 'is causal germline mutation partially giving rise to' and 'pathogenic for condition' to 'causes condition'
+        #if rel_id == 'RO:0004013' or rel_id == 'RO:0004016' or rel_id == 'GENO:0000840':
+        #    rel_id = 'RO:0003303'
+        #    rel_label = 'causes condition'
+        #    rel_uri = 'http://purl.obolibrary.org/obo/RO_0003303'
+        #
+        ## change every 'in orthology relationship with' to 'in 1 to 1 orthology relationship with'
+        #if rel_id == 'RO:HOM0000017':
+        #    rel_id = 'RO:HOM0000020'
+        #    rel_label = 'in 1 to 1 orthology relationship with'
+        #    rel_uri = 'http://purl.obolibrary.org/obo/RO_HOM0000020'  
+        #
+        ## if 'genotype' -->'has phenotype' --> 'disease', change 'has phenotype' to 'has role in modelling'
+        #if edge.subject_category == 'genotype' and edge.object_category == 'disease' and rel_id == 'RO:0002200':
+        #    rel_id = 'RO:0003301'
+        #    rel_label = 'has role in modeling'
+        #    rel_uri = 'http://purl.obolibrary.org/obo/RO_0003301'
+        #
+        ## change every 'is reference allele of' to 'is allele of'
+        #if rel_id == 'GENO:0000610':
+        #    rel_id = 'GENO:0000408'
+        #    rel_label = 'is_allele_of'
+        #    rel_uri = 'http://purl.obolibrary.org/obo/GENO_0000408'
+        # (!!!) whole section removed for testing
+
         # build the data structure = list of edges as list of dict, where a dict is an edge
         edge = dict()
         edge['subject_id'] = sub_id
@@ -937,9 +1015,9 @@ def build_edges(edges_df, edges_fname):
     df = pd.DataFrame(edges_l)
     #print('df',df.shape)
     #path = os.getcwd() + '/monarch'
-    #df = df[['subject_id', 'property_id', 'object_id', 'reference_uri', 'reference_supporting_text', 'reference_date', \
-    #         'property_label', 'property_description', 'property_uri']]
-    #df.fillna('NA').to_csv('{}/{}_v{}.csv'.format(path,edges_fname,today), index=False)
+    df = df[['subject_id', 'property_id', 'object_id', 'reference_uri', 'reference_supporting_text', 'reference_date', \
+             'property_label', 'property_description', 'property_uri']]
+    df.fillna('NA').to_csv('{}/{}_v{}.csv'.format(path,edges_fname,today), index=False)
     #print('\n* This is the size of the edges file data structure: {}'.format(pd.DataFrame(edges_l).shape))
     #print('* These are the edges attributes: {}'.format(pd.DataFrame(edges_l).columns))
     #print('* This is the first record:\n{}'.format(pd.DataFrame(edges_l).head(1)))
@@ -958,17 +1036,19 @@ def build_edges(edges_df, edges_fname):
     logging.info(f"DataFrame columns: {df.columns.tolist()}")
     logging.debug(f"First record in the DataFrame:\n{sample_df.to_string(index=False)}")
 
-    return df
+    #return df   # check if required down the line to be in df format
+    return edges_l  # in the original bioknowledge reviewer
 
 
-def build_nodes(edges_df, nodes_fname):
+def build_nodes(edges_df, nodes_fname):  #bioknowledgeReviewer
     """
     This function builds the nodes network with the graph schema.
     :param edges_df: network dataframe from the extract_edges() function
     :return: graph nodes object as a list of dictionaries, where every dictionary is a record
     """
 
-    print('\nThe function "build_nodes()" is running...')
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
+
     # build semantic groups dictionary
     # collide concepts in a concept dict
     concept_dct = dict()
@@ -980,76 +1060,150 @@ def build_nodes(edges_df, nodes_fname):
             record = dict()
             record['subject_id'] = tuple[0]
             record['subject_label'] = tuple[1]
-            record['subject_uri'] = tuple[2]
-            record['subject_category'] = tuple[3]
-            record['relation_id'] = tuple[4]
-            record['relation_label'] = tuple[5]
-            record['relation_uri'] = tuple[6]
-            record['object_id'] = tuple[7]
-            record['object_label'] = tuple[8]
-            record['object_uri'] = tuple[9]
-            record['object_category'] = tuple[10]
-            record['reference_id_list'] = tuple[11]
+            #record['subject_uri'] = tuple[2]
+            #record['subject_category'] = tuple[3]
+            #record['relation_id'] = tuple[4]
+            record['relation_id'] = tuple[2]
+            record['relation_label'] = tuple[3]
+            #record['relation_label'] = tuple[5]
+            #record['relation_uri'] = tuple[6]
+            #record['object_id'] = tuple[7]
+            record['object_id'] = tuple[4]
+            record['object_label'] = tuple[5]
+            #record['object_label'] = tuple[8]
+            #record['object_uri'] = tuple[9]
+            #record['object_category'] = tuple[10]
+            #record['reference_id_list'] = tuple[11]
+            record['reference_id_list'] = tuple[6]
             connections_l.append(record)
 
         edges_df = pd.DataFrame(connections_l)
 
     for edge in edges_df.itertuples():
-        sid = edge.subject_id 
-        oid = edge.object_id 
+        sid = edge.subject_id #fields[0]
+        oid = edge.object_id #fields[4]
         concept_dct[sid] = {}
         concept_dct[oid] = {}
     print('Number of concepts: {}'.format(len(concept_dct.keys())))
 
+    ## build concept attributes dict: id integration of sub and obj IDs in a common data structure
+    #concept_dct = dict()
+    #
+    ## read edges from variable
+    #for edge in edges_df.itertuples():
+    #    #fields = list(edge_tuple)
+    #    # id: integration of sub and obj IDs in a unique data structure
+    #    sid = edge.subject_id 
+    #    slab = edge.subject_label 
+    #    sgroup = edge.subject_category
+    #    suri = edge.subject_uri
+    #    oid = edge.object_id 
+    #    olab = edge.object_label 
+    #    ogroup = edge.object_category
+    #    ouri = edge.object_uri
+    #    
+    #    # if 'genotype' -->'is allele of' --> 'gene', change 'genotype' to 'variant'
+    #    if sgroup == 'genotype' and ogroup == 'gene' and edge.relation_id == 'GENO:0000408':
+    #        sgroup = 'variant'
+    #    
+    #    # build the concept data structure
+    #    concept_dct[sid] = {'preflabel': slab,
+    #                        #'name': 'NA',
+    #                        'semantic_groups': sgroup,
+    #                        'uri': suri,
+    #                        'synonyms': 'NA', 
+    #                        'description': 'NA'}
+    #    concept_dct[oid] = {'preflabel': olab,
+    #                        #'name': 'NA',
+    #                        'semantic_groups': ogroup,
+    #                        'uri': ouri,
+    #                        'synonyms': 'NA', 
+    #                        'description': 'NA'}
+    #
+    ## biothings: annotate name,synonyms,description to genes
+    #print('\nAdding BioThings annotation: name, synonyms, description...')
+    ## input: (preflabel) symbol,alias
+    #symbols = list()
+    #for concept in concept_dct:
+    #    if isinstance(concept_dct[concept]['semantic_groups'], list):
+    #        for label in concept_dct[concept]['semantic_groups']:
+    #            if 'gene' in label:
+    #                symbols.append(concept_dct[concept]['preflabel'])
+    #    else:
+    #        if 'gene' in concept_dct[concept]['semantic_groups']:
+    #            symbols.append(concept_dct[concept]['preflabel'])
+    #
+    #print('symbols:', len(symbols))
+    # (!!!) removed for testing, substituted with original below
+
+        # list of concept prefixes with dict
+    conceptPrefix_dct = dict()
+    for concept in concept_dct:
+        conceptPrefix_dct[concept.split(':')[0]] = 1
+    print('Number of nodes CURIEs: {}'.format(len(conceptPrefix_dct.keys())))
+    print('List of nodes CURIEs: {}'.format(conceptPrefix_dct.keys()))
+
+    # build conceptPrefix2semantic dict
+    conceptPrefix2semantic_dct = dict()
+    for prefix in conceptPrefix_dct:
+        prefix = prefix.lower()
+        if 'variant' in prefix:
+            conceptPrefix2semantic_dct[prefix] = 'VARI'
+        elif 'phenotype' in prefix or 'mondo' in prefix or 'omim' in prefix or 'doid' in prefix or 'mesh' in prefix or 'hp' in prefix or 'mp' in prefix or 'fbcv' in prefix or 'fbbt' in prefix or 'zp' in prefix or 'apo' in prefix or 'trait' in prefix:
+            conceptPrefix2semantic_dct[prefix] = 'DISO'
+        elif 'gene' in prefix or 'hgnc' in prefix or 'ensembl' in prefix or 'mgi' in prefix or 'flybase' in prefix or 'wormbase' in prefix or 'xenbase' in prefix or 'zfin' in prefix or 'rgd' in prefix or 'sgd' in prefix:
+            conceptPrefix2semantic_dct[prefix] = 'GENE'
+        elif 'react' in prefix or 'kegg-path' in prefix or 'go' in prefix:
+            conceptPrefix2semantic_dct[prefix] = 'PHYS'
+        elif 'uberon' in prefix or 'cl' in prefix:
+            conceptPrefix2semantic_dct[prefix] = 'ANAT'
+        elif 'geno' in prefix or 'coriell' in prefix or 'monarch' in prefix or 'mmrrc' in prefix or '' in prefix \
+                or 'bnode' in prefix:
+            conceptPrefix2semantic_dct[prefix] = 'GENO'
+        else:
+            conceptPrefix2semantic_dct[prefix] = 'CONC'
 
     # build concept attributes dict: id integration of sub and obj IDs in a common data structure
     concept_dct = dict()
-
+    # read edges from file
+    #header = 1
+    ##for row in open('../monarch/1shell-animal-hgnc/get-monarch-connections/monarch_connections.tsv').readlines():
+    #for row in open('{}'.format(csv_path)).readlines():
+    #    if header:
+    #        header = 0
+    #        continue
+    #    fields = row.strip('\n').split('\t')
     # read edges from variable
     for edge in edges_df.itertuples():
         #fields = list(edge_tuple)
         # id: integration of sub and obj IDs in a unique data structure
-        sid = edge.subject_id 
-        slab = edge.subject_label 
-        sgroup = edge.subject_category
-        suri = edge.subject_uri
-        oid = edge.object_id 
-        olab = edge.object_label 
-        ogroup = edge.object_category
-        ouri = edge.object_uri
-        
-        # if 'genotype' -->'is allele of' --> 'gene', change 'genotype' to 'variant'
-        if sgroup == 'genotype' and ogroup == 'gene' and edge.relation_id == 'GENO:0000408':
-            sgroup = 'variant'
-        
+        sid = edge.subject_id #fields[0]
+        slab = edge.subject_label #fields[1]
+        oid = edge.object_id #fields[4]
+        olab = edge.object_label #fields[5]
         # build the concept data structure
         concept_dct[sid] = {'preflabel': slab,
-                            #'name': 'NA',
-                            'semantic_groups': sgroup,
-                            'uri': suri,
-                            'synonyms': 'NA', 
-                            'description': 'NA'}
+                            'semantic_groups': conceptPrefix2semantic_dct.get(sid.split(':')[0].lower(), 'CONC'),
+                            'synonyms': 'NA', 'description': 'NA'}
         concept_dct[oid] = {'preflabel': olab,
-                            #'name': 'NA',
-                            'semantic_groups': ogroup,
-                            'uri': ouri,
-                            'synonyms': 'NA', 
-                            'description': 'NA'}
+                            'semantic_groups': conceptPrefix2semantic_dct.get(oid.split(':')[0].lower(), 'CONC'),
+                            'synonyms': 'NA', 'description': 'NA'}
 
+    # build graph schema network nodes data structure and save nodes file
     # biothings: annotate name,synonyms,description to genes
-    print('\nAdding BioThings annotation: name, synonyms, description...')
+    print('\nAdding BioThings annotation: gene name, synonyms, description...')
     # input: (preflabel) symbol,alias
     symbols = list()
     for concept in concept_dct:
         if isinstance(concept_dct[concept]['semantic_groups'], list):
             for label in concept_dct[concept]['semantic_groups']:
-                if 'gene' in label:
+                if 'GENE' in label:
                     symbols.append(concept_dct[concept]['preflabel'])
         else:
-            if 'gene' in concept_dct[concept]['semantic_groups']:
+            if 'GENE' in concept_dct[concept]['semantic_groups']:
                 symbols.append(concept_dct[concept]['preflabel'])
-    
     print('symbols:', len(symbols))
+    # original code above since previous (!!!) comment
 
     # query biothings
     mg = get_client('gene')
@@ -1100,7 +1254,8 @@ def build_nodes(edges_df, nodes_fname):
     logging.info(f"Monarch network nodes file has been built and saved.")
     logging.info(f"File saved at: {file_path}")
 
-    return df
+    #return df   # check if required down the line to be in df format
+    return nodes_l  # in the original bioknowledge reviewer
 
 
 def get_symptoms_disease(disease_id, monarch_edges_csv, monarch_nodes_csv):
@@ -1111,6 +1266,9 @@ def get_symptoms_disease(disease_id, monarch_edges_csv, monarch_nodes_csv):
     :param monarch_nodes_csv: name of the nodes csv file from Monarch
     :return: a list of symptom names
     """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}. This might take a while.")
+
     # open csv file
     fname_edges = monarch_edges_csv
     fname_nodes = monarch_nodes_csv
@@ -1140,6 +1298,9 @@ def symptom_list_specified_folder(input_folder = 'Huntington disease (2022-06-23
     :param input_folder: The input folder of the disease
     :return: symptom name list
     """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
+
     date_str = input_folder[-11:-1] # get the date from the disease name
     date = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
     logging.info(f"Processing folder: {input_folder} with date: {date}")
@@ -1181,6 +1342,9 @@ def symptom_list_today():
     that same day.
     :return: symptom name list, date of creation of files required, disease name
     """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
+
     date=today
     logging.info(f"Generating symptom list for today: {date}")
     
@@ -1220,6 +1384,8 @@ def run_monarch(input_id = 'MONDO:0007739'):
     :param input_number: The input phenotype MIM number of the disease
     :return: nodes and edges files in /monarch folder
     """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
     
     ## turn input number into input ID
     #input_id = 'OMIM:'+input_number
@@ -1268,6 +1434,8 @@ def run_monarch_symptom(input_symptom, date):
     :param input_symptom: The input symptom
     :return: nodes and edges files in /monarch folder
     """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}")
 
     # turn input symptom name into ID
     monarch_fname_nodes = './monarch/monarch_nodes_disease_v{}.csv'.format(date)

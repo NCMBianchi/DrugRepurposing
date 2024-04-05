@@ -39,4 +39,10 @@ Run the image: <code>docker run -d -p 5000:5000 --name drugapp drugapp</code>
 ### <s>Without docker</s> (no longer suggested: requires out-of-date python packages)
 <s>Download the `app` folder, then run the Flask app with <code>python run.py</code>. </s>
 
+## Aknowledgements
+### LUMC and LIACS (NL)
+[Carmen Reep](https://www.researchgate.net/profile/Carmen-Reep), [Núria Queralt-Rosinach](https://www.researchgate.net/scientific-contributions/Nuria-Queralt-Rosinach-2198951627), [Katy J. Wolstencroft](https://www.researchgate.net/profile/Katy-Wolstencroft), [Armel Lefebvre](https://0-scholar-google-com.brum.beds.ac.uk/citations?user=O363fEMAAAAJ&hl=en), [Marco Spruit](https://scholar.google.com/citations?user=GFvyyeAAAAAJ), [Mireia Palou Tort](https://nl.linkedin.com/in/mireia-palou-tort-295909198)
+
+### Politecnico di Milano (IT)
+[Rosario M. Piro](https://scholar.google.com/citations?user=HuNyLrcAAAAJ)
 
