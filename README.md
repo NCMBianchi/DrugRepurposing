@@ -6,6 +6,12 @@ Moreover, the new API <b>no longer supports OMIM</b> as an input seed for querie
 
 ![README_image-1](https://github.com/NCMBianchi/DrugRepurposing/assets/111352723/3ae0e0a8-7367-4ec8-b804-3b0633272d83)
 
+The tool is currently still not working: function <bi>get_neighbours()</bi> needs some changes in order to output two items per row instead of just one, which breaks the code down the line. Here's a flowchart of the ongoing issue:
+
+![routes py   Monarch py (1)](https://github.com/NCMBianchi/DrugRepurposing/assets/111352723/269b4edf-a106-4ec1-8053-fd8f80a16007)
+
+An extra function <bi>run_monarch_mock()</bi> was added to bypass a first step that might have been broken, but in the end the faulty function above still cause issue down the line.
+
 ## Original Description by Carmen Reep
 Automated drug repurposing workflow for rare diseases using Flask.
 
