@@ -1,0 +1,310 @@
+subject_id,property_id,object_id,reference_uri,reference_supporting_text,reference_date,property_label,property_description,property_uri
+FlyBase:FBal0231851,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/31965876,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+WormBase:WBGene00019613,RO:0002434,WormBase:WBGene00017968,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00016700,RO:0002434,WormBase:WBGene00009897,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+MONDO:0007088,RO:0002200,HP:0001300,http://purl.obolibrary.org/obo/MONDO_0007088,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+HGNC:620,RO:HOM0000020,WormBase:WBGene00000149,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+WormBase:WBGene00016700,RO:0002434,WormBase:WBGene00017968,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00022743,RO:0002434,WormBase:WBGene00015841,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00016700,RO:0002434,WormBase:WBGene00019613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+MONDO:0007088,RO:0002331,REACT:R-HSA-445989,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+WormBase:WBGene00008627,RO:0002434,WormBase:WBGene00009897,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00011530,RO:0002434,WormBase:WBGene00009897,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNPIndividual:18952,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+dbSNP:rs7412,RO:0002200,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+HGNC:620,RO:0002331,REACT:R-HSA-879415,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+WormBase:WBGene00019613,RO:0002434,WormBase:WBGene00011530,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNPIndividual:10264,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+ClinVarVariant:599628,GENO:0000841,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,likely_pathogenic_for_condition,NA,http://purl.obolibrary.org/obo/GENO_0000841
+HGNC:9052,RO:0003304,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,contributes to condition,NA,http://purl.obolibrary.org/obo/RO_0003304
+HGNC:7876,RO:0003304,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,contributes to condition,NA,http://purl.obolibrary.org/obo/RO_0003304
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10205,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+MONDO:0007088,RO:0002200,HP:0002511,http://purl.obolibrary.org/obo/MONDO_0007088,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+HGNC:620,RO:0002331,REACT:R-HSA-444473,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+ClinVarVariant:18088,GENO:0000418,HGNC:620,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_affected_feature,NA,http://purl.obolibrary.org/obo/GENO_0000418
+HGNC:620,RO:0002331,REACT:R-HSA-9660826,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+ClinVarVariant:599608,GENO:0000841,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,likely_pathogenic_for_condition,NA,http://purl.obolibrary.org/obo/GENO_0000841
+dbSNPIndividual:10263,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+WormBase:WBGene00006620,RO:0002434,WormBase:WBGene00000149,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+HGNC:620,RO:0002200,HP:0410054,https://www.ncbi.nlm.nih.gov/pubmed/17031479,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+MONDO:0007088,RO:0002331,REACT:R-HSA-933542,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+WormBase:WBGene00009897,RO:0002434,WormBase:WBGene00008627,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10265,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+ClinVarVariant:18089,GENO:0000418,HGNC:620,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_affected_feature,NA,http://purl.obolibrary.org/obo/GENO_0000418
+dbSNPIndividual:10277,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+WormBase:WBGene00019970,RO:0002434,WormBase:WBGene00011530,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNPIndividual:10224,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+MONDO:0007088,RO:0002331,REACT:R-HSA-432720,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+HGNC:4886,RO:0003304,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,contributes to condition,NA,http://purl.obolibrary.org/obo/RO_0003304
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10079,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+dbSNPIndividual:10208,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+HGNC:620,RO:0002200,HP:0002511,http://purl.obolibrary.org/obo/MONDO_0007088,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+dbSNPIndividual:10262,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+HGNC:620,RO:0002331,REACT:R-HSA-933542,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+ClinVarVariant:10,RO:0003303,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+HGNC:620,RO:0002200,HP:0002423,http://purl.obolibrary.org/obo/MONDO_0007088,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+HGNC:7218,RO:HOM0000020,WormBase:WBGene00015841,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+WormBase:WBGene00015841,RO:0002434,WormBase:WBGene00019613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00008627,RO:0002434,WormBase:WBGene00022743,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+HGNC:613,RO:0002434,HGNC:7,"https://www.ncbi.nlm.nih.gov/pubmed/9831625,21163940",This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00022743,RO:0002434,WormBase:WBGene00011530,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+REACT:R-HSA-114608,dc:source,HGNC:620,http://reactome.org/content/detail/R-HSA-114608,This edge comes from the Monarch Initiative 2022.,2022-07-26,source,NA,http://purl.org/dc/terms/source
+WormBase:WBGene00022743,RO:0002434,WormBase:WBGene00017968,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNPIndividual:20200,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+WormBase:WBGene00008627,RO:0002434,WormBase:WBGene00015841,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00009897,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/19029536,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10248,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+ClinVarVariant:18091,RO:0003303,MONDO:0007088,"https://www.ncbi.nlm.nih.gov/pubmed/9848098,1303239,11311152,9754958",This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+dbSNPIndividual:10262,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+MONDO:0007088,RO:0002331,REACT:R-HSA-444473,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+MONDO:0007088,RO:0002331,REACT:R-HSA-9660826,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+HGNC:7876,RO:0002434,HGNC:620,https://www.ncbi.nlm.nih.gov/pubmed/21163940,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00011530,RO:0002434,WormBase:WBGene00008627,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+HGNC:620,RO:0002331,REACT:R-HSA-977225,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+WormBase:WBGene00019613,RO:0002434,WormBase:WBGene00009897,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10277,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+MONDO:0007088,RO:0002331,REACT:R-HSA-9609523,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+dbSNP:rs7412,GENO:0000408,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,is_allele_of,NA,http://purl.obolibrary.org/obo/GENO_0000408
+dbSNPIndividual:10221,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+WormBase:WBGene00009897,RO:HOM0000020,HGNC:7218,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+WormBase:WBGene00017968,RO:0002434,WormBase:WBGene00009897,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00015841,RO:0002434,WormBase:WBGene00008627,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+MONDO:0007088,RO:0002331,REACT:R-HSA-879415,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+dbSNPIndividual:10200,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+MONDO:0007088,RO:0002331,REACT:R-HSA-8862803,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10221,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+ClinVarVariant:18090,RO:0003303,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/1944558,This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+MONDO:0007088,RO:0002331,REACT:R-HSA-8957275,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+dbSNPIndividual:10209,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+MONDO:0007088,RO:0002331,REACT:R-HSA-381426,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+dbSNPIndividual:10276,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+WormBase:WBGene00022743,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/19029536,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+WormBase:WBGene00004257,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/19029536,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+dbSNPIndividual:10265,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+ClinVarVariant:18098,GENO:0000418,HGNC:620,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_affected_feature,NA,http://purl.obolibrary.org/obo/GENO_0000418
+HGNC:620,RO:0002200,HP:0001300,http://purl.obolibrary.org/obo/MONDO_0007088|http://purl.obolibrary.org/obo/MONDO_0015140,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10204,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+WormBase:WBGene00016700,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/19029536,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+ClinVarVariant:17864,GENO:0000418,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_affected_feature,NA,http://purl.obolibrary.org/obo/GENO_0000418
+HGNC:620,RO:0002434,HGNC:7876,https://www.ncbi.nlm.nih.gov/pubmed/21163940,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNPIndividual:14722,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+ClinVarVariant:18101,GENO:0000418,HGNC:620,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_affected_feature,NA,http://purl.obolibrary.org/obo/GENO_0000418
+ClinVarVariant:18105,RO:0003303,MONDO:0007088,"https://www.ncbi.nlm.nih.gov/pubmed/16505331,10867787",This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+dbSNPIndividual:10188,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+HGNC:620,RO:0002434,HGNC:7,https://www.ncbi.nlm.nih.gov/pubmed/21163940,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+HGNC:613,RO:0002200,HP:0002185,http://purl.obolibrary.org/obo/MONDO_0007089|http://purl.obolibrary.org/obo/MONDO_0007088,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+WormBase:WBGene00004256,RO:HOM0000020,HGNC:7218,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+dbSNPIndividual:16628,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+MONDO:0007088,RO:0002331,REACT:R-HSA-416476,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+WormBase:WBGene00022743,RO:0002434,WormBase:WBGene00009897,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00004257,RO:HOM0000020,HGNC:7218,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+dbSNPIndividual:17352,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+HGNC:620,RO:0002331,REACT:R-HSA-9609523,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+ClinVarVariant:18093,RO:0003303,MONDO:0007088,"https://www.ncbi.nlm.nih.gov/pubmed/9796810,23649480,7489411,7991571,8810256,8012386,1465129,1302033,9371838,21335619",This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10263,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+dbSNPIndividual:10276,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+dbSNPIndividual:10079,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+WormBase:WBGene00019970,RO:0002434,WormBase:WBGene00017968,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+ClinVarVariant:18098,RO:0003303,MONDO:0007088,"https://www.ncbi.nlm.nih.gov/pubmed/10821838,11528419,18413473,15502844",This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+dbSNPIndividual:10204,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+MONDO:0007088,RO:0002331,REACT:R-HSA-114608,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+WormBase:WBGene00017968,RO:0002434,WormBase:WBGene00022743,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00017968,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/19029536,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+dbSNPIndividual:10208,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10264,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+dbSNPIndividual:10108,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+WormBase:WBGene00015841,RO:0002434,WormBase:WBGene00019970,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00019970,RO:0002434,WormBase:WBGene00015841,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+HGNC:620,RO:0003303,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+WormBase:WBGene00011530,RO:0002434,WormBase:WBGene00022743,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00000149,RO:0002434,WormBase:WBGene00006620,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+HGNC:620,RO:0002200,HP:0000726,http://purl.obolibrary.org/obo/MONDO_0015033|http://purl.obolibrary.org/obo/MONDO_0011583|http://purl.obolibrary.org/obo/MONDO_0007088|http://purl.obolibrary.org/obo/MONDO_0015140|http://purl.obolibrary.org/obo/MONDO_0017946|http://purl.obolibrary.org/obo/MONDO_0017947|http://purl.obolibrary.org/obo/MONDO_0017945,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+dbSNPIndividual:10167,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+WormBase:WBGene00013969,RO:HOM0000020,HGNC:7,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+HGNC:7218,RO:HOM0000020,WormBase:WBGene00009897,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+dbSNPIndividual:16808,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+ClinVarVariant:18096,RO:0003303,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/9328472,This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+WormBase:WBGene00008627,RO:0002434,WormBase:WBGene00019970,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNPIndividual:21336,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+HGNC:620,RO:0002331,REACT:R-HSA-844456,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+HGNC:613,RO:0002331,REACT:R-HSA-381426,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+WormBase:WBGene00017968,RO:HOM0000020,HGNC:7218,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+WormBase:WBGene00019970,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/19029536,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+HGNC:7876,RO:0002434,HGNC:7,https://www.ncbi.nlm.nih.gov/pubmed/21163940,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00000149,RO:HOM0000020,HGNC:620,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+MONDO:0007088,RO:0002200,HP:0000726,http://purl.obolibrary.org/obo/MONDO_0007088,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+WormBase:WBGene00019613,RO:0002434,WormBase:WBGene00016700,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNPIndividual:10248,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+dbSNPIndividual:10263,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+HGNC:620,RO:0002331,REACT:R-HSA-8957275,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+MONDO:0007088,RO:0002200,HP:0002185,http://purl.obolibrary.org/obo/MONDO_0007088,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+WormBase:WBGene00015841,RO:0002434,WormBase:WBGene00016700,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+HGNC:7218,RO:0003304,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,contributes to condition,NA,http://purl.obolibrary.org/obo/RO_0003304
+WormBase:WBGene00008627,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/19029536,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+WormBase:WBGene00015841,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/19029536,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+WormBase:WBGene00017968,RO:0002434,WormBase:WBGene00011530,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00009897,RO:0002434,WormBase:WBGene00015841,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00019613,RO:0002434,WormBase:WBGene00015841,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+HGNC:7218,RO:HOM0000020,WormBase:WBGene00004257,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10102,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+WormBase:WBGene00013969,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/19029536,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+dbSNPIndividual:10167,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+dbSNPIndividual:10205,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+FlyBase:FBal0150472,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/25281744,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+HGNC:613,RO:0002434,HGNC:620,https://www.ncbi.nlm.nih.gov/pubmed/22528093,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00008735,RO:HOM0000020,HGNC:7,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+WormBase:WBGene00009897,RO:0002434,WormBase:WBGene00019613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00009897,RO:0002434,WormBase:WBGene00017968,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+MONDO:0007088,RO:0002200,HP:0002423,http://purl.obolibrary.org/obo/MONDO_0007088,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10191,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+ClinVarVariant:9726,RO:0003303,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/7624338,This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+WormBase:WBGene00019970,RO:0002434,WormBase:WBGene00016700,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+HGNC:620,RO:0002331,REACT:R-HSA-381426,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+FlyBase:FBal0358409,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/31806024,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+ClinVarVariant:599622,GENO:0000841,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,likely_pathogenic_for_condition,NA,http://purl.obolibrary.org/obo/GENO_0000841
+HGNC:620,RO:0002434,HGNC:613,https://www.ncbi.nlm.nih.gov/pubmed/22528093,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+MONDO:0007088,RO:0002331,REACT:R-HSA-3000178,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+WormBase:WBGene00016700,RO:0002434,WormBase:WBGene00019970,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+ClinVarVariant:599629,GENO:0000841,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,likely_pathogenic_for_condition,NA,http://purl.obolibrary.org/obo/GENO_0000841
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10224,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+WormBase:WBGene00008627,RO:0002434,WormBase:WBGene00017968,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00021314,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/19029536,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+HGNC:7,RO:0002434,HGNC:613,"https://www.ncbi.nlm.nih.gov/pubmed/9831625,21163940",This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNP:rs429358,RO:0002200,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+HGNC:613,RO:0002200,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+HGNC:620,RO:0002331,REACT:R-HSA-432720,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+ClinVarVariant:9,GENO:0000418,HGNC:4886,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_affected_feature,NA,http://purl.obolibrary.org/obo/GENO_0000418
+WormBase:WBGene00011530,RO:0002434,WormBase:WBGene00019970,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00022743,RO:0002434,WormBase:WBGene00016700,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+ClinVarVariant:18095,RO:0003303,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/8154870,This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+ClinVarVariant:599607,GENO:0000841,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,likely_pathogenic_for_condition,NA,http://purl.obolibrary.org/obo/GENO_0000841
+WormBase:WBGene00006620,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/19029536,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+HGNC:620,RO:0002331,REACT:R-HSA-416476,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+dbSNPIndividual:18319,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+dbSNPIndividual:20392,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+FlyBase:FBal0103093,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/31354437,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+ClinVarVariant:18102,RO:0003303,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/12034808,This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+dbSNPIndividual:10079,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10209,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+HGNC:7876,RO:0002434,HGNC:613,https://www.ncbi.nlm.nih.gov/pubmed/21163940,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNPIndividual:10248,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+WormBase:WBGene00015841,RO:0002434,WormBase:WBGene00011530,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNP:rs429358,GENO:0000408,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,is_allele_of,NA,http://purl.obolibrary.org/obo/GENO_0000408
+HGNC:620,RO:0002200,HP:0002185,http://purl.obolibrary.org/obo/MONDO_0007088|http://purl.obolibrary.org/obo/MONDO_0015140,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+ClinVarVariant:9,RO:0003303,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+WormBase:WBGene00016700,RO:0002434,WormBase:WBGene00008627,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+HGNC:7,RO:0002434,HGNC:7876,https://www.ncbi.nlm.nih.gov/pubmed/21163940,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00019970,RO:0002434,WormBase:WBGene00009897,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+ClinVarVariant:18089,RO:0003303,MONDO:0007088,"https://www.ncbi.nlm.nih.gov/pubmed/7686976,7845465,7806491,11910111,1925564,15776278,10611368",This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+ClinVarVariant:18106,GENO:0000418,HGNC:620,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_affected_feature,NA,http://purl.obolibrary.org/obo/GENO_0000418
+ClinVarVariant:599611,GENO:0000841,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,likely_pathogenic_for_condition,NA,http://purl.obolibrary.org/obo/GENO_0000841
+WormBase:WBGene00022743,RO:0002434,WormBase:WBGene00019613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00000149,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/19029536,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+WormBase:WBGene00017968,RO:0002434,WormBase:WBGene00016700,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00017968,RO:0002434,WormBase:WBGene00008627,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00011530,RO:0002434,WormBase:WBGene00017968,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00011530,RO:0002434,WormBase:WBGene00016700,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00019970,RO:0002434,WormBase:WBGene00019613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00011530,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/19029536,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+WormBase:WBGene00019613,RO:0002434,WormBase:WBGene00008627,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+ClinVarVariant:18088,RO:0003303,MONDO:0007088,"https://www.ncbi.nlm.nih.gov/pubmed/1679288,24524897,1678057,1678058,27838006,24650794,1520398,25138979,19281847,1671712,11978821,1925564,8886002,1908231,15776278,8290965",This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+FlyBase:FBal0028990,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/31354437,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+HGNC:620,RO:0002331,REACT:R-HSA-8862803,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+dbSNPIndividual:10209,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+HGNC:620,RO:0002331,REACT:R-HSA-3000178,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+WormBase:WBGene00011530,RO:0002434,WormBase:WBGene00015841,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+ClinVarVariant:18094,RO:0003303,MONDO:0007088,"https://www.ncbi.nlm.nih.gov/pubmed/8499923,15365148",This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+ClinVarVariant:18091,GENO:0000418,HGNC:620,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_affected_feature,NA,http://purl.obolibrary.org/obo/GENO_0000418
+dbSNPIndividual:10205,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+dbSNPIndividual:10265,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+HGNC:613,RO:0002200,HP:0000726,http://purl.obolibrary.org/obo/MONDO_0007089|http://purl.obolibrary.org/obo/MONDO_0007088,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+ClinVarVariant:18106,RO:0003303,MONDO:0007088,"https://www.ncbi.nlm.nih.gov/pubmed/11735772,19286555",This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+HGNC:620,RO:0002331,REACT:R-HSA-418594,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+ClinVarVariant:18101,RO:0003303,MONDO:0007088,"https://www.ncbi.nlm.nih.gov/pubmed/27858710,11441013,20228223,27000221,28350801,26104569,24878480,26402770",This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+WormBase:WBGene00011530,RO:0002434,WormBase:WBGene00019613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00015841,RO:0002434,WormBase:WBGene00009897,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+HGNC:7,RO:0002331,REACT:R-HSA-114608,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+HGNC:7,RO:HOM0000020,WormBase:WBGene00008735,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+dbSNPIndividual:10226,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+dbSNPIndividual:10204,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+HGNC:7218,RO:HOM0000020,WormBase:WBGene00004256,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+HGNC:613,RO:0002200,HP:0002423,http://purl.obolibrary.org/obo/MONDO_0007089|http://purl.obolibrary.org/obo/MONDO_0007088,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+dbSNPIndividual:10102,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+dbSNPIndividual:10224,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+WormBase:WBGene00015841,RO:0002434,WormBase:WBGene00022743,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+ClinVarVariant:18100,RO:0003303,MONDO:0007088,"https://www.ncbi.nlm.nih.gov/pubmed/15668448,11063718",This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+WormBase:WBGene00009897,RO:0002434,WormBase:WBGene00019970,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+MONDO:0007088,RO:0002331,REACT:R-HSA-418594,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+WormBase:WBGene00008627,RO:0002434,WormBase:WBGene00019613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+ClinVarVariant:599627,RO:0003303,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+HGNC:7,RO:HOM0000020,WormBase:WBGene00013969,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+dbSNPIndividual:10165,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10167,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+HGNC:7,RO:0003304,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,contributes to condition,NA,http://purl.obolibrary.org/obo/RO_0003304
+ClinVarVariant:17864,RO:0003303,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+ClinVarVariant:10,GENO:0000418,HGNC:4886,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_affected_feature,NA,http://purl.obolibrary.org/obo/GENO_0000418
+WormBase:WBGene00015841,RO:0002434,WormBase:WBGene00017968,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNP:rs7412,GENO:0000222,dbSNPIndividual:10276,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+ClinVarVariant:127268,RO:0003303,MONDO:0007088,"https://www.ncbi.nlm.nih.gov/pubmed/16369530,16921174,24691562",This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+WormBase:WBGene00016700,RO:0002434,WormBase:WBGene00022743,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNPIndividual:10200,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+MONDO:0007088,RO:0002331,REACT:R-HSA-977225,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+WormBase:WBGene00022743,RO:0002434,WormBase:WBGene00008627,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00009897,RO:0002434,WormBase:WBGene00022743,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNPIndividual:20692,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+ClinVarVariant:599625,GENO:0000841,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,likely_pathogenic_for_condition,NA,http://purl.obolibrary.org/obo/GENO_0000841
+HGNC:613,RO:0002200,HP:0410054,https://www.ncbi.nlm.nih.gov/pubmed/17031479,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+dbSNPIndividual:10191,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+WormBase:WBGene00022743,RO:HOM0000020,HGNC:7218,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+WormBase:WBGene00008627,RO:0002434,WormBase:WBGene00011530,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNPIndividual:10101,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+WormBase:WBGene00019613,RO:0002434,WormBase:WBGene00019970,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+HGNC:620,RO:0002331,REACT:R-HSA-114608,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+ClinVarVariant:599624,GENO:0000841,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,likely_pathogenic_for_condition,NA,http://purl.obolibrary.org/obo/GENO_0000841
+WormBase:WBGene00016700,RO:0002434,WormBase:WBGene00015841,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00004256,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/19029536,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+WormBase:WBGene00009897,RO:0002434,WormBase:WBGene00011530,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00017968,RO:0002434,WormBase:WBGene00019970,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+REACT:R-HSA-114608,dc:source,HGNC:7,http://reactome.org/content/detail/R-HSA-114608,This edge comes from the Monarch Initiative 2022.,2022-07-26,source,NA,http://purl.org/dc/terms/source
+HGNC:7218,RO:HOM0000020,WormBase:WBGene00017968,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+WormBase:WBGene00019613,RO:0002434,WormBase:WBGene00022743,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNPIndividual:13855,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+dbSNPIndividual:10264,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+HGNC:613,RO:0002200,HP:0001300,http://purl.obolibrary.org/obo/MONDO_0007089|http://purl.obolibrary.org/obo/MONDO_0007088,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+WormBase:WBGene00022743,RO:0002434,WormBase:WBGene00019970,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+HGNC:7,RO:0002434,HGNC:620,https://www.ncbi.nlm.nih.gov/pubmed/21163940,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00015841,RO:HOM0000020,HGNC:7218,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10276,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+HGNC:620,RO:0002331,REACT:R-HSA-445989,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+WormBase:WBGene00008735,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/19029536,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+HGNC:7218,RO:HOM0000020,WormBase:WBGene00022743,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,in 1 to 1 orthology relationship with,NA,http://purl.obolibrary.org/obo/RO_HOM0000020
+MONDO:0007088,RO:0002200,HP:0410054,https://www.ncbi.nlm.nih.gov/pubmed/17031479,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+ClinVarVariant:18097,RO:0003303,MONDO:0007088,"https://www.ncbi.nlm.nih.gov/pubmed/10097173,10441572",This edge comes from the Monarch Initiative 2022.,2022-07-26,causes condition,NA,http://purl.obolibrary.org/obo/RO_0003303
+dbSNPIndividual:10226,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+HGNC:613,RO:0002200,HP:0002511,http://purl.obolibrary.org/obo/MONDO_0008608|http://purl.obolibrary.org/obo/MONDO_0007089|http://purl.obolibrary.org/obo/MONDO_0007088,This edge comes from the Monarch Initiative 2022.,2022-07-26,has phenotype,NA,http://purl.obolibrary.org/obo/RO_0002200
+WormBase:WBGene00008627,RO:0002434,WormBase:WBGene00016700,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00019970,RO:0002434,WormBase:WBGene00022743,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNPIndividual:13878,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+dbSNPIndividual:10277,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+WormBase:WBGene00009897,RO:0002434,WormBase:WBGene00016700,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+HGNC:613,RO:0002331,REACT:R-HSA-8957275,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+MONDO:0007088,RO:0002331,REACT:R-HSA-844456,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,involved_in,NA,http://purl.obolibrary.org/obo/RO_0002331
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10208,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+WormBase:WBGene00017968,RO:0002434,WormBase:WBGene00015841,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10226,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+dbSNPIndividual:10191,RO:0002610,HGNC:613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,correlated with,NA,http://purl.obolibrary.org/obo/RO_0002610
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10262,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+ClinVarVariant:18093,GENO:0000418,HGNC:620,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_affected_feature,NA,http://purl.obolibrary.org/obo/GENO_0000418
+ClinVarVariant:599620,GENO:0000841,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,likely_pathogenic_for_condition,NA,http://purl.obolibrary.org/obo/GENO_0000841
+WormBase:WBGene00019613,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/19029536,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+dbSNPIndividual:10168,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+WormBase:WBGene00017968,RO:0002434,WormBase:WBGene00019613,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+dbSNPIndividual:10102,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+ClinVarVariant:599623,GENO:0000841,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,likely_pathogenic_for_condition,NA,http://purl.obolibrary.org/obo/GENO_0000841
+dbSNPIndividual:10172,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+FlyBase:FBal0198740,RO:0003301,MONDO:0007088,https://www.ncbi.nlm.nih.gov/pubmed/31965876,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+dbSNP:rs429358,GENO:0000222,dbSNPIndividual:10200,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has_genotype,NA,http://purl.obolibrary.org/obo/GENO_0000222
+dbSNPIndividual:10221,RO:0003301,MONDO:0007088,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,has role in modeling,NA,http://purl.obolibrary.org/obo/RO_0003301
+WormBase:WBGene00019970,RO:0002434,WormBase:WBGene00008627,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+WormBase:WBGene00016700,RO:0002434,WormBase:WBGene00011530,NA,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434
+HGNC:613,RO:0002434,HGNC:7876,https://www.ncbi.nlm.nih.gov/pubmed/21163940,This edge comes from the Monarch Initiative 2022.,2022-07-26,interacts with,NA,http://purl.obolibrary.org/obo/RO_0002434

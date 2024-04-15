@@ -69,7 +69,8 @@ def config():
     form = URIphenotype()
     if form.validate_on_submit(): # if a mim number is inserted
         input_number = form.URIphenotype.data
-        run_monarch(input_number)
+        #run_monarch(input_number)
+        run_monarch_mock(input_number)
         symptoms_name_lst, date, diseasename = symptom_list_today()
         session['symptoms_name_lst'] = symptoms_name_lst
         return redirect(url_for('symptoms', date=date, diseasename=diseasename))

@@ -13,6 +13,7 @@ import json  # to save the latest .json returned by the API
 import datetime
 import logging  # to check for running variables
 import inspect  # to chec for running functions
+import shutil  # to properly copy and rename files in run_monarch_mock()
 import pandas as pd
 from biothings_client import get_client
 from tqdm import tqdm
@@ -530,6 +531,14 @@ def get_neighbours_list(seed_list):  #bioknowledgeReviewer
     sample_neighbours = neighbours_list[:5]
     logging.debug(f"Sample of neighbours: {sample_neighbours}")
 
+    # Save intermediate object 'neighbours_list' as a CSV file
+    path = os.path.join(os.getcwd(), 'monarch')
+    if not os.path.isdir(path):
+        os.makedirs(path)
+    file_path = os.path.join(path, f"monarch_neighbours_list_v{today}.csv")
+    df = pd.DataFrame(neighbours_list).fillna('None')
+    df.to_csv(file_path, index=False)
+
     return neighbours_list
 
 
@@ -568,6 +577,14 @@ def get_orthopheno_list(seed_list):  #bioknowledgeReviewer
     sample_nodes = nodes_list[:5]
     logging.debug(f"Sample of orthopheno nodes: {sample_nodes}")
 
+    # Save intermediate object 'nodes_list' as a CSV file
+    path = os.path.join(os.getcwd(), 'monarch')
+    if not os.path.isdir(path):
+        os.makedirs(path)
+    file_path = os.path.join(path, f"monarch_orthopeno_list_v{today}.csv")
+    df = pd.DataFrame(nodes_list).fillna('None')
+    df.to_csv(file_path, index=False)
+
     return nodes_list
 
 
@@ -596,6 +613,14 @@ def extract_edges(gene_list):  #bioknowledgeReviewer
     logging.info(f"Extracted network size: {len(network)}")
     sample_network = list(network)[:5]
     logging.debug(f"Sample of extracted network edges: {sample_network}")
+
+    # Save intermediate object 'network' as a CSV file
+    path = os.path.join(os.getcwd(), 'monarch')
+    if not os.path.isdir(path):
+        os.makedirs(path)
+    file_path = os.path.join(path, f"monarch_network_v{today}.csv")
+    df = pd.DataFrame(network).fillna('None')
+    df.to_csv(file_path, index=False)
 
     return network
 
@@ -804,21 +829,21 @@ def build_edges(edges_df, edges_fname):  #bioknowledgeReviewer
             record = dict()
             record['subject_id'] = tuple[0]
             record['subject_label'] = tuple[1]
-            #record['subject_uri'] = tuple[2]  # removed for testing
-            #record['subject_category'] = tuple[3]
-            #record['relation_id'] = tuple[4]  # tuple id modified according to previous steps
-            record['relation_id'] = tuple[2]
-            #record['relation_label'] = tuple[5]
-            record['relation_label'] = tuple[3]
-            #record['relation_uri'] = tuple[6]
-            #record['object_id'] = tuple[7]
-            record['object_id'] = tuple[4]
-            #record['object_label'] = tuple[8]
-            record['object_label'] = tuple[5]
-            #record['object_uri'] = tuple[9]
-            #record['object_category'] = tuple[10]
-            #record['reference_id_list'] = tuple[11]
-            record['reference_id_list'] = tuple[6]
+            record['subject_uri'] = tuple[2]  # removed for testing
+            record['subject_category'] = tuple[3]
+            record['relation_id'] = tuple[4]  # tuple id modified according to previous steps
+            #record['relation_id'] = tuple[2]
+            record['relation_label'] = tuple[5]
+            #record['relation_label'] = tuple[3]
+            record['relation_uri'] = tuple[6]
+            record['object_id'] = tuple[7]
+            #record['object_id'] = tuple[4]
+            record['object_label'] = tuple[8]
+            #record['object_label'] = tuple[5]
+            record['object_uri'] = tuple[9]
+            record['object_category'] = tuple[10]
+            record['reference_id_list'] = tuple[11]
+            #record['reference_id_list'] = tuple[6]
             connections_l.append(record)
 
         edges_df = pd.DataFrame(connections_l)
@@ -1060,21 +1085,21 @@ def build_nodes(edges_df, nodes_fname):  #bioknowledgeReviewer
             record = dict()
             record['subject_id'] = tuple[0]
             record['subject_label'] = tuple[1]
-            #record['subject_uri'] = tuple[2]
-            #record['subject_category'] = tuple[3]
-            #record['relation_id'] = tuple[4]
-            record['relation_id'] = tuple[2]
-            record['relation_label'] = tuple[3]
-            #record['relation_label'] = tuple[5]
-            #record['relation_uri'] = tuple[6]
-            #record['object_id'] = tuple[7]
-            record['object_id'] = tuple[4]
-            record['object_label'] = tuple[5]
-            #record['object_label'] = tuple[8]
-            #record['object_uri'] = tuple[9]
-            #record['object_category'] = tuple[10]
-            #record['reference_id_list'] = tuple[11]
-            record['reference_id_list'] = tuple[6]
+            record['subject_uri'] = tuple[2]
+            record['subject_category'] = tuple[3]
+            record['relation_id'] = tuple[4]
+            #record['relation_id'] = tuple[2]
+            #record['relation_label'] = tuple[3]
+            record['relation_label'] = tuple[5]
+            record['relation_uri'] = tuple[6]
+            record['object_id'] = tuple[7]
+            #record['object_id'] = tuple[4]
+            #record['object_label'] = tuple[5]
+            record['object_label'] = tuple[8]
+            record['object_uri'] = tuple[9]
+            record['object_category'] = tuple[10]
+            record['reference_id_list'] = tuple[11]
+            #record['reference_id_list'] = tuple[6]
             connections_l.append(record)
 
         edges_df = pd.DataFrame(connections_l)
@@ -1318,8 +1343,9 @@ def symptom_list_specified_folder(input_folder = 'Huntington disease (2022-06-23
     disease_id_file_path = os.path.join(new_path, "disease_id.txt")
     with open(disease_id_file_path, 'r') as file:
         file_text = file.read()
-        input_number, disease_id, disease_name = file_text.split(';')
-    logging.info(f"Read disease information: ID={disease_id}, Name={disease_name}, Input Number={input_number}")
+                #input_number, disease_id, disease_name = file_text.split(';') # input cannot be OMIM any longer
+        disease_id, disease_name = file_text.split(';')
+    logging.info(f"Read disease information for today: ID={disease_id}, Name={disease_name}")
 
     monarch_fname_edges = './monarch/monarch_edges_disease_v{}.csv'.format(date)
     monarch_fname_nodes = './monarch/monarch_nodes_disease_v{}.csv'.format(date)
@@ -1355,8 +1381,9 @@ def symptom_list_today():
     disease_id_file_path = os.path.join(os.getcwd(), "disease_id.txt")
     with open(disease_id_file_path, 'r') as file:
         file_text = file.read()
-        input_number, disease_id, disease_name = file_text.split(';')
-    logging.info(f"Read disease information for today: ID={disease_id}, Name={disease_name}, Input Number={input_number}")
+        #input_number, disease_id, disease_name = file_text.split(';') # input cannot be OMIM any longer
+        disease_id, disease_name = file_text.split(';')
+    logging.info(f"Read disease information for today: ID={disease_id}, Name={disease_name}")
 
     #disease_name_date = disease_name+' ({})'.format(date)
     disease_name_date = f"{disease_name} ({date})"
@@ -1404,10 +1431,8 @@ def run_monarch(input_id = 'MONDO:0007739'):
     os.chdir(new_path)
 
     # save disease_ID as text file
-    text_file = open(os.getcwd()+"/disease_id.txt", "w")
-    #text_file.write(input_number + ';' + disease_id + ';'+ disease_name)
-    text_file.write(disease_id + ';'+ disease_name)
-    text_file.close()
+    with open("disease_id.txt", "w") as text_file:
+        text_file.write(f"{disease_id};{disease_name}")
     
     #build monarch network
     seedList = [input_id]
@@ -1424,6 +1449,67 @@ def run_monarch(input_id = 'MONDO:0007739'):
     monarch_connections = read_connections(file)
     build_edges(monarch_connections, edges_fname = 'monarch_edges_disease')
     build_nodes(monarch_connections, nodes_fname = 'monarch_nodes_disease')
+
+
+## 20240415 (by NBianchi)
+# Due to issues with having run_monarch() properly run, this function retrieves files from
+# older runs (2022) that are locally stored and saves them as if they were the output of a
+# correct run of the function above. The original function will be restored later on, but
+# it was necessary to act as such in order for the pipeline to work and proceed with my thesis.
+def run_monarch_mock(input_id = 'MONDO:0007739'):
+    """
+    This function runs mimics what the whole Monarch script would do,
+    to then retrieve the result of a previous run_monarch() call and
+    save it accordingly.
+
+    :param input_number: The input phenotype MIM number of the disease
+    :return: nodes and edges files in /monarch folder
+    """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
+
+    # get the disease name (str)
+    disease_name, disease_id = get_disease_name_id(disease_input_ID = input_id)
+    
+    # make folder for HD and change cwd to this folder
+    base_path = os.getcwd()  # Get the current working directory
+    new_path = os.path.join(base_path,'drugapp','data',f'{disease_name}({today})')
+
+    # check if directory exists, if not create it, then change directory to it
+    #os.makedirs(new_path)
+    if not os.path.exists(new_path):
+        os.makedirs(new_path)
+    os.chdir(new_path)
+
+    # save disease_ID as text file
+    with open("disease_id.txt", "w") as text_file:
+        text_file.write(f"{disease_id};{disease_name}")
+
+    ## Up until here, the pipeline is identical to that of run_monarch().
+
+    ## Following instead the custom code to mock the run_monarch() pipeline:
+
+    # Create a 'monarch' subdirectory within the new path
+    monarch_path = os.path.join(new_path, 'monarch')
+    if not os.path.exists(monarch_path):
+        os.makedirs(monarch_path)
+
+    # define paths of reference file retrieval based on input_id
+    if input_id == 'MONDO:0007739':  # Huntington disease
+        reference_path = os.path.join(base_path, 'drugapp', 'data', 'reference_material', 'huntington_disease')
+    elif input_id == 'MONDO:0007088':  # Alzheimer disease
+        reference_path = os.path.join(base_path, 'drugapp', 'data', 'reference_material', 'alzheimer_disease')
+    else:
+        print("Sorry, only able to perform runs for Huntington disease (MONDO:0007739) and Alzheimer disease (MONDO:0007088) at the moment.")
+        return
+
+    # copy and rename files from the reference directory
+    for filename in os.listdir(reference_path):
+        if filename.startswith('monarch_'):
+            old_file = os.path.join(reference_path, filename)
+            new_filename = filename.replace('v2022-06-27', f'v{today}')
+            new_file = os.path.join(monarch_path, new_filename)
+            shutil.copy(old_file, new_file)
 
 
 def run_monarch_symptom(input_symptom, date):

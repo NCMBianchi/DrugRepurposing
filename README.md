@@ -46,3 +46,5 @@ Run the image: <code>docker run -d -p 5000:5000 --name drugapp drugapp</code>
 ### Politecnico di Milano (IT)
 [Rosario M. Piro](https://scholar.google.com/citations?user=HuNyLrcAAAAJ)
 
+### SWAT4HCLS
+Presentation by Carmen Reep on the original work this fork repository is based on: [Automated drug repurposing workflow for rare diseases](https://youtu.be/RsfUrRhZAso?si=Og1z1RdPaukpPIbP)

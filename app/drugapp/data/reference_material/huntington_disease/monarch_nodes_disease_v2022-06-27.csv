@@ -1,0 +1,219 @@
+id,semantic_groups,uri,preflabel,name,synonyms,description
+MGI:3530234,genotype,http://www.informatics.jax.org/accession/MGI:3530234,Tg(HDexon1)62Gpb [involves: C57BL/6J * CBA/J],Tg(HDexon1)62Gpb [involves: C57BL/6J * CBA/J],NA,NA
+MONDO:0007739,disease,http://purl.obolibrary.org/obo/MONDO_0007739,Huntington disease,Huntington disease,NA,NA
+HGNC:11007,gene,https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:11007,SLC2A3,solute carrier family 2 member 3,GLUT3,NA
+MGI:2671158,genotype,http://www.informatics.jax.org/accession/MGI:2671158,Tg(HD82Gln)81Gschi [involves: C3H/HeJ * C57BL/6],Tg(HD82Gln)81Gschi [involves: C3H/HeJ * C57BL/6],NA,NA
+HGNC:4851,gene,https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:4851,HTT,huntingtin,HD|IT15|LOMARS,"Huntingtin is a disease gene linked to Huntington's disease, a neurodegenerative disorder characterized by loss of striatal neurons. This is thought to be caused by an expanded, unstable trinucleotide repeat in the huntingtin gene, which translates as a polyglutamine repeat in the protein product. A fairly broad range of trinucleotide repeats (9-35) has been identified in normal controls, and repeat numbers in excess of 40 have been described as pathological. The huntingtin locus is large, spanning 180 kb and consisting of 67 exons. The huntingtin gene is widely expressed and is required for normal development. It is expressed as 2 alternatively polyadenylated forms displaying different relative abundance in various fetal and adult tissues. The larger transcript is approximately 13.7 kb and is expressed predominantly in adult and fetal brain whereas the smaller transcript of approximately 10.3 kb is more widely expressed. The genetic defect leading to Huntington's disease may not necessarily eliminate transcription, but may confer a new property on the mRNA or alter the function of the protein. One candidate is the huntingtin-associated protein-1, highly expressed in brain, which has increased affinity for huntingtin protein with expanded polyglutamine repeats. This gene contains an upstream open reading frame in the 5' UTR that inhibits expression of the huntingtin gene product through translational repression. [provided by RefSeq, Jul 2016]."
+MONDO:0016621,disease,http://purl.obolibrary.org/obo/MONDO_0016621,juvenile Huntington disease,juvenile Huntington disease,NA,NA
+HP:0001251,phenotype,http://purl.obolibrary.org/obo/HP_0001251,Ataxia,Ataxia,NA,NA
+MGI:5635158,genotype,http://www.informatics.jax.org/accession/MGI:5635158,Tg(HTT*)NXwy [involves: FVB/NJ],Tg(HTT*)NXwy [involves: FVB/NJ],NA,NA
+HP:0001288,phenotype,http://purl.obolibrary.org/obo/HP_0001288,Gait disturbance,Gait disturbance,NA,NA
+MGI:5432147,variant,http://www.informatics.jax.org/accession/MGI:5432147,Tg(YAC128)55Hay,Tg(YAC128)55Hay,NA,NA
+MGI:5432192,genotype,http://www.informatics.jax.org/accession/MGI:5432192,Tg(YAC128)55Hay [FVB/N-Tg(YAC128)55Hay],Tg(YAC128)55Hay [FVB/N-Tg(YAC128)55Hay],NA,NA
+HP:0000741,phenotype,http://purl.obolibrary.org/obo/HP_0000741,Apathy,Apathy,NA,NA
+HP:0002067,phenotype,http://purl.obolibrary.org/obo/HP_0002067,Bradykinesia,Bradykinesia,NA,NA
+HP:0003107,phenotype,http://purl.obolibrary.org/obo/HP_0003107,Abnormal circulating cholesterol concentration,Abnormal circulating cholesterol concentration,NA,NA
+MGI:2675580,genotype,http://www.informatics.jax.org/accession/MGI:2675580,Htt<tm1Mfc>,Htt<tm1Mfc>,NA,NA
+MGI:2675620,genotype,http://www.informatics.jax.org/accession/MGI:2675620,Htt<tm1Mfc>/Htt<tm1Mfc> [involves: 129S1/Sv * C57BL/6],Htt<tm1Mfc>/Htt<tm1Mfc> [involves: 129S1/Sv * C57BL/6],NA,NA
+MGI:6294294,genotype,http://www.informatics.jax.org/accession/MGI:6294294,Tg(Prnp-HTT*82Q)61Gschi [involves: C3H/HeJ * C57BL/6J],Tg(Prnp-HTT*82Q)61Gschi [involves: C3H/HeJ * C57BL/6J],NA,NA
+MGI:2177755,variant,http://www.informatics.jax.org/accession/MGI:2177755,Htt<tm2Szi>,Htt<tm2Szi>,NA,NA
+MGI:2429756,variant,http://www.informatics.jax.org/accession/MGI:2429756,Tg(YAC72)2511Hay,Tg(YAC72)2511Hay,NA,NA
+HP:0000752,phenotype,http://purl.obolibrary.org/obo/HP_0000752,Hyperactivity,Hyperactivity,NA,NA
+dbSNPIndividual:21488,genotype,http://www.ncbi.nlm.nih.gov/SNP/snp_ind.cgi?ind_id=21488,46;XY;t(2;19)(2pter->2q23::19p12->19pter;&#x0D;&#x0A;2qter->2q23::19p12->19qter)[9]/46;XY[11] [GM04476],46;XY;t(2;19)(2pter->2q23::19p12->19pter;&#x0D;&#x0A;2qter->2q23::19p12->19qter)[9]/46;XY[11] [GM04476],NA,NA
+MGI:2386951,variant,http://www.informatics.jax.org/accession/MGI:2386951,Tg(HDexon1)62Gpb,Tg(HDexon1)62Gpb,NA,NA
+HP:0000726,phenotype,http://purl.obolibrary.org/obo/HP_0000726,Dementia,Dementia,NA,NA
+HP:0001272,phenotype,http://purl.obolibrary.org/obo/HP_0001272,Cerebellar atrophy,Cerebellar atrophy,NA,NA
+ClinVarVariant:409,variant,http://www.ncbi.nlm.nih.gov/clinvar/variation/409,NC_000004.11:g.3076606GCA[(40_?)],NC_000004.11:g.3076606GCA[(40_?)],NA,NA
+MGI:5304801,genotype,http://www.informatics.jax.org/accession/MGI:5304801,Tg(Prnp-HTT*82Q)52Caro [involves: C3H * C57BL/6],Tg(Prnp-HTT*82Q)52Caro [involves: C3H * C57BL/6],NA,NA
+HP:0001347,phenotype,http://purl.obolibrary.org/obo/HP_0001347,Hyperreflexia,Hyperreflexia,NA,NA
+MGI:6294293,genotype,http://www.informatics.jax.org/accession/MGI:6294293,Tg(Prnp-HTT*82Q)8AGschi [involves: C3H/HeJ * C57BL/6J],Tg(Prnp-HTT*82Q)8AGschi [involves: C3H/HeJ * C57BL/6J],NA,NA
+MGI:3605770,genotype,http://www.informatics.jax.org/accession/MGI:3605770,Htt<tm1Szi>/Htt<tm2Szi>; Tg(Camk2a-cre)2Szi [involves: 129S/SvEv * 129S1/Sv * C57BL/6 * CBA],Htt<tm1Szi>/Htt<tm2Szi>; Tg(Camk2a-cre)2Szi [involves: 129S/SvEv * 129S1/Sv * C57BL/6 * CBA],NA,NA
+HP:0002171,phenotype,http://purl.obolibrary.org/obo/HP_0002171,Gliosis,Gliosis,NA,NA
+REACT:R-HSA-9022692,pathway,http://www.reactome.org/PathwayBrowser/#/R-HSA-9022692,Regulation of MECP2 expression and activity,Regulation of MECP2 expression and activity,NA,NA
+MGI:5432191,genotype,http://www.informatics.jax.org/accession/MGI:5432191,Tg(YAC72)2511Hay/Tg(YAC72)2511Hay [FVB/N-Tg(YAC72)2511Hay],Tg(YAC72)2511Hay/Tg(YAC72)2511Hay [FVB/N-Tg(YAC72)2511Hay],NA,NA
+HP:0002340,phenotype,http://purl.obolibrary.org/obo/HP_0002340,Caudate atrophy,Caudate atrophy,NA,NA
+HP:0000737,phenotype,http://purl.obolibrary.org/obo/HP_0000737,Irritability,Irritability,NA,NA
+MGI:5617271,genotype,http://www.informatics.jax.org/accession/MGI:5617271,Htt<tm1Hay>/Htt<tm1Hay>; Tg(HTT*97Q)IXwy; Tg(YAC18)18Hay/Tg(YAC18)18Hay [FVB.Cg-Htt<tm1Hay> Tg(HTT*97Q)IXwy Tg(YAC18)18Hay],Htt<tm1Hay>/Htt<tm1Hay>; Tg(HTT*97Q)IXwy; Tg(YAC18)18Hay/Tg(YAC18)18Hay [FVB.Cg-Htt<tm1Hay> Tg(HTT*97Q)IXwy Tg(YAC18)18Hay],NA,NA
+HP:0002072,phenotype,http://purl.obolibrary.org/obo/HP_0002072,Chorea,Chorea,NA,NA
+MGI:5052380,genotype,http://www.informatics.jax.org/accession/MGI:5052380,Tg(HTT*/EGFP)190Nn [involves: C57BL/6 * DBA/2],Tg(HTT*/EGFP)190Nn [involves: C57BL/6 * DBA/2],NA,NA
+HP:0001332,phenotype,http://purl.obolibrary.org/obo/HP_0001332,Dystonia,Dystonia,NA,NA
+MGI:5569532,variant,http://www.informatics.jax.org/accession/MGI:5569532,Tg(CMV-HTT*89Q)ATag,Tg(CMV-HTT*89Q)ATag,NA,NA
+MGI:3800927,genotype,http://www.informatics.jax.org/accession/MGI:3800927,Tg(HTT*97Q)IXwy [FVB-Tg(HTT*97Q)IXwy],Tg(HTT*97Q)IXwy [FVB-Tg(HTT*97Q)IXwy],NA,NA
+MGI:5432177,genotype,http://www.informatics.jax.org/accession/MGI:5432177,Gt(ROSA)26Sor<tm49(HTT)Arte>/Gt(ROSA)26Sor<+> [Not Specified],Gt(ROSA)26Sor<tm49(HTT)Arte>/Gt(ROSA)26Sor<+> [Not Specified],NA,NA
+MGI:5569536,genotype,http://www.informatics.jax.org/accession/MGI:5569536,Tg(CMV-HTT*89Q)ATag [involves: FVB/N],Tg(CMV-HTT*89Q)ATag [involves: FVB/N],NA,NA
+HP:0000738,phenotype,http://purl.obolibrary.org/obo/HP_0000738,Hallucinations,Hallucinations,NA,NA
+HP:0031473,phenotype,http://purl.obolibrary.org/obo/HP_0031473,Hostility,Hostility,NA,NA
+MGI:5635161,genotype,http://www.informatics.jax.org/accession/MGI:5635161,Tg(HTT*)LXwy [involves: FVB/NJ],Tg(HTT*)LXwy [involves: FVB/NJ],NA,NA
+MGI:2670626,genotype,http://www.informatics.jax.org/accession/MGI:2670626,Tg(HD82Gln)81Gschi,Tg(HD82Gln)81Gschi,NA,NA
+HP:0002136,phenotype,http://purl.obolibrary.org/obo/HP_0002136,Broad-based gait,Broad-based gait,NA,NA
+HP:0000739,phenotype,http://purl.obolibrary.org/obo/HP_0000739,Anxiety,Anxiety,NA,NA
+MGI:2177757,variant,http://www.informatics.jax.org/accession/MGI:2177757,Htt<tm2Detl>,Htt<tm2Detl>,NA,NA
+HP:0001824,phenotype,http://purl.obolibrary.org/obo/HP_0001824,Weight loss,Weight loss,NA,NA
+HP:0004408,phenotype,http://purl.obolibrary.org/obo/HP_0004408,Abnormality of the sense of smell,Abnormality of the sense of smell,NA,NA
+HP:0002119,phenotype,http://purl.obolibrary.org/obo/HP_0002119,Ventriculomegaly,Ventriculomegaly,NA,NA
+MGI:5698523,genotype,http://www.informatics.jax.org/accession/MGI:5698523,Htt<tm2Detl>/Htt<+> [B6J.129P2-Htt<tm2Detl>],Htt<tm2Detl>/Htt<+> [B6J.129P2-Htt<tm2Detl>],NA,NA
+MGI:3757562,genotype,http://www.informatics.jax.org/accession/MGI:3757562,Tg(HDexon1)61Gpb [involves: C57BL/6 * CBA],Tg(HDexon1)61Gpb [involves: C57BL/6 * CBA],NA,NA
+MGI:3605769,genotype,http://www.informatics.jax.org/accession/MGI:3605769,Htt<tm1Szi>/Htt<tm2Szi>; Tg(Camk2a-cre)1Szi [involves: 129S/SvEv * 129S1/Sv * C57BL/6 * CBA],Htt<tm1Szi>/Htt<tm2Szi>; Tg(Camk2a-cre)1Szi [involves: 129S/SvEv * 129S1/Sv * C57BL/6 * CBA],NA,NA
+HP:0003487,phenotype,http://purl.obolibrary.org/obo/HP_0003487,Babinski sign,Babinski sign,NA,NA
+HP:0002066,phenotype,http://purl.obolibrary.org/obo/HP_0002066,Gait ataxia,Gait ataxia,NA,NA
+MGI:3722277,genotype,http://www.informatics.jax.org/accession/MGI:3722277,Tg(YAC72)2511Hay [involves: FVB/N],Tg(YAC72)2511Hay [involves: FVB/N],NA,NA
+HP:0002169,phenotype,http://purl.obolibrary.org/obo/HP_0002169,Clonus,Clonus,NA,NA
+MGI:5052308,genotype,http://www.informatics.jax.org/accession/MGI:5052308,Tg(HD82Gln)81Gschi [involves: 129S1/Sv * 129X1/SvJ * C3H * C57BL/6 * CD-1],Tg(HD82Gln)81Gschi [involves: 129S1/Sv * 129X1/SvJ * C3H * C57BL/6 * CD-1],NA,NA
+MGI:5569528,variant,http://www.informatics.jax.org/accession/MGI:5569528,Tg(CMV-HTT*48Q)BTag,Tg(CMV-HTT*48Q)BTag,NA,NA
+MGI:5569535,genotype,http://www.informatics.jax.org/accession/MGI:5569535,Tg(CMV-HTT*48Q)BTag/Tg(CMV-HTT*48Q)BTag [involves: FVB/N],Tg(CMV-HTT*48Q)BTag/Tg(CMV-HTT*48Q)BTag [involves: FVB/N],NA,NA
+MGI:4429156,genotype,http://www.informatics.jax.org/accession/MGI:4429156,Tg(GFAP-HTT*160Q)1Xjl [either: (involves: FVB/NCrl) or (involves: C3H * C57BL/6 * FVB/NCrl)],Tg(GFAP-HTT*160Q)1Xjl [either: (involves: FVB/NCrl) or (involves: C3H * C57BL/6 * FVB/NCrl)],NA,NA
+HP:0000708,phenotype,http://purl.obolibrary.org/obo/HP_0000708,Behavioral abnormality,Behavioral abnormality,NA,NA
+HP:0003324,phenotype,http://purl.obolibrary.org/obo/HP_0003324,Generalized muscle weakness,Generalized muscle weakness,NA,NA
+MGI:3757568,genotype,http://www.informatics.jax.org/accession/MGI:3757568,Tg(HDexon1)62Gpb [involves: C57BL/6 * CBA],Tg(HDexon1)62Gpb [involves: C57BL/6 * CBA],NA,NA
+dbSNP:rs28406206,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs28406206,rs28406206-?,rs28406206-?,NA,NA
+MGI:3813482,genotype,http://www.informatics.jax.org/accession/MGI:3813482,Tg(Ppp1r1b-HTT*)1Meeh [C57BL/6J-Tg(Ppp1r1b-HTT*)1Meeh],Tg(Ppp1r1b-HTT*)1Meeh [C57BL/6J-Tg(Ppp1r1b-HTT*)1Meeh],NA,NA
+MGI:5052381,genotype,http://www.informatics.jax.org/accession/MGI:5052381,Tg(HTT*/EGFP)150Nn [involves: C57BL/6 * DBA/2],Tg(HTT*/EGFP)150Nn [involves: C57BL/6 * DBA/2],NA,NA
+MGI:4437302,genotype,http://www.informatics.jax.org/accession/MGI:4437302,Tg(GFAP-HTT*160Q)31Xjl [either: (involves: FVB/NCrl) or (involves: C3H * C57BL/6 * FVB/NCrl)],Tg(GFAP-HTT*160Q)31Xjl [either: (involves: FVB/NCrl) or (involves: C3H * C57BL/6 * FVB/NCrl)],NA,NA
+HP:0030190,phenotype,http://purl.obolibrary.org/obo/HP_0030190,Oral motor hypotonia,Oral motor hypotonia,NA,NA
+HP:0002529,phenotype,http://purl.obolibrary.org/obo/HP_0002529,Neuronal loss in central nervous system,Neuronal loss in central nervous system,NA,NA
+MGI:3800779,variant,http://www.informatics.jax.org/accession/MGI:3800779,Tg(HTT*97Q)IXwy,Tg(HTT*97Q)IXwy,NA,NA
+MGI:4129208,variant,http://www.informatics.jax.org/accession/MGI:4129208,Zdhhc17<Gt(RRJ233)Byg>,Zdhhc17<Gt(RRJ233)Byg>,NA,NA
+MGI:3043476,genotype,http://www.informatics.jax.org/accession/MGI:3043476,Htt<tm2Detl>/Htt<tm2Detl> [involves: 129P2/OlaHsd * C57BL/6J],Htt<tm2Detl>/Htt<tm2Detl> [involves: 129P2/OlaHsd * C57BL/6J],NA,NA
+HGNC:243,gene,https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:243,ADD1,adducin 1,ADDA,"Adducins are a family of cytoskeletal proteins encoded by three genes (alpha, beta, and gamma). Adducin acts as a heterodimer of the related alpha, beta, or gamma subunits. The protein encoded by this gene represents the alpha subunit. Alpha- and beta-adducin include a protease-resistant N-terminal region and a protease-sensitive, hydrophilic C-terminal region. Adducin binds with high affinity to Ca(2+)/calmodulin and is a substrate for protein kinases A and C. [provided by RefSeq, Aug 2017]."
+MGI:4438241,genotype,http://www.informatics.jax.org/accession/MGI:4438241,Tg(HTT*)1Xwy [FVB-Tg(HTT*)1Xwy],Tg(HTT*)1Xwy [FVB-Tg(HTT*)1Xwy],NA,NA
+MGI:5286128,genotype,http://www.informatics.jax.org/accession/MGI:5286128,Tg(Prnp-HTT*82Q/KRT14-EGFP)C63Dbo [Not Specified],Tg(Prnp-HTT*82Q/KRT14-EGFP)C63Dbo [Not Specified],NA,NA
+MGI:3586839,genotype,http://www.informatics.jax.org/accession/MGI:3586839,Htt<tm1Hay>/Htt<+> [involves: C57BL/6J],Htt<tm1Hay>/Htt<+> [involves: C57BL/6J],NA,NA
+MGI:5565691,genotype,http://www.informatics.jax.org/accession/MGI:5565691,Tg(UBC-GFP/HTT*84Q)22Shya [involves: FVB],Tg(UBC-GFP/HTT*84Q)22Shya [involves: FVB],NA,NA
+HP:0030955,phenotype,http://purl.obolibrary.org/obo/HP_0030955,Alcoholism,Alcoholism,NA,NA
+dbSNP:rs3889139,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs3889139,rs3889139-?,rs3889139-?,NA,NA
+HGNC:8161,gene,https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:8161,OR10A2,olfactory receptor family 10 subfamily A member 2,OR10A2P|OR11-82|OR11-86|OST363,"Olfactory receptors interact with odorant molecules in the nose, to initiate a neuronal response that triggers the perception of a smell. The olfactory receptor proteins are members of a large family of G-protein-coupled receptors (GPCR) arising from single coding-exon genes. Olfactory receptors share a 7-transmembrane domain structure with many neurotransmitter and hormone receptors and are responsible for the recognition and G protein-mediated transduction of odorant signals. The olfactory receptor gene family is the largest in the genome. The nomenclature assigned to the olfactory receptor genes and proteins for this organism is independent of other organisms. [provided by RefSeq, Jul 2008]."
+HP:0002312,phenotype,http://purl.obolibrary.org/obo/HP_0002312,Clumsiness,Clumsiness,NA,NA
+HGNC:11551,gene,https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:11551,BRF1,BRF1 RNA polymerase III transcription initiation factor subunit,BRF|BRF-1|CFDS|GTF3B|HEL-S-76p|TAF3B2|TAF3C|TAFIII90|TF3B90|TFIIIB90|hBRF,"This gene encodes one of the three subunits of the RNA polymerase III transcription factor complex. This complex plays a central role in transcription initiation by RNA polymerase III on genes encoding tRNA, 5S rRNA, and other small structural RNAs. The gene product belongs to the TF2B family. Several alternatively spliced variants encoding different isoforms, that function at different promoters transcribed by RNA polymerase III, have been identified. [provided by RefSeq, Jun 2011]."
+HP:0030842,phenotype,http://purl.obolibrary.org/obo/HP_0030842,Choking episodes,Choking episodes,NA,NA
+HP:0002540,phenotype,http://purl.obolibrary.org/obo/HP_0002540,Inability to walk,Inability to walk,NA,NA
+HP:0004305,phenotype,http://purl.obolibrary.org/obo/HP_0004305,Involuntary movements,Involuntary movements,NA,NA
+MGI:5897176,genotype,http://www.informatics.jax.org/accession/MGI:5897176,Tg(CAG-Ppard*E411P)#Als; Tg(Nes-cre)1Kln [B6J.Cg-Tg(Nes-cre)1Kln Tg(CAG-Ppard*E411P)#Als],Tg(CAG-Ppard*E411P)#Als; Tg(Nes-cre)1Kln [B6J.Cg-Tg(Nes-cre)1Kln Tg(CAG-Ppard*E411P)#Als],NA,NA
+HGNC:29170,gene,https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:29170,FAN1,FANCD2 and FANCI associated nuclease 1,KIAA1018|KMIN|MTMR15|hFAN1,"This gene plays a role in DNA interstrand cross-link repair and encodes a protein with 5' flap endonuclease and 5'-3' exonuclease activity. Mutations in this gene cause karyomegalic interstitial nephritis. Alternatively spliced transcript variants encoding distinct isoforms have been described. [provided by RefSeq, Feb 2016]."
+MGI:5565690,genotype,http://www.informatics.jax.org/accession/MGI:5565690,Tg(UBC-GFP/HTT*84Q)22Shya,Tg(UBC-GFP/HTT*84Q)22Shya,NA,NA
+HP:0002355,phenotype,http://purl.obolibrary.org/obo/HP_0002355,Difficulty walking,Difficulty walking,NA,NA
+dbSNP:rs72715653,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs72715653,rs72715653-?,rs72715653-?,NA,NA
+HGNC:49222,gene,https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:49222,LINC01099,long intergenic non-protein coding RNA 1099,NA,NA
+HGNC:27731,gene,https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:27731,LINC01098,long intergenic non-protein coding RNA 1098,NA,NA
+HP:0000734,phenotype,http://purl.obolibrary.org/obo/HP_0000734,Disinhibition,Disinhibition,NA,NA
+HP:0031843,phenotype,http://purl.obolibrary.org/obo/HP_0031843,Bradyphrenia,Bradyphrenia,NA,NA
+dbSNP:rs117933444,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs117933444,rs117933444-?,rs117933444-?,NA,NA
+ENSEMBL:ENSG00000249141,gene,http://ensembl.org/id/ENSG00000249141,AL159163.1,NA,NA,NA
+HGNC:21686,gene,https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:21686,RNASET2,ribonuclease T2,RNASE6PL|bA514O12.3,"This ribonuclease gene is a novel member of the Rh/T2/S-glycoprotein class of extracellular ribonucleases. It is a single copy gene that maps to 6q27, a region associated with human malignancies and chromosomal rearrangement. [provided by RefSeq, Jul 2008]."
+dbSNP:rs73786719,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs73786719,rs73786719-?,rs73786719-?,NA,NA
+HGNC:21212,gene,https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:21212,ADGB,androglobin,C6orf103|CAPN16,NA
+HP:0000751,phenotype,http://purl.obolibrary.org/obo/HP_0000751,Personality changes,Personality changes,NA,NA
+HP:0001268,phenotype,http://purl.obolibrary.org/obo/HP_0001268,Mental deterioration,Mental deterioration,NA,NA
+HP:0045082,phenotype,http://purl.obolibrary.org/obo/HP_0045082,Decreased body mass index,Decreased body mass index,NA,NA
+MGI:3573927,genotype,http://www.informatics.jax.org/accession/MGI:3573927,Htt<tm1Detl>/Htt<tm1Detl> [involves: 129P2/OlaHsd * C57BL/6J],Htt<tm1Detl>/Htt<tm1Detl> [involves: 129P2/OlaHsd * C57BL/6J],NA,NA
+MGI:3699097,genotype,http://www.informatics.jax.org/accession/MGI:3699097,Htt<tm1.1Tna>/Htt<+> [involves: 129P2/OlaHsd * C57BL/6J],Htt<tm1.1Tna>/Htt<+> [involves: 129P2/OlaHsd * C57BL/6J],NA,NA
+MGI:5432176,genotype,http://www.informatics.jax.org/accession/MGI:5432176,Gt(ROSA)26Sor<tm48(HTT)Arte>/Gt(ROSA)26Sor<+> [Not Specified],Gt(ROSA)26Sor<tm48(HTT)Arte>/Gt(ROSA)26Sor<+> [Not Specified],NA,NA
+MGI:3694681,genotype,http://www.informatics.jax.org/accession/MGI:3694681,Tg(HDexon1)62Gpb [B6CBA-Tg(HDexon1)62Gpb/1J],Tg(HDexon1)62Gpb [B6CBA-Tg(HDexon1)62Gpb/1J],NA,NA
+HP:0009088,phenotype,http://purl.obolibrary.org/obo/HP_0009088,Speech articulation difficulties,Speech articulation difficulties,NA,NA
+HP:0000722,phenotype,http://purl.obolibrary.org/obo/HP_0000722,Obsessive-compulsive behavior,Obsessive-compulsive behavior,NA,NA
+MGI:5432190,genotype,http://www.informatics.jax.org/accession/MGI:5432190,Tg(YAC128)55Hay/Tg(YAC128)55Hay [FVB/N-Tg(YAC128)55Hay],Tg(YAC128)55Hay/Tg(YAC128)55Hay [FVB/N-Tg(YAC128)55Hay],NA,NA
+MGI:5432149,genotype,http://www.informatics.jax.org/accession/MGI:5432149,Tg(YAC128)#Hay,Tg(YAC128)#Hay,NA,NA
+dbSNP:rs114688092,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs114688092,rs114688092-?,rs114688092-?,NA,NA
+HGNC:16666,gene,https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:16666,KIF9,kinesin family member 9,NA,NA
+MGI:1861934,genotype,http://www.informatics.jax.org/accession/MGI:1861934,Htt<tm4Mem>,Htt<tm4Mem>,NA,NA
+MGI:3698039,genotype,http://www.informatics.jax.org/accession/MGI:3698039,Htt<tm4Mem>/Htt<tm4Mem> [involves: 129S1/Sv * 129X1/SvJ * CD-1],Htt<tm4Mem>/Htt<tm4Mem> [involves: 129S1/Sv * 129X1/SvJ * CD-1],NA,NA
+WormBase:WBGene00018294,genotype,https://www.wormbase.org/get?name=WBGene00018294,atg-18,atg-18,NA,NA
+HGNC:50546,gene,https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:50546,LINC01337,long intergenic non-protein coding RNA 1337,TCONS_00009713,NA
+HP:0001262,phenotype,http://purl.obolibrary.org/obo/HP_0001262,Excessive daytime somnolence,Excessive daytime somnolence,NA,NA
+HP:0031845,phenotype,http://purl.obolibrary.org/obo/HP_0031845,Abnormal libido,Abnormal libido,NA,NA
+HP:0001336,phenotype,http://purl.obolibrary.org/obo/HP_0001336,Myoclonus,Myoclonus,NA,NA
+HP:0002141,phenotype,http://purl.obolibrary.org/obo/HP_0002141,Gait imbalance,Gait imbalance,NA,NA
+HP:0031589,phenotype,http://purl.obolibrary.org/obo/HP_0031589,Suicidal ideation,Suicidal ideation,NA,NA
+HP:0000496,phenotype,http://purl.obolibrary.org/obo/HP_0000496,Abnormality of eye movement,Abnormality of eye movement,NA,NA
+MGI:3698855,genotype,http://www.informatics.jax.org/accession/MGI:3698855,Htt<tm2Msl>/Htt<tm2Msl> [involves: 129S1/Sv * C57BL/6J],Htt<tm2Msl>/Htt<tm2Msl> [involves: 129S1/Sv * C57BL/6J],NA,NA
+dbSNP:rs1232027,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs1232027,rs1232027-?,rs1232027-?,NA,NA
+MGI:3613525,genotype,http://www.informatics.jax.org/accession/MGI:3613525,Tg(YAC128)53Hay [FVB/N-Tg(YAC128)53Hay],Tg(YAC128)53Hay [FVB/N-Tg(YAC128)53Hay],NA,NA
+MGI:5569537,genotype,http://www.informatics.jax.org/accession/MGI:5569537,Tg(CMV-HTT*89Q)ATag/Tg(CMV-HTT*89Q)ATag [involves: FVB/N],Tg(CMV-HTT*89Q)ATag/Tg(CMV-HTT*89Q)ATag [involves: FVB/N],NA,NA
+MGI:1861935,variant,http://www.informatics.jax.org/accession/MGI:1861935,Htt<tm5Mem>,Htt<tm5Mem>,NA,NA
+MGI:3851446,genotype,http://www.informatics.jax.org/accession/MGI:3851446,Tg(Camk2a-tTA)1Mmay; Tg(tetO-HTT*94Q/-lacZ)1Rhn [involves: C57BL/6 * CBA],Tg(Camk2a-tTA)1Mmay; Tg(tetO-HTT*94Q/-lacZ)1Rhn [involves: C57BL/6 * CBA],NA,NA
+MGI:5052377,variant,http://www.informatics.jax.org/accession/MGI:5052377,Tg(HTT*/EGFP)190Nn,Tg(HTT*/EGFP)190Nn,NA,NA
+MGI:3584455,genotype,http://www.informatics.jax.org/accession/MGI:3584455,Gt(ROSA)26Sor<tm1(HD*103Q)Xwy>; Tg(Nes-cre)1Kln [involves: 129S1/Sv * 129X1/SvJ * C57BL/6 * SJL],Gt(ROSA)26Sor<tm1(HD*103Q)Xwy>; Tg(Nes-cre)1Kln [involves: 129S1/Sv * 129X1/SvJ * C57BL/6 * SJL],NA,NA
+dbSNP:rs12668183,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs12668183,rs12668183-C,rs12668183-C,NA,NA
+dbSNP:rs4736525,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs4736525,rs4736525-?,rs4736525-?,NA,NA
+HGNC:28970,gene,https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:28970,EFR3A,EFR3 homolog A,NA,"The protein encoded by this gene is part of a complex that plays a role in maintaining an active pool of phosphatidylinositol 4-kinase (PI4K) at the plasma membrane. This protein is thought to be a peripheral membrane protein that associates with the plasma membrane through palmitoylation. Studies indicate that this gene product plays a role in controlling G protein-coupled receptor (GPCR) activity by affecting receptor phosphorylation. Whole exome sequencing studies have implicated mutations in this gene with autism spectrum disorders. [provided by RefSeq, Apr 2016]."
+HP:0002063,phenotype,http://purl.obolibrary.org/obo/HP_0002063,Rigidity,Rigidity,NA,NA
+WormBase:WBGene00009027,gene,https://www.wormbase.org/get?name=WBGene00009027,F21G4.6,Uncharacterized protein,NA,NA
+HP:0025401,phenotype,http://purl.obolibrary.org/obo/HP_0025401,Staring gaze,Staring gaze,NA,NA
+MGI:3698040,genotype,http://www.informatics.jax.org/accession/MGI:3698040,Htt<tm4Mem>/Htt<+> [involves: 129S1/Sv * 129X1/SvJ * CD-1],Htt<tm4Mem>/Htt<+> [involves: 129S1/Sv * 129X1/SvJ * CD-1],NA,NA
+dbSNP:rs6882169,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs6882169,rs6882169-?,rs6882169-?,NA,NA
+ENSEMBL:ENSG00000253978,gene,http://ensembl.org/id/ENSG00000253978,ENSEMBL:ENSG00000253978,NA,NA,NA
+HP:0000716,phenotype,http://purl.obolibrary.org/obo/HP_0000716,Depressivity,Depressivity,NA,NA
+ENSEMBL:ENSG00000250424,gene,http://ensembl.org/id/ENSG00000250424,AC004691.2,NA,NA,NA
+MGI:5575509,genotype,http://www.informatics.jax.org/accession/MGI:5575509,Tg(Prnp-SNAP25/HTT*150Q)8Xjl [involves: FVB],Tg(Prnp-SNAP25/HTT*150Q)8Xjl [involves: FVB],NA,NA
+HGNC:7326,gene,https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:7326,MSH3,mutS homolog 3,DUP|FAP4|MRP1,"The protein encoded by this gene forms a heterodimer with MSH2 to form MutS beta, part of the post-replicative DNA mismatch repair system. MutS beta initiates mismatch repair by binding to a mismatch and then forming a complex with MutL alpha heterodimer. This gene contains a polymorphic 9 bp tandem repeat sequence in the first exon. The repeat is present 6 times in the reference genome sequence and 3-7 repeats have been reported. Defects in this gene are a cause of susceptibility to endometrial cancer. [provided by RefSeq, Mar 2011]."
+MGI:3613515,variant,http://www.informatics.jax.org/accession/MGI:3613515,Tg(YAC128)53Hay,Tg(YAC128)53Hay,NA,NA
+HP:0000713,phenotype,http://purl.obolibrary.org/obo/HP_0000713,Agitation,Agitation,NA,NA
+dbSNP:rs114643193,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs114643193,rs114643193-?,rs114643193-?,NA,NA
+HP:0000718,phenotype,http://purl.obolibrary.org/obo/HP_0000718,Aggressive behavior,Aggressive behavior,NA,NA
+HP:0010794,phenotype,http://purl.obolibrary.org/obo/HP_0010794,Impaired visuospatial constructive cognition,Impaired visuospatial constructive cognition,NA,NA
+MGI:2389466,variant,http://www.informatics.jax.org/accession/MGI:2389466,Tg(HDexon1)61Gpb,Tg(HDexon1)61Gpb,NA,NA
+HP:0002591,phenotype,http://purl.obolibrary.org/obo/HP_0002591,Polyphagia,Polyphagia,NA,NA
+HP:0001250,phenotype,http://purl.obolibrary.org/obo/HP_0001250,Seizure,Seizure,NA,NA
+MGI:5569533,genotype,http://www.informatics.jax.org/accession/MGI:5569533,Tg(CMV-HTT*48Q)BTag [involves: FVB/N],Tg(CMV-HTT*48Q)BTag [involves: FVB/N],NA,NA
+dbSNPIndividual:16731,genotype,http://www.ncbi.nlm.nih.gov/SNP/snp_ind.cgi?ind_id=16731,46;XX.arr(1-22;X)x2 [GM04723],46;XX.arr(1-22;X)x2 [GM04723],NA,NA
+HP:0002354,phenotype,http://purl.obolibrary.org/obo/HP_0002354,Memory impairment,Memory impairment,NA,NA
+MGI:5052307,genotype,http://www.informatics.jax.org/accession/MGI:5052307,Cnr1<tm1Map>/Cnr1<tm1Map>; Tg(HD82Gln)81Gschi [involves: 129S1/Sv * 129X1/SvJ * C3H * C57BL/6 * CD-1],Cnr1<tm1Map>/Cnr1<tm1Map>; Tg(HD82Gln)81Gschi [involves: 129S1/Sv * 129X1/SvJ * C3H * C57BL/6 * CD-1],NA,NA
+HP:0040140,phenotype,http://purl.obolibrary.org/obo/HP_0040140,Degeneration of the striatum,Degeneration of the striatum,NA,NA
+HP:0100785,phenotype,http://purl.obolibrary.org/obo/HP_0100785,Insomnia,Insomnia,NA,NA
+HP:0002300,phenotype,http://purl.obolibrary.org/obo/HP_0002300,Mutism,Mutism,NA,NA
+MGI:5466506,genotype,http://www.informatics.jax.org/accession/MGI:5466506,Zdhhc13<Gt(AC0492)Wtsi>/Zdhhc13<Gt(AC0492)Wtsi> [FVB.129P2-Zdhhc13<Gt(AC0492)Wtsi>],Zdhhc13<Gt(AC0492)Wtsi>/Zdhhc13<Gt(AC0492)Wtsi> [FVB.129P2-Zdhhc13<Gt(AC0492)Wtsi>],NA,NA
+dbSNP:rs11197481,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs11197481,rs11197481-G,rs11197481-G,NA,NA
+HP:0012547,phenotype,http://purl.obolibrary.org/obo/HP_0012547,Abnormal involuntary eye movements,Abnormal involuntary eye movements,NA,NA
+MGI:5566682,genotype,http://www.informatics.jax.org/accession/MGI:5566682,Tg(YAC128)#Hay [FVB/N-Tg(YAC128)#Hay],Tg(YAC128)#Hay [FVB/N-Tg(YAC128)#Hay],NA,NA
+MGI:1861699,genotype,http://www.informatics.jax.org/accession/MGI:1861699,Htt<tm3Mem>,Htt<tm3Mem>,NA,NA
+MGI:5432178,genotype,http://www.informatics.jax.org/accession/MGI:5432178,Gt(ROSA)26Sor<tm50(HTT)Arte>/Gt(ROSA)26Sor<+> [Not Specified],Gt(ROSA)26Sor<tm50(HTT)Arte>/Gt(ROSA)26Sor<+> [Not Specified],NA,NA
+dbSNPIndividual:21047,genotype,http://www.ncbi.nlm.nih.gov/SNP/snp_ind.cgi?ind_id=21047,46;XX.arr(1-22;X)x2 [GM04721],46;XX.arr(1-22;X)x2 [GM04721],NA,NA
+dbSNP:rs8031584,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs8031584,rs8031584-?,rs8031584-?,NA,NA
+ENSEMBL:ENSG00000259720,gene,http://ensembl.org/id/ENSG00000259720,ENSEMBL:ENSG00000259720,NA,NA,NA
+MGI:3723505,genotype,http://www.informatics.jax.org/accession/MGI:3723505,Tg(HD)63Aron [involves: C57BL/6 * SJL],Tg(HD)63Aron [involves: C57BL/6 * SJL],NA,NA
+HP:0002059,phenotype,http://purl.obolibrary.org/obo/HP_0002059,Cerebral atrophy,Cerebral atrophy,NA,NA
+dbSNP:rs150393409,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs150393409,rs150393409-A,rs150393409-A,NA,NA
+MGI:6400710,genotype,http://www.informatics.jax.org/accession/MGI:6400710,Htt<tm5Detl>/Htt<+> [involves: C57BL/6],Htt<tm5Detl>/Htt<+> [involves: C57BL/6],NA,NA
+HP:0002500,phenotype,http://purl.obolibrary.org/obo/HP_0002500,Abnormality of the cerebral white matter,Abnormality of the cerebral white matter,NA,NA
+MGI:3698041,genotype,http://www.informatics.jax.org/accession/MGI:3698041,Htt<tm5Mem>/Htt<+> [involves: 129S1/Sv * 129X1/SvJ * CD-1],Htt<tm5Mem>/Htt<+> [involves: 129S1/Sv * 129X1/SvJ * CD-1],NA,NA
+dbSNP:rs116220136,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs116220136,rs116220136-?,rs116220136-?,NA,NA
+MGI:5432179,genotype,http://www.informatics.jax.org/accession/MGI:5432179,Gt(ROSA)26Sor<tm51(HTT)Arte>/Gt(ROSA)26Sor<+> [Not Specified],Gt(ROSA)26Sor<tm51(HTT)Arte>/Gt(ROSA)26Sor<+> [Not Specified],NA,NA
+dbSNPIndividual:21199,genotype,http://www.ncbi.nlm.nih.gov/SNP/snp_ind.cgi?ind_id=21199,46;XX/47;XX;+12;47;XX;+12[13]/46;XX[37] [GM02166],46;XX/47;XX;+12;47;XX;+12[13]/46;XX[37] [GM02166],NA,NA
+MGI:5292519,genotype,http://www.informatics.jax.org/accession/MGI:5292519,Zdhhc17<Gt(RRJ233)Byg>/Zdhhc17<Gt(RRJ233)Byg> [FVB.129P2-Zdhhc17<Gt(RRJ233)Byg>],Zdhhc17<Gt(RRJ233)Byg>/Zdhhc17<Gt(RRJ233)Byg> [FVB.129P2-Zdhhc17<Gt(RRJ233)Byg>],NA,NA
+HGNC:29943,gene,https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:29943,TENM2,teneurin transmembrane protein 2,ODZ2|TEN-M2|TEN2|TNM2|ten-2,NA
+HP:0200147,phenotype,http://purl.obolibrary.org/obo/HP_0200147,Neuronal loss in basal ganglia,Neuronal loss in basal ganglia,NA,NA
+HGNC:9675,gene,https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:9675,PTPRM,protein tyrosine phosphatase receptor type M,PTPRL1|R-PTP-MU|RPTPM|RPTPU|hR-PTPu,"The protein encoded by this gene is a member of the protein tyrosine phosphatase (PTP) family. PTPs are known to be signaling molecules that regulate a variety of cellular processes including cell growth, differentiation, mitotic cycle, and oncogenic transformation. This PTP possesses an extracellular region, a single transmembrane region, and two tandem catalytic domains, and thus represents a receptor-type PTP. The extracellular region contains a meprin-A5 antigen-PTP mu (MAM) domain, an Ig-like domain and four fibronectin type III-like repeats. This PTP has been shown to mediate cell-cell aggregation through the interaction with another molecule of this PTP on an adjacent cell. This PTP can interact with scaffolding protein RACK1/GNB2L1, which may be necessary for the downstream signaling in response to cell-cell adhesion. Alternative splicing results in multiple transcripts encoding distinct isoforms. [provided by RefSeq, Jul 2008]."
+dbSNP:rs78621558,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs78621558,rs78621558-?,rs78621558-?,NA,NA
+dbSNP:rs117440785,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs117440785,rs117440785-?,rs117440785-?,NA,NA
+HP:0200136,phenotype,http://purl.obolibrary.org/obo/HP_0200136,Oral-pharyngeal dysphagia,Oral-pharyngeal dysphagia,NA,NA
+MGI:3709758,genotype,http://www.informatics.jax.org/accession/MGI:3709758,Drd1<tm2Jcd>/Drd1<+>; Tg(Camk2a-cre)2Gsc [involves: 129S4/SvJae * FVB/N],Drd1<tm2Jcd>/Drd1<+>; Tg(Camk2a-cre)2Gsc [involves: 129S4/SvJae * FVB/N],NA,NA
+HP:0002073,phenotype,http://purl.obolibrary.org/obo/HP_0002073,Progressive cerebellar ataxia,Progressive cerebellar ataxia,NA,NA
+HGNC:9587,gene,https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:9587,PTDSS1,phosphatidylserine synthase 1,LMHD|PSS1|PSSA,"The protein encoded by this gene catalyzes the formation of phosphatidylserine from either phosphatidylcholine or phosphatidylethanolamine. Phosphatidylserine localizes to the mitochondria-associated membrane of the endoplasmic reticulum, where it serves a structural role as well as a signaling role. Defects in this gene are a cause of Lenz-Majewski hyperostotic dwarfism. Two transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Mar 2014]."
+dbSNP:rs4720024,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs4720024,rs4720024-?,rs4720024-?,NA,NA
+HP:0006855,phenotype,http://purl.obolibrary.org/obo/HP_0006855,Cerebellar vermis atrophy,Cerebellar vermis atrophy,NA,NA
+HP:0007010,phenotype,http://purl.obolibrary.org/obo/HP_0007010,Poor fine motor coordination,Poor fine motor coordination,NA,NA
+HP:0000746,phenotype,http://purl.obolibrary.org/obo/HP_0000746,Delusions,Delusions,NA,NA
+dbSNP:rs80260687,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs80260687,rs80260687-?,rs80260687-?,NA,NA
+MGI:5700345,genotype,http://www.informatics.jax.org/accession/MGI:5700345,Tg(Plp1-HTT*150Q)4aXjl [Not Specified],Tg(Plp1-HTT*150Q)4aXjl [Not Specified],NA,NA
+dbSNPIndividual:22796,genotype,http://www.ncbi.nlm.nih.gov/SNP/snp_ind.cgi?ind_id=22796,46;XY.arr(1-22)x2;(XY)x1 [GM09197],46;XY.arr(1-22)x2;(XY)x1 [GM09197],NA,NA
+MGI:3698754,genotype,http://www.informatics.jax.org/accession/MGI:3698754,Htt<tm2.1Pfs>/Htt<+> [involves: 129X1/SvJ * C57BL/6],Htt<tm2.1Pfs>/Htt<+> [involves: 129X1/SvJ * C57BL/6],NA,NA
+MGI:2177756,genotype,http://www.informatics.jax.org/accession/MGI:2177756,Htt<tm1Detl>,Htt<tm1Detl>,NA,NA
+MGI:3698042,genotype,http://www.informatics.jax.org/accession/MGI:3698042,Htt<tm5Mem>/Htt<tm5Mem> [involves: 129S1/Sv * 129X1/SvJ * CD-1],Htt<tm5Mem>/Htt<tm5Mem> [involves: 129S1/Sv * 129X1/SvJ * CD-1],NA,NA
+ZFIN:ZDB-FISH-170608-6,genotype,http://zfin.org/ZDB-FISH-170608-6,<zf602Tg>/<?>; <zf703Tg>/<?> [unspecified background],<zf602Tg>/<?>; <zf703Tg>/<?> [unspecified background],NA,NA
+MGI:3573928,genotype,http://www.informatics.jax.org/accession/MGI:3573928,Htt<tm1Detl>/Htt<+> [involves: 129P2/OlaHsd * C57BL/6J],Htt<tm1Detl>/Htt<+> [involves: 129P2/OlaHsd * C57BL/6J],NA,NA
+dbSNP:rs79029191,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs79029191,rs79029191-?,rs79029191-?,NA,NA
+MGI:3698752,genotype,http://www.informatics.jax.org/accession/MGI:3698752,Htt<tm1.1Pfs>/Htt<+> [involves: 129S4/SvJae * C57BL/6],Htt<tm1.1Pfs>/Htt<+> [involves: 129S4/SvJae * C57BL/6],NA,NA
+dbSNPIndividual:18613,genotype,http://www.ncbi.nlm.nih.gov/SNP/snp_ind.cgi?ind_id=18613,47;XY;t(1;3)(3qter->3q?21::1p?32->1qter;&#x0D;&#x0A;3pter->3q?21::1p?32->1pter);+20[8]/46;XY[12] [GM01085],47;XY;t(1;3)(3qter->3q?21::1p?32->1qter;&#x0D;&#x0A;3pter->3q?21::1p?32->1pter);+20[8]/46;XY[12] [GM01085],NA,NA
+ZFIN:ZDB-FISH-170608-17,genotype,http://zfin.org/ZDB-FISH-170608-17,<zf696Tg>/<?>; <zf703Tg>/<?> [unspecified background],<zf696Tg>/<?>; <zf703Tg>/<?> [unspecified background],NA,NA
+dbSNPIndividual:17323,genotype,http://www.ncbi.nlm.nih.gov/SNP/snp_ind.cgi?ind_id=17323,46;XX;46;XX.arr(1-22;X)x2 [GM03621],46;XX;46;XX.arr(1-22;X)x2 [GM03621],NA,NA
+MGI:1861703,genotype,http://www.informatics.jax.org/accession/MGI:1861703,Htt<tm2Mem>,Htt<tm2Mem>,NA,NA
+ZFIN:ZDB-FISH-170608-4,genotype,http://zfin.org/ZDB-FISH-170608-4,<zf602Tg>/<?>; <zf701Tg>/<?> [unspecified background],<zf602Tg>/<?>; <zf701Tg>/<?> [unspecified background],NA,NA
+dbSNPIndividual:22138,genotype,http://www.ncbi.nlm.nih.gov/SNP/snp_ind.cgi?ind_id=22138,46;XY.arr 3p25.2(12651912-12806123)x3;6(q13q16.175176185-98959605)x2 hmz;7p21.3(7313484-13335041)x2 hmz;15q11.1(20216942-22681064)x1;17q22q24.2(53819086-65020731)x2 hmz [GM04285],46;XY.arr 3p25.2(12651912-12806123)x3;6(q13q16.175176185-98959605)x2 hmz;7p21.3(7313484-13335041)x2 hmz;15q11.1(20216942-22681064)x1;17q22q24.2(53819086-65020731)x2 hmz [GM04285],NA,NA
+FlyBase:FBal0209708,genotype,http://flybase.org/reports/FBal0209708,htt[GD14339],htt[GD14339],NA,NA
+ClinVarVariant:31916,variant,http://www.ncbi.nlm.nih.gov/clinvar/variation/31916,NM_002111.8(HTT):c.52CAG[(36_39)],NM_002111.8(HTT):c.52CAG[(36_39)],NA,NA
+ZFIN:ZDB-FISH-150901-22783,genotype,http://zfin.org/ZDB-FISH-150901-22783,WT,WT,NA,NA
+dbSNP:rs932428,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs932428,rs932428-?,rs932428-?,NA,NA
+ClinVarVariant:31915,variant,http://www.ncbi.nlm.nih.gov/clinvar/variation/31915,NM_002111.8(HTT):c.52CAG[(27_35)] (p.Gln18_Gln38delinsGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGln),NM_002111.8(HTT):c.52CAG[(27_35)] (p.Gln18_Gln38delinsGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGlnGln),NA,NA
+dbSNPIndividual:22189,genotype,http://www.ncbi.nlm.nih.gov/SNP/snp_ind.cgi?ind_id=22189,46;XY;add(2)(pter->q?31::?);der(6)(6pter->6q?13::2q?14.1->2qter)[5]/46;XY[15].arr(1-22)x2;(XY)x1 [GM04693],46;XY;add(2)(pter->q?31::?);der(6)(6pter->6q?13::2q?14.1->2qter)[5]/46;XY[15].arr(1-22)x2;(XY)x1 [GM04693],NA,NA
+FlyBase:FBal0293482,genotype,http://flybase.org/reports/FBal0293482,htt[HMS02845],htt[HMS02845],NA,NA
+MGI:3699093,genotype,http://www.informatics.jax.org/accession/MGI:3699093,Htt<tm1.1Tna>/Htt<tm1.1Tna> [involves: 129P2/OlaHsd * C57BL/6J],Htt<tm1.1Tna>/Htt<tm1.1Tna> [involves: 129P2/OlaHsd * C57BL/6J],NA,NA
+dbSNP:rs3013648,variant,http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=rs3013648,rs3013648-?,rs3013648-?,NA,NA
