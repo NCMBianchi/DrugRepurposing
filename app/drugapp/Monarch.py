@@ -55,6 +55,7 @@ def read_connections(filename):  #bioknowledgeReviewer
     # monarch network
     path = os.getcwd() + '/monarch'
     csv_path = path + '/' + filename
+    ## MIREIA: does not parse correctly labels due to commas within str labels
     network_df = pd.read_csv('{}'.format(csv_path))
     #print('\n* This is the size of the data structure: {}'.format(network_df.shape))
     #print('* These are the attributes: {}'.format(network_df.columns))
@@ -348,23 +349,50 @@ def get_neighbours(seed):  #bioknowledgeReviewer
     keepNodes = set()
     keepEdges = set()
     seedNodes = set(seed)
-    for node in tqdm(seedNodes):
-        try:
-            r_out, r_in = hit_monarch_api(node)
-            sub_l, rel_l, obj_l, ref_l = get_edges_objects(r_out, r_in)
-            edges = get_edges(sub_l, rel_l, obj_l, ref_l, 'id')
-            keepEdges = keep_edges(keepEdges, edges)
-            keepNodes = keep_nodes(keepNodes, edges, seedNodes)
+    #for node in tqdm(seedNodes):
+    #    try:
+    #        r_out, r_in = hit_monarch_api(node)
+    #        sub_l, rel_l, obj_l, ref_l = get_edges_objects(r_out, r_in)
+    #        edges = get_edges(sub_l, rel_l, obj_l, ref_l, 'id')
+    #        keepEdges = keep_edges(keepEdges, edges)
+    #        keepNodes = keep_nodes(keepNodes, edges, seedNodes)
+    #
+    #    #except (ValueError, KeyError):
+    #    #    pass
+    #    #except:
+    #    #    print('error: {}'.format(sys.exc_info()[0]))
+    #    #    print(node)
+    #    except (ValueError, KeyError):  # (!!!) where it seems to break
+    #        logging.warning(f"Skipping node {node} due to ValueError or KeyError.")
+    #    except Exception as e:
+    #        logging.error(f"An error occurred for node {node}: {e}")
+    ## Variant that saves the variables in a .txt logfile to check with function breaks down
+    path = os.path.join(os.getcwd(), 'monarch')
+    if not os.path.isdir(path):
+        os.makedirs(path)
+    file_path = os.path.join(path, f"monarch_get_neighbours_v{today}.txt")
+    with open(file_path, 'a') as log_file:
+        for node in tqdm(seedNodes):
+            try:
+                r_out, r_in = hit_monarch_api(node)
+                log_file.write(f"R_out: {r_out}\n")
+                log_file.write(f"R_in: {r_in}\n")
+                sub_l, rel_l, obj_l, ref_l = get_edges_objects(r_out, r_in)
+                log_file.write(f"sub_l: {sub_l}\n")
+                log_file.write(f"rel_l: {rel_l}\n")
+                log_file.write(f"obj_l: {obj_l}\n")
+                log_file.write(f"ref_l: {ref_l}\n")
+                edges = get_edges(sub_l, rel_l, obj_l, ref_l, 'id')
+                log_file.write(f"edges: {edges}\n")
+                keepEdges = keep_edges(keepEdges, edges)
+                log_file.write(f"keepEdges: {keepEdges}\n")
+                keepNodes = keep_nodes(keepNodes, edges, seedNodes)
+                log_file.write(f"keepNodes: {keepNodes}\n\n")
+            except (ValueError, KeyError):
+                logging.warning(f"Skipping node {node} due to ValueError or KeyError.")
+            except Exception as e:
+                logging.error(f"An error occurred for node {node}: {e}")
 
-        #except (ValueError, KeyError):
-        #    pass
-        #except:
-        #    print('error: {}'.format(sys.exc_info()[0]))
-        #    print(node)
-        except (ValueError, KeyError):  # (!!!) where it seems to break
-            logging.warning(f"Skipping node {node} due to ValueError or KeyError.")
-        except Exception as e:
-            logging.error(f"An error occurred for node {node}: {e}")
 
     logging.info(f"Final keepNodes set size: {len(keepNodes)}")
     sample_nodes = list(keepNodes)[:5]
@@ -401,6 +429,26 @@ def filter_edges(nodes, edges):  #bioknowledgeReviewer
     return keep
 
 
+def filter_edges_mock(nodes, edges):  #bioknowledgeReviewer
+    """
+    This function filters down edges with both nodes in a nodes list.
+
+    :param nodes: nodes list
+    :param edges: edges set
+    :return: filtered edges set
+    """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
+
+    keep = set(edges)
+
+    logging.info(f"Filtered edges set size: {len(keep)}")
+    sample_keep = list(keep)[:5]
+    logging.debug(f"Sample of filtered edges: {sample_keep}")
+
+    return keep
+
+
 def add_attributes(sub_l, rel_l, obj_l, edges):  #bioknowledgeReviewer
     """
     This function adds 'label', 'iri', 'category' attribute to each entity in the edge.
@@ -413,24 +461,45 @@ def add_attributes(sub_l, rel_l, obj_l, edges):  #bioknowledgeReviewer
 
     logging.info(f"NOW RUNNING: {current_function_name()}.")
 
+    ## ADD INPUT .CSV FOR EACH FUNCTION PARAMETER
+    path = os.path.join(os.getcwd(), 'monarch')
+    if not os.path.isdir(path):
+        os.makedirs(path)
+    if sub_l:
+        df_sub = pd.DataFrame(sub_l).fillna('None')
+        df_sub.to_csv(os.path.join(path, f"sub_l_v{today}.csv"), index=False)
+    if rel_l:
+        df_rel = pd.DataFrame(rel_l).fillna('None')
+        df_rel.to_csv(os.path.join(path, f"rel_l_v{today}.csv"), index=False)
+    if obj_l:
+        df_obj = pd.DataFrame(obj_l).fillna('None')
+        df_obj.to_csv(os.path.join(path, f"obj_l_v{today}.csv"), index=False)
+    if edges:  # EMPTY so far, check again
+        df_edges = pd.DataFrame(list(edges), columns=['sub_id', 'rel_id', 'obj_id', 'refs']).fillna('None')
+        df_edges.to_csv(os.path.join(path, f"edges_v{today}.csv"), index=False)
+
     metaedges = set()
     for (sub_id, rel_id, obj_id, refs) in edges:
         for i in range(len(sub_l)):
             if sub_l[i]['id'] == sub_id and rel_l[i]['id'] == rel_id and obj_l[i]['id'] == obj_id:
                 metaedges.add((sub_l[i]['id'],
                                sub_l[i]['label'],
-                               #sub_l[i]['iri'],  # temporary removed for testing
+                               sub_l[i]['iri'],  # not in bioknowledgeReviewer
                                sub_l[i]['category'][0], # add [0] because category is in a list
                                rel_l[i]['id'],
                                rel_l[i]['label'],
-                               #rel_l[i]['iri'],
+                               rel_l[i]['iri'],  # not in bioknowledgeReviewer
                                obj_l[i]['id'],
                                obj_l[i]['label'],
-                               #obj_l[i]['iri'],
-                               #obj_l[i]['category'][0],
+                               obj_l[i]['iri'],  # not in bioknowledgeReviewer
+                               obj_l[i]['category'][0],  # not in bioknowledgeReviewer
                                refs)
                               )
                 break
+
+    ## ADD OUTPUT .CSV
+    df_metaedges = pd.DataFrame(list(metaedges), columns=['sub_id', 'sub_label', 'sub_category', 'rel_id', 'rel_label', 'obj_id', 'obj_label', 'refs']).fillna('None')
+    df_metaedges.to_csv(os.path.join(path, f"metaedges_v{today}.csv"), index=False)
 
     logging.info(f"Metaedges set size: {len(metaedges)}")
     sample_metaedges = list(metaedges)[:5]
@@ -456,6 +525,7 @@ def keep_node_type(edges, seed, nodeType='ortho'):  #bioknowledgeReviewer
     if nodeType == 'pheno':
         propertyList = ['RO:0002200', 'RO:0002607', 'RO:0002326', 'GENO:0000840']
     # https://github.com/monarch-initiative/dipper/issues/378 apparently they no longer are in OWL
+    ## CHECK w/NQR which identifiers should be used
 
     keep = set()
     for (sub, rel, obj, ref) in edges:
@@ -466,6 +536,31 @@ def keep_node_type(edges, seed, nodeType='ortho'):  #bioknowledgeReviewer
                 keep.add(sub)
             if obj not in seed:
                 keep.add(obj)
+
+    logging.info(f"Kept nodes set size: {len(keep)}")
+    sample_keep_nodes = list(keep)[:5]
+    logging.debug(f"Sample of kept nodes: {sample_keep_nodes}")
+
+    return keep
+
+
+def keep_node_type_mock(edges, seed, nodeType='ortho'):  #variant of originally in bioknowledgeReviewer
+    """
+    This function bypasses keep_node_type() which currently doesn't work –probably due to
+    changes in the OWL provided accepted node types.
+
+    :param edges: edges set
+    :param seed: the query nodes list
+    :param nodeType: Introduce node type to keep (string): 'ortho' for orthologs or 'pheno' \
+    for phenotypes/diseases, default is 'ortho'
+    :return: nodes set
+    """
+
+    ## To check where it breaks down: ADD .CSV SAVE (input)
+
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
+
+    keep = edges
 
     logging.info(f"Kept nodes set size: {len(keep)}")
     sample_keep_nodes = list(keep)[:5]
@@ -489,7 +584,8 @@ def get_connections(nodes):  #bioknowledgeReviewer
             r_out, r_in = hit_monarch_api(node, 1000)
             sub_l, rel_l, obj_l, ref_l = get_edges_objects(r_out, r_in)
             edges = get_edges(sub_l, rel_l, obj_l, ref_l, 'id')
-            filteredEdges = filter_edges(nodes, edges)
+            #filteredEdges = filter_edges(nodes, edges)
+            filteredEdges = filter_edges_mock(nodes, edges)
             metaFilteredEdges = add_attributes(sub_l, rel_l, obj_l, filteredEdges)
             keep = keep_edges(keep, metaFilteredEdges)
 
@@ -560,13 +656,17 @@ def get_orthopheno_list(seed_list):  #bioknowledgeReviewer
     neighbours, relations = get_neighbours(seed_list)
 
     # keep orthologs in the first layer
-    orthologs = keep_node_type(relations, seed_list)
+    #orthologs = keep_node_type(relations, seed_list)
+    orthologs = keep_node_type_mock(relations, seed_list)
+    ## This allows the pipeline to work, but both 'ortho' and 'pheno' are kept
 
     # get second layer from orthologs
     neighbours, relations = get_neighbours(orthologs)
 
     # keep phenotypes in the second layer
-    phenotypes = keep_node_type(relations, orthologs, 'pheno')
+    #phenotypes = keep_node_type(relations, orthologs, 'pheno')
+    phenotypes = keep_node_type_mock(relations, orthologs, 'pheno')
+    ## This allows the pipeline to work, but both 'ortho' and 'pheno' are kept
 
     nodes = set()
     nodes.update(orthologs, phenotypes)
@@ -581,7 +681,7 @@ def get_orthopheno_list(seed_list):  #bioknowledgeReviewer
     path = os.path.join(os.getcwd(), 'monarch')
     if not os.path.isdir(path):
         os.makedirs(path)
-    file_path = os.path.join(path, f"monarch_orthopeno_list_v{today}.csv")
+    file_path = os.path.join(path, f"monarch_orthopheno_list_v{today}.csv")
     df = pd.DataFrame(nodes_list).fillna('None')
     df.to_csv(file_path, index=False)
 
@@ -675,15 +775,15 @@ def print_network(network, filename):  #bioknowledgeReviewer
         row = dict()
         row['subject_id'] = tuple[0]
         row['subject_label'] = tuple[1]
-        #row['subject_uri'] = tuple[2]  # temporary removed for testing
+        row['subject_uri'] = tuple[2]  # not in bioknowledgeReviewer
         row['subject_category'] = tuple[3]
         row['relation_id'] = tuple[4]
         row['relation_label'] = tuple[5]
-        #row['relation_uri'] = tuple[6]
+        row['relation_uri'] = tuple[6]  # not in bioknowledgeReviewer
         row['object_id'] = tuple[7]
         row['object_label'] = tuple[8]
-        #row['object_uri'] = tuple[9]
-        #row['object_category'] = tuple[10]
+        row['object_uri'] = tuple[9]  # not in bioknowledgeReviewer
+        row['object_category'] = tuple[10]  # not in bioknowledgeReviewer
         row['reference_id_list'] = tuple[11]
         edges.append(row)
     
@@ -1443,9 +1543,9 @@ def run_monarch(input_id = 'MONDO:0007739'):
     network = extract_edges(geneList) 
 
     # save network
-    print_network(network, 'monarch_orthopeno_network_disease')
+    print_network(network, 'monarch_orthopheno_network_disease')
     
-    file = 'monarch_orthopeno_network_disease_v{}.csv'.format(today)
+    file = 'monarch_orthopheno_network_disease_v{}.csv'.format(today)
     monarch_connections = read_connections(file)
     build_edges(monarch_connections, edges_fname = 'monarch_edges_disease')
     build_nodes(monarch_connections, nodes_fname = 'monarch_nodes_disease')
@@ -1537,9 +1637,9 @@ def run_monarch_symptom(input_symptom, date):
     network = extract_edges(geneList) 
 
     # save network
-    print_network(network, 'monarch_orthopeno_network_symptom')
+    print_network(network, 'monarch_orthopheno_network_symptom')
     
-    file = 'monarch_orthopeno_network_symptom_v{}.csv'.format(today)
+    file = 'monarch_orthopheno_network_symptom_v{}.csv'.format(today)
     monarch_connections = read_connections(file)
     build_edges(monarch_connections, edges_fname='monarch_edges_symptom')
     build_nodes(monarch_connections, nodes_fname = 'monarch_nodes_symptom')

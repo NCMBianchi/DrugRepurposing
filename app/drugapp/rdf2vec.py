@@ -463,21 +463,21 @@ def rdf2vec_general(symptom_user_input, date, disease_name_date):
     # delete the files not needed anymore (everything except the original disease graph)
     # these extra files take up a lot of space
     os.chdir('./drugapp/data/{}'.format(disease_name_date)) # go into the disease folder
-    os.remove('./monarch/monarch_edges_symptom_v{}.csv'.format(today))
-    os.remove('./monarch/monarch_nodes_symptom_v{}.csv'.format(today))
-    os.remove('./monarch/monarch_orthopeno_network_symptom_v{}.csv'.format(today))
-    os.remove('./DGIdb/DGIdb_edges_v{}.csv'.format(today))
-    os.remove('./DGIdb/DGIdb_nodes_v{}.csv'.format(today))
-    os.remove('./DGIdb/DGIdb_network_v{}.csv'.format(today))
-    os.remove('./similaritygraph/drugdrugsim_v{}.csv'.format(today))
-    os.remove('./graph/graph_edges_v{}.csv'.format(today)) # keep for neo4j
-    os.remove('./graph/graph_nodes_v{}.csv'.format(today)) # keep for neo4j
-    os.remove('drug_embedding_dict.pkl')
-    os.remove('gene_embedding_dict.pkl')
-    os.remove('./embedding/genetarget_predict_v{}.csv'.format(today))
-    os.remove('./embedding/genetarget_train_v{}.csv'.format(today))
-    os.remove('my_graph_removed.ttl')
-    
+    #os.remove('./monarch/monarch_edges_symptom_v{}.csv'.format(today))
+    #os.remove('./monarch/monarch_nodes_symptom_v{}.csv'.format(today))
+    #os.remove('./monarch/monarch_orthopheno_network_symptom_v{}.csv'.format(today))
+    #os.remove('./DGIdb/DGIdb_edges_v{}.csv'.format(today))
+    #os.remove('./DGIdb/DGIdb_nodes_v{}.csv'.format(today))
+    #os.remove('./DGIdb/DGIdb_network_v{}.csv'.format(today))
+    #os.remove('./similaritygraph/drugdrugsim_v{}.csv'.format(today))
+    #os.remove('./graph/graph_edges_v{}.csv'.format(today)) # keep for neo4j
+    #os.remove('./graph/graph_nodes_v{}.csv'.format(today)) # keep for neo4j
+    #os.remove('drug_embedding_dict.pkl')
+    #os.remove('gene_embedding_dict.pkl')
+    #os.remove('./embedding/genetarget_predict_v{}.csv'.format(today))
+    #os.remove('./embedding/genetarget_train_v{}.csv'.format(today))
+    #os.remove('my_graph_removed.ttl')
+    ## File removal temporarily commented out to first check out the pipeline works.
   
     
 if __name__ == '__main__':
