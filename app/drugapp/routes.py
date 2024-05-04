@@ -69,8 +69,8 @@ def config():
     form = URIphenotype()
     if form.validate_on_submit(): # if a mim number is inserted
         input_number = form.URIphenotype.data
-        run_monarch(input_number)
-        #run_monarch_mock(input_number)
+        #run_monarch(input_number)
+        run_monarch_mock(input_number)
         symptoms_name_lst, date, diseasename = symptom_list_today()
         session['symptoms_name_lst'] = symptoms_name_lst
         return redirect(url_for('symptoms', date=date, diseasename=diseasename))
@@ -83,7 +83,8 @@ def symptoms(date='None', diseasename='None'):
     form.symptoms.choices = session['symptoms_name_lst']
     if form.validate_on_submit():
         input_symptom = form.symptoms.data
-        run_monarch_symptom(input_symptom, date)
+        #run_monarch_symptom(input_symptom, date)
+        run_monarch_symptom_mock(input_symptom, date)
         run_dgidb(date)
         run_drugsimilarity()
         run_combine_graphs(date)

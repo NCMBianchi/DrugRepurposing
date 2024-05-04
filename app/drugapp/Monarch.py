@@ -165,7 +165,7 @@ def get_disease_name_id(disease_input_ID = 'MONDO:0007739'):
     json_file_path = os.path.join(data_directory_path, 'api_response.json')
     os.makedirs(data_directory_path, exist_ok=True)
     with open(json_file_path, 'w') as json_file:
-        json.dump(response_json, json_file)
+        json.dump(response_json, json_file) 
     logging.info(f"API response saved to {json_file_path}")
 
     return disease_name, disease_id
@@ -416,11 +416,28 @@ def filter_edges(nodes, edges):  #bioknowledgeReviewer
 
     logging.info(f"NOW RUNNING: {current_function_name()}.")
 
-    nodes = set(nodes)
-    keep = set()
-    for (start, pred, stop, ref) in edges:
-        if {start, stop} <= nodes: # is {..} a subset of {..}
-            keep.add((start, pred, stop, ref))
+    path = os.path.join(os.getcwd(), 'monarch')
+    if not os.path.isdir(path):
+        os.makedirs(path)
+    file_path = os.path.join(path, f"filter_edges_v{today}.txt")
+
+    #nodes = set(nodes)
+    #keep = set()
+    #for (start, pred, stop, ref) in edges:
+    #    if {start, stop} <= nodes: # is {..} a subset of {..}
+    #        keep.add((start, pred, stop, ref))
+
+    with open(file_path, 'w') as log_file:
+        for (start, pred, stop, ref) in edges:
+            # Log the current nodes and edge being processed
+            log_file.write(f"Processing edge: start={start}, stop={stop}, nodes present={nodes}\n")
+            
+            # Check if both start and stop nodes are in the 'nodes' set
+            if {start, stop} <= nodes:
+                keep.add((start, pred, stop, ref))
+                log_file.write(f"Edge kept: start={start}, pred={pred}, stop={stop}, ref={ref}\n")
+            else:
+                log_file.write(f"Edge discarded: start={start}, stop={stop}\n")
 
     logging.info(f"Filtered edges set size: {len(keep)}")
     sample_keep = list(keep)[:5]
@@ -478,24 +495,52 @@ def add_attributes(sub_l, rel_l, obj_l, edges):  #bioknowledgeReviewer
         df_edges = pd.DataFrame(list(edges), columns=['sub_id', 'rel_id', 'obj_id', 'refs']).fillna('None')
         df_edges.to_csv(os.path.join(path, f"edges_v{today}.csv"), index=False)
 
-    metaedges = set()
-    for (sub_id, rel_id, obj_id, refs) in edges:
-        for i in range(len(sub_l)):
-            if sub_l[i]['id'] == sub_id and rel_l[i]['id'] == rel_id and obj_l[i]['id'] == obj_id:
-                metaedges.add((sub_l[i]['id'],
-                               sub_l[i]['label'],
-                               sub_l[i]['iri'],  # not in bioknowledgeReviewer
-                               sub_l[i]['category'][0], # add [0] because category is in a list
-                               rel_l[i]['id'],
-                               rel_l[i]['label'],
-                               rel_l[i]['iri'],  # not in bioknowledgeReviewer
-                               obj_l[i]['id'],
-                               obj_l[i]['label'],
-                               obj_l[i]['iri'],  # not in bioknowledgeReviewer
-                               obj_l[i]['category'][0],  # not in bioknowledgeReviewer
-                               refs)
-                              )
-                break
+    #metaedges = set()
+    #for (sub_id, rel_id, obj_id, refs) in edges:
+    #    for i in range(len(sub_l)):
+    #        if sub_l[i]['id'] == sub_id and rel_l[i]['id'] == rel_id and obj_l[i]['id'] == obj_id:
+    #            metaedges.add((sub_l[i]['id'],
+    #                           sub_l[i]['label'],
+    #                           sub_l[i]['iri'],  # not in bioknowledgeReviewer
+    #                           sub_l[i]['category'][0], # add [0] because category is in a list
+    #                           rel_l[i]['id'],
+    #                           rel_l[i]['label'],
+    #                           rel_l[i]['iri'],  # not in bioknowledgeReviewer
+    #                           obj_l[i]['id'],
+    #                           obj_l[i]['label'],
+    #                           obj_l[i]['iri'],  # not in bioknowledgeReviewer
+    #                           obj_l[i]['category'][0],  # not in bioknowledgeReviewer
+    #                           refs)
+    #                          )
+    #            break
+
+    file_path = os.path.join(path, f"add_attributes_v{today}.txt")
+    with open(file_path, 'w') as id_file:
+        metaedges = set()
+        for (sub_id, rel_id, obj_id, refs) in edges:
+            for i in range(len(sub_l)):
+                id_file.write(f"sub_l[i]['id']: {sub_l[i]['id']}, sub_id: {sub_id}, "
+                                  f"rel_l[i]['id']: {rel_l[i]['id']}, rel_id: {rel_id}, "
+                                  f"obj_l[i]['id']: {obj_l[i]['id']}, obj_id: {obj_id}\n")
+                if sub_l[i]['id'] == sub_id and rel_l[i]['id'] == rel_id and obj_l[i]['id'] == obj_id:
+                    # Write matched IDs to file
+                    id_file.write(f"OK\n")
+
+                    # CHECK AGAIN WHY THESE OTHER COLUMNS ARE NOT THERE
+                    metaedges.add((sub_l[i]['id'],
+                                   sub_l[i]['label'],
+                                   sub_l[i]['iri'],
+                                   sub_l[i]['category'][0],
+                                   rel_l[i]['id'],
+                                   rel_l[i]['label'],
+                                   rel_l[i]['iri'],
+                                   obj_l[i]['id'],
+                                   obj_l[i]['label'],
+                                   obj_l[i]['iri'],
+                                   obj_l[i]['category'][0],
+                                   refs)
+                                  )
+                    break
 
     ## ADD OUTPUT .CSV
     df_metaedges = pd.DataFrame(list(metaedges), columns=['sub_id', 'sub_label', 'sub_category', 'rel_id', 'rel_label', 'obj_id', 'obj_label', 'refs']).fillna('None')
@@ -521,11 +566,26 @@ def keep_node_type(edges, seed, nodeType='ortho'):  #bioknowledgeReviewer
 
     logging.info(f"NOW RUNNING: {current_function_name()}.")
 
+    ## Old list based on RO (relational ontology)
+    #propertyList = ['RO:HOM0000017', 'RO:HOM0000020']
+    #if nodeType == 'pheno':
+    #    propertyList = ['RO:0002200', 'RO:0002607', 'RO:0002326', 'GENO:0000840']
+    # https://github.com/monarch-initiative/dipper/issues/378 apparently they no longer are in OWL
+    ## yet they seem to still be in the .json output (CHECK)
+    
+    # RO:HOM0000017 - 'in orthology relationship' - IAO:0000115, HOM:0000017
+    # RO:HOM0000020 - 'in 1 to 1 orthology relationship with' - IAO:0000115, HOM:0000020 
+    # RO:0002200 - ... - IAO:0000114, IAO:0000115, IAO:0000117, IAO:0000125, UPHENO:0001001
+    # RO:0002607 - ... - IAO:0000115, IAO:0000116
+    #
+    #
+    # IAO:0000114 = 'has curation status'
+    # IAO:0000116 = 'editor note'
+
+    ## New lists based on 'biolink:___' format
     propertyList = ['RO:HOM0000017', 'RO:HOM0000020']
     if nodeType == 'pheno':
         propertyList = ['RO:0002200', 'RO:0002607', 'RO:0002326', 'GENO:0000840']
-    # https://github.com/monarch-initiative/dipper/issues/378 apparently they no longer are in OWL
-    ## CHECK w/NQR which identifiers should be used
 
     keep = set()
     for (sub, rel, obj, ref) in edges:
@@ -584,8 +644,8 @@ def get_connections(nodes):  #bioknowledgeReviewer
             r_out, r_in = hit_monarch_api(node, 1000)
             sub_l, rel_l, obj_l, ref_l = get_edges_objects(r_out, r_in)
             edges = get_edges(sub_l, rel_l, obj_l, ref_l, 'id')
-            #filteredEdges = filter_edges(nodes, edges)
-            filteredEdges = filter_edges_mock(nodes, edges)
+            filteredEdges = filter_edges(nodes, edges)
+            #filteredEdges = filter_edges_mock(nodes, edges)
             metaFilteredEdges = add_attributes(sub_l, rel_l, obj_l, filteredEdges)
             keep = keep_edges(keep, metaFilteredEdges)
 
@@ -1123,6 +1183,7 @@ def build_edges(edges_df, edges_fname):  #bioknowledgeReviewer
         #    rel_uri = 'http://purl.obolibrary.org/obo/GENO_0000408'
         # (!!!) whole section removed for testing
 
+        ## CHECK: they are not added
         # build the data structure = list of edges as list of dict, where a dict is an edge
         edge = dict()
         edge['subject_id'] = sub_id
@@ -1508,7 +1569,7 @@ def run_monarch(input_id = 'MONDO:0007739'):
     """
     This function runs the whole Monarch script and saves nodes and edges files.
 
-    :param input_number: The input phenotype MIM number of the disease
+    :param input_number: The input MONDO: URI  of the disease
     :return: nodes and edges files in /monarch folder
     """
 
@@ -1558,11 +1619,11 @@ def run_monarch(input_id = 'MONDO:0007739'):
 # it was necessary to act as such in order for the pipeline to work and proceed with my thesis.
 def run_monarch_mock(input_id = 'MONDO:0007739'):
     """
-    This function runs mimics what the whole Monarch script would do,
+    This function mimics what the whole Monarch script would do,
     to then retrieve the result of a previous run_monarch() call and
     save it accordingly.
 
-    :param input_number: The input phenotype MIM number of the disease
+    :param input_number: The input MONDO: URI  of the disease
     :return: nodes and edges files in /monarch folder
     """
 
@@ -1614,7 +1675,7 @@ def run_monarch_mock(input_id = 'MONDO:0007739'):
 
 def run_monarch_symptom(input_symptom, date):
     """
-    This function runs the whole Monarch script using the disease phenotype MIM number
+    This function runs the whole Monarch script using the disease MONDO: URI
     and symptom ID as seeds and saves nodes and edges files.
 
     :param input_symptom: The input symptom
@@ -1644,6 +1705,35 @@ def run_monarch_symptom(input_symptom, date):
     build_edges(monarch_connections, edges_fname='monarch_edges_symptom')
     build_nodes(monarch_connections, nodes_fname = 'monarch_nodes_symptom')
 
+## 20240419 (by NBianchi)
+# Same as in run_monarch().
+def run_monarch_symptom_mock(input_symptom, date):
+    """
+    This function repeatss what the run_monarch_mock() did and fetches,
+    the same reference files to 'pretend' they are instead the symptom ones
+    –just in order to proceed with the next steps.
+
+    :param input_symptom: The input symptom
+    :return: nodes and edges files in /monarch folder
+    """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}")
+
+    # Path to the 'monarch' directory where the original files are stored
+    base_path = os.getcwd()  # Ensure we are in the correct working directory
+    monarch_path = os.path.join(base_path, 'monarch')
+
+    for filename in os.listdir(monarch_path):
+        old_file = os.path.join(monarch_path, filename)
+        
+        # Create a new filename by replacing 'disease' with 'symptom'
+        new_filename = filename.replace('disease', 'symptom')
+        
+        # Define the new file path
+        new_file = os.path.join(monarch_path, new_filename)
+        
+        # Copy the file to the new filename
+        shutil.copy(old_file, new_file)
 
 
 if __name__ == '__main__':

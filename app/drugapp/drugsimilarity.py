@@ -13,12 +13,34 @@ from rdkit.Chem import AllChem
 from rdkit import RDLogger, DataStructs
 import datetime
 import logging
+import inspect  # to chec for running functions
+import shutil  # to properly copy and rename files in run_monarch_mock()
 import numpy as np
 import os
 import pandas as pd
 import requests
 
+# timestamp
 today = datetime.date.today()
+
+
+# logging configuration
+base_data_directory = os.path.join(os.getcwd(), 'drugapp', 'data')
+log_directory = os.path.join(base_data_directory, 'logs')
+log_filename = datetime.datetime.now().strftime('monarch_app_%Y-%m-%d.log')
+log_file_path = os.path.join(log_directory, log_filename)
+os.makedirs(log_directory, exist_ok=True)
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(levelname)s: %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    handlers=[
+                        logging.FileHandler(log_file_path),
+                        logging.StreamHandler()  # Enables logging to stderr.
+                    ])
+
+def current_function_name():
+    return inspect.currentframe().f_back.f_code.co_name
+
 
 # Mute RDKit logger
 RDLogger.logger().setLevel(RDLogger.CRITICAL)
@@ -38,52 +60,69 @@ def drug_smiles_conversion(dgidb_nodes_file_str):
     # open csv file
     dgidb_nodes_file_str = './DGIdb/'+ dgidb_nodes_file_str
     dgidb_nodes_df = pd.read_csv(dgidb_nodes_file_str)
-    
-    drug_lst = dgidb_nodes_df.loc[dgidb_nodes_df['semantic_groups'] == 'drug', 'id']
-    
-    # final dict
-    concept_dct = dict()
 
     # input
-    chembl = list()
-    wikidata = list()
-    for idx in drug_lst:
-        if ':' in idx:
-            if 'chembl' in idx.split(':')[0].lower():
-                chembl.append(idx.split(':')[1])
-            elif 'wikidata' in idx.split(':')[0].lower():
-                wikidata.append(idx.split(':')[1])
+    #chembl = list()
+    #wikidata = list()
+    #for idx in drug_lst:
+    #    if ':' in idx:
+    #        if 'chembl' in idx.split(':')[0].lower():
+    #            chembl.append(idx.split(':')[1])
+    #        elif 'wikidata' in idx.split(':')[0].lower():
+    #            wikidata.append(idx.split(':')[1])
+    #
+    #chembl = list(set(chembl))
+    #wikidata = list(set(wikidata))
 
-    chembl = list(set(chembl))
-    wikidata = list(set(wikidata))
+    drug_lst = dgidb_nodes_df.loc[dgidb_nodes_df['semantic_groups'] == 'drug', 'id']
+    chembl = list(set(idx.split(':')[1] for idx in drug_lst if 'chembl' in idx.split(':')[0].lower()))
+    wikidata = list(set(idx.split(':')[1] for idx in drug_lst if 'wikidata' in idx.split(':')[0].lower()))
+    logging.info(f"Unique ChEMBL IDs: {len(chembl)} | List: {chembl[:5]} (Sample)")
+    logging.info(f"Unique Wikidata IDs: {len(wikidata)} | List: {wikidata[:5]} (Sample)")
 
     # api call
     mc = get_client('chem')
-
     df_chembl = mc.querymany(qterms=chembl, scopes=['chembl.molecule_chembl_id'], size=1, fields=['chembl.smiles'],as_dataframe=True) #9 out of1586 not found
     df_wikidata = mc.querymany(qterms=wikidata, fields='chembl.smiles', size=1, as_dataframe=True) #8 out of 8 not found
+    logging.info(f"df_chembl entries: {df_chembl.shape[0]}")
+    logging.info(f"df_wikidata entries: {df_wikidata.shape[0]}")
 
-    #build dictionaries
-    ids_chembl = df_chembl.reset_index().copy()
-    if 'chembl.smiles' in ids_chembl.columns:
-        # turn ids into uris
-        ids_chembl['query'] = 'chembl:' + ids_chembl['query']
-        smiles2chembl = dict(zip(ids_chembl['chembl.smiles'], ids_chembl['query'])) 
-        concept_dct.update(smiles2chembl)
-    else:
-        print('no chembl IDs can be mapped to smiles')
+    ## CARMEN: older version that would break down if no elements were found
+    ##build dictionaries
+    #ids_chembl = df_chembl.reset_index().copy()
+    #if 'chembl.smiles' in ids_chembl.columns:
+    #    # turn ids into uris
+    #    ids_chembl['query'] = 'chembl:' + ids_chembl['query']
+    #    smiles2chembl = dict(zip(ids_chembl['chembl.smiles'], ids_chembl['query'])) 
+    #    concept_dct.update(smiles2chembl)
+    #else:
+    #    print('no chembl IDs can be mapped to smiles')
+    #
+    #ids_wikidata = df_wikidata.reset_index().copy()
+    #if 'chembl.smiles' in ids_wikidata.columns:
+    #    # turn ids into uris
+    #    ids_chembl['query'] = 'wikidata:' + ids_chembl['query']
+    #    smiles2wikidata = dict(zip(ids_wikidata['chembl.smiles'],ids_wikidata['query']))
+    #    concept_dct.update(smiles2wikidata)
+    #else:
+    #    print('no wikidata IDs can be mapped to smiles')
 
-    ids_wikidata = df_wikidata.reset_index().copy()
-    if 'chembl.smiles' in ids_wikidata.columns:
-        # turn ids into uris
-        ids_chembl['query'] = 'wikidata:' + ids_chembl['query']
-        smiles2wikidata = dict(zip(ids_wikidata['chembl.smiles'],ids_wikidata['query']))
-        concept_dct.update(smiles2wikidata)
-    else:
-        print('no wikidata IDs can be mapped to smiles')
+    ## NICCOLO': new version that creates a 'query' column even if no matches are found
+    # process each DataFrame
+    concept_dct = {}
+    for df, source in [(df_chembl, 'chembl'), (df_wikidata, 'wikidata')]:
+        df.reset_index(inplace=True)
+        if 'chembl.smiles' in df.columns and not df['chembl.smiles'].isna().all():
+            df['query'] = f'{source}:' + df['query'].astype(str)
+            smiles_dict = dict(zip(df['chembl.smiles'], df['query']))
+            concept_dct.update(smiles_dict)
+        else:
+            print(f'No {source} IDs can be mapped to smiles')
 
     # remove drugs for which no smiles was found (value is nan)
-    concept_dct = {k: concept_dct[k] for k in concept_dct if not pd.isna(concept_dct[k])}
+    #concept_dct = {k: concept_dct[k] for k in concept_dct if not pd.isna(concept_dct[k])}
+    ## NICCOLO': variant that focuses also on values and not just keys
+    concept_dct = {k: v for k, v in concept_dct.items() if pd.notna(k) and pd.notna(v)}
     return concept_dct
 
 def get_mols(smiles_list):
@@ -190,6 +229,8 @@ def run_drugsimilarity():
 
     :return: nodes and edges files in /similaritygraph folder
     """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}")
 
     # create drug similarity graph
     dgidb_nodes_file_str = 'DGIdb_nodes_v{}.csv'.format(today) # drug file

@@ -14,9 +14,31 @@ import pandas as pd
 from biothings_client import get_client
 import ast
 import os
+import logging  # to check for running variables
+import inspect  # to chec for running functions
+import shutil  # to properly copy and rename files in run_monarch_mock()
+
 
 # timestamp
 today = datetime.date.today()
+
+
+# logging configuration
+base_data_directory = os.path.join(os.getcwd(), 'drugapp', 'data')
+log_directory = os.path.join(base_data_directory, 'logs')
+log_filename = datetime.datetime.now().strftime('monarch_app_%Y-%m-%d.log')
+log_file_path = os.path.join(log_directory, log_filename)
+os.makedirs(log_directory, exist_ok=True)
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(levelname)s: %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    handlers=[
+                        logging.FileHandler(log_file_path),
+                        logging.StreamHandler()  # Enables logging to stderr.
+                    ])
+
+def current_function_name():
+    return inspect.currentframe().f_back.f_code.co_name
 
 
 def get_genes(nodes_df):
@@ -553,7 +575,9 @@ def run_dgidb(date):
     :param date: the date of creation of the disease graph
     :return: nodes and edges files in /DGIdb folder
     """
-    
+
+    logging.info(f"NOW RUNNING: {current_function_name()}")
+
     path = os.getcwd() + '/DGIdb'
     if not os.path.isdir(path): os.makedirs(path)
     

@@ -1,0 +1,17 @@
+Python kernel: /Users/ncmbianchi/miniconda3/bin/python
+Python version: 3.11.9
+
+Package 'pandas' imported. (version: 2.1.2)
+
+Package 'requests' imported. (version: 2.31.0)
+
+Component 'get_client' from package 'biothings_client' imported. (version: 0.3.1)
+
+Component 'tqdm' from package 'tqdm' imported. (version: 4.66.2)
+
+Component 'Chem' from package 'rdkit' imported. (version: 2024.3.1)
+
+Component 'RDLogger' from package 'rdkit' imported. (version: 2024.3.1)
+
+Component 'DataStructs' from package 'rdkit' imported. (version: 2024.3.1)
+
