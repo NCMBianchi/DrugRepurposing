@@ -1,41 +1,39 @@
 # DrugRepurposing
 
 ## Notes on Pipeline Update, by Niccolò Bianchi
-Due to many issues with the tool –further notes available in the README.md files in previous commits– I developed new code that is aimed at performing the same tasks as in the python files (<i>i.e.<i/> ```Monarch.py```, ```DGIdb.py```, ```drugsimilarity.py```, ```combine_graphs.py``` and ```rdf2vec.py```) in a Jupyter Notebook.
+Due to many issues with the tool –further notes available in the README.md files in previous commits– I developed new code that is aimed at performing the same tasks as in the python files (<i>i.e.</i> ```Monarch.py```, ```DGIdb.py```, ```drugsimilarity.py```, ```combine_graphs.py``` and ```rdf2vec.py```) in a Jupyter Notebook.
 
-After writing the whole code, functions will once again be divided in python scripts that can be called by the code in <b>```routes.py```<b/> which manages the code after input in the flaskApp: I indeed still want this tool to run as a self-contained docker that can be:
+After writing the whole code, functions will once again be divided in python scripts that can be called by the code in <b>```routes.py```</b> which manages the code after input in the flaskApp: I indeed still want this tool to run as a self-contained docker that can be:
 	- either installed locally by tech-savy users that want to customise operations and tweak the code,
 	- or accessed remotely online through a client-server connection while the flaskApp runs in a server.
 
 ![README_image-1_bis](https://github.com/NCMBianchi/DrugRepurposing/assets/111352723/7db18469-0998-42f7-8bb2-23ee2af35f3c)
 
-So far I solved issues with the new V3 API by Monarch Initiative –replacing the old Biolink API: some of the metadata information (<i>e.g.<i/> ```RO:``` for relational ontology) are no longer available, nor does the new API accept ```OMIM:``` IDs as inputs. The new version uses <b>```MONDO:```<b/> IDs as input for the diseases –mostly focusing on Huntington's Disease, ```MONDO:0007743```.
+So far I solved issues with the new V3 API by Monarch Initiative –replacing the old Biolink API: some of the metadata information (<i>e.g.</i> ```RO:``` for relational ontology) are no longer available, nor does the new API accept ```OMIM:``` IDs as inputs. The new version uses <b>```MONDO:```</b> IDs as input for the diseases –mostly focusing on Huntington's Disease, ```MONDO:0007743```.
 
-This section originally was in file <b>```Monarch.py```<b/> that managed API calls to build the network of associations between disease, phenotypes and genes.
+This section originally was in file <b>```Monarch.py```</b> that managed API calls to build the network of associations between disease, phenotypes and genes.
 
 ![README_image-2](https://github.com/NCMBianchi/DrugRepurposing/assets/111352723/86c5166f-fac8-42b5-8e62-5a00be65c074)
 
 I also skipped most the redundant steps that were in the original code: the results is a more linear pipeline. Yet by removing some of the metadata-adding steps –which broke the original code, though– output information is slightly less wide. Now the output files have these structures:
 
-| col1 NODEs    | col2 NODEs    |
 | node_id       | node_name     |
 | ------------- | ------------- |
 |               |               |
 
-The <b>```nodes```<b/> object is therefore a list of dictionaries (<i>i.e.<i/> {id: label}) for each node.
+The <b>```nodes```</b> object is therefore a list of dictionaries (<i>i.e.</i> {id: label}) for each node.
 
-| col1 EDGEs    | col2 EDGEs    | col3 EDGEs    | col4 EDGEs    | col5 EDGEs    |
 | subj_id       | subj_name     | relation      | obj_name      | obj_name      |
 | ------------- | ------------- | ------------- | ------------- | ------------- |
 |               |               |               |               |               |
 
-The <b>```edges```<b/> object instead is a list of lists for each edge, some elements of which are dictionaries (<i>i.e.<i/> {subj}{rel}{obj}). 
+The <b>```edges```</b> object instead is a list of lists for each edge, some elements of which are dictionaries (<i>i.e.</i> {subj}{rel}{obj}). 
 
-![IMAGE_placeholder]
+![MONARCH py COMPARISON](https://github.com/NCMBianchi/DrugRepurposing/assets/111352723/594abfb4-3937-43b0-92ec-aec50690005e)
 
-I also implemented the functions originally in <b>```DGIdb.py```<b/>, which manages calls to the Entrez API to convert gene IDs from the ones used by Monarch Initiative (<i>i.e.<i/> ```HGNC:```, ```ZFIN:```), to the Entrez ones accepted by DGIdb's API to obtain interactions between genes and drugs.
+I also implemented the functions originally in <b>```DGIdb.py```</b>, which manages calls to the Entrez API to convert gene IDs from the ones used by Monarch Initiative (<i>i.e.</i> ```HGNC:```, ```ZFIN:```), to the Entrez ones accepted by DGIdb's API to obtain interactions between genes and drugs.
 
-Those calls took quite a lot: ~15-20min for Monarch Initiative (65MB) and ~200min for ENTREZ and DGIdb (7MB). Initial seed was <b>```MONDO:0007743```<b/>, three layers of neighbours for the association network:
+Those calls took quite a lot: ~15-20min for Monarch Initiative (65MB) and ~200min for ENTREZ and DGIdb (7MB). Initial seed was <b>```MONDO:0007743```</b>, three layers of neighbours for the association network:
 
 | Nodes         | Edges         |
 | ------------- | ------------- |
