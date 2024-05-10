@@ -167,7 +167,7 @@ def calculate_internal_pairwise_similarities(smiles_list):
     fps = get_fingerprints(mols)
     nfps = len(fps)
 
-    similarities = np.zeros((nfps, nfps))
+    similarities = np.zeros((nfps, nfps))   # WRONG
 
     for i in range(1, nfps):
         sims = DataStructs.BulkTanimotoSimilarity(fps[i], fps[:i])
@@ -195,6 +195,7 @@ def create_drug_sim_graph(smiles_conc_dict, K=10):
     similarity_matr = similarity_matr * -1 # to make sure most similar is smallest
     
     sims_np_sort = np.argpartition(similarity_matr, K, axis=1) #indices of smallest similarities come first
+       # WRONG
     
     drug_similarity_graph = pd.DataFrame(columns=['subject_id','property_id', 'object_id','reference_uri',
                                                   'reference_supporting_text', 'reference_date', 'property_label',
@@ -204,7 +205,7 @@ def create_drug_sim_graph(smiles_conc_dict, K=10):
         for j in sims_np_sort[i, :K]:
             subj = id_lst[i]
             obj = id_lst[j]
-            weight = similarity_matr[i,j] *-1
+            weight = similarity_matr[i,j] *-1   # WRONG
         
             prop = 'CHEMINF:000481'
             prop_label = 'similar to'
