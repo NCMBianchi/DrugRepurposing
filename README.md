@@ -48,6 +48,8 @@ This section is no longer necessary, as data objects have been structured cohere
 ### ```rdf2vec.py``` FIXED (renamed as ```network_model.py```)
 Due to issues with PyPi package ```pyrdf2vec``` requireing a version of ```torch``` that is no longer supported, I switched to a non-RDF approach via ```node2vec```: data is still structured as a knowledge graph. I changed the logic of which data the model is trained (<i>i.e.</i> no longer on a subset of the drug-to-gene associations, but their entirety) and of which the prediction is made on (<i>i.e.</i> no longer the other subset of drug-to-gene associations, but the entire biological and drug associations network, plus all other drugs on DGIdb) in order to effectively 'discover' new repurposed drugs outside of those already related to the disease of interest.
 
+![Huntington disease_2024-05-22_full_network_plot](https://github.com/NCMBianchi/DrugRepurposing/assets/111352723/04788652-457c-4a7a-977a-7b2debe3b391)
+
 ## Notes on the Docker Image / FlaskApp (Niccolò Bianchi)
 
 Later on I will also work on more changes in the <b>.html</b> and <b>.css</b> files used by the flask App, in order to enhance the UI of the tool.
