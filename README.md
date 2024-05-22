@@ -35,16 +35,18 @@ This code section manages calls to the Entrez API to convert gene IDs from the o
 
 Running this section can take up to 4h if fetching gene-to-drug associations for all 3 layers in the Monarch API call, so the script in the Jupyter notebook only runs layers 1 and 2 –thanks to an optional variable in main function ```run_dgidb()``` that allows to select up to which layer to consider. Runtime gets to about 30min.
 
+Furthermore, I also already made functions that would use DGIdb's new V5 GraphQL API –as the old V2 API will be no longer supported following June 1st 2024. This API does not require Entrez API anymore, as it uses gene IDs found in Monarch. The result is that this step is now much faster: a full 3-layer run now takes about 35-40min instead of almost 4h.
+
 ### ```drugsimilarity.py``` FIXED
 Similarity between drugs found in the previous step is calculated by first converting drug IDs into SMILES notations (<i>i.e.</i> strings corresponding to molecular structures), then RDKit objects (<i>i.e.</i> 2D/3D molecular structure objects) and finally in ECFP bitvector (<i>i.e.</i> Extended Connectivity FingerPrints) which store information on whether certain features are present or not.
 
 Based on that, similarity is computed based on Tanimoto's coefficient.
 
 ### ```combine_graphs.py``` SKIPPED
-This section is no longer necessary.
+This section is no longer necessary, as data objects have been structured coherently throughout the entire pipeline.
 
-### ```rdf2vec.py``` ONGOING
-I still have to work on this.
+### ```rdf2vec.py``` FIXED (renamed as ```network_model.py```)
+Due to issues with PyPi package ```pyrdf2vec``` requireing a version of ```torch``` that is no longer supported, I switched to a non-RDF approach via ```node2vec```: data is still structured as a knowledge graph. I changed the logic of which data the model is trained (<i>i.e.</i> no longer on a subset of the drug-to-gene associations, but their entirety) and of which the prediction is made on (<i>i.e.</i> no longer the other subset of drug-to-gene associations, but the entire biological and drug associations network, plus all other drugs on DGIdb) in order to effectively 'discover' new repurposed drugs outside of those already related to the disease of interest.
 
 ## Notes on the Docker Image / FlaskApp (Niccolò Bianchi)
 
@@ -64,16 +66,13 @@ For this, it uses a workflow that has four main steps:
 
 (...)
 
-## Getting started
+## INSTRUCTIONS: how to use the tool
 ### Docker
 Build docker image: <code>docker build --tag drugapp .</code>
 
 This might take a while (5-20min depending on your internet connection) due to the entire image size being almost 8GB due to some very big python packages.
 
 Run the image: <code>docker run -d -p 5000:5000 --name drugapp drugapp</code>
-
-### <s>Without docker</s> (no longer suggested: requires out-of-date python packages)
-<s>Download the `app` folder, then run the Flask app with <code>python run.py</code>. </s>
 
 ## Aknowledgements
 ### LUMC and LIACS (NL)
