@@ -1,246 +1,263 @@
-# -*- coding: utf-8 -*-
 """
-Module to create the drug-drug similarity graph.
-
-Created on Thu Jun 16 08:21:14 2022
-
-@author: Carmen Reep
+DRUG SIMILARITY MODULE: COMPUTE D-to-D SIMILARITY, AND GENERATE EDGES
+Created on August 3rd 2024
+@author: Niccolò Bianchi [https://github.com/NCMBianchi]
 """
 
-from biothings_client import get_client
-from rdkit import Chem
-from rdkit.Chem import AllChem
-from rdkit import RDLogger, DataStructs
-import datetime
-import logging
-import inspect  # to chec for running functions
-import shutil  # to properly copy and rename files in run_monarch_mock()
-import numpy as np
-import os
-import pandas as pd
-import requests
+import sys,os,platform,datetime,logging,builtins,time,multiprocessing
 
-# timestamp
-today = datetime.date.today()
+## REMOVE DEBUGGING PRINTS
 
 
-# logging configuration
-base_data_directory = os.path.join(os.getcwd(), 'drugapp', 'data')
-log_directory = os.path.join(base_data_directory, 'logs')
-log_filename = datetime.datetime.now().strftime('monarch_app_%Y-%m-%d.log')
-log_file_path = os.path.join(log_directory, log_filename)
-os.makedirs(log_directory, exist_ok=True)
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(levelname)s: %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S',
-                    handlers=[
-                        logging.FileHandler(log_file_path),
-                        logging.StreamHandler()  # Enables logging to stderr.
-                    ])
-
-def current_function_name():
-    return inspect.currentframe().f_back.f_code.co_name
-
-
-# Mute RDKit logger
-RDLogger.logger().setLevel(RDLogger.CRITICAL)
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
-
-
-def drug_smiles_conversion(dgidb_nodes_file_str):
+def get_smiles(nodes):
     """
-    This function performs drug ID conversion from chembl and wikidata ID to smiles chemical structure notation.
-    :param dgidb_nodes_file_str: string of file name containing all drugs to converse
-    :return: concept dictionary (where keys are smiles structures and values are old ontology IDs)
-    """
-
-    print('\n Mapping DGIdb drug ontologies to smiles structures ...')
+    This function performs drug ID conversion from chembl and wikidata ID to SMILES
+    chemical structure notation.
     
-    # open csv file
-    dgidb_nodes_file_str = './DGIdb/'+ dgidb_nodes_file_str
-    dgidb_nodes_df = pd.read_csv(dgidb_nodes_file_str)
+    :param nodes: list of tuples (id, label) containing all drugs to convert.
+    :return: concept dictionary (key = smiles structures: values = old ontology IDs).
+    """
 
-    # input
-    #chembl = list()
-    #wikidata = list()
-    #for idx in drug_lst:
-    #    if ':' in idx:
-    #        if 'chembl' in idx.split(':')[0].lower():
-    #            chembl.append(idx.split(':')[1])
-    #        elif 'wikidata' in idx.split(':')[0].lower():
-    #            wikidata.append(idx.split(':')[1])
-    #
-    #chembl = list(set(chembl))
-    #wikidata = list(set(wikidata))
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
+    
+    chembl = [(id.split(':')[1], label) for id, label in nodes if 'chembl' in id.split(':')[0].lower()]
+    wikidata = [(id.split(':')[1], label) for id, label in nodes if 'wikidata' in id.split(':')[0].lower()]
 
-    drug_lst = dgidb_nodes_df.loc[dgidb_nodes_df['semantic_groups'] == 'drug', 'id']
-    chembl = list(set(idx.split(':')[1] for idx in drug_lst if 'chembl' in idx.split(':')[0].lower()))
-    wikidata = list(set(idx.split(':')[1] for idx in drug_lst if 'wikidata' in idx.split(':')[0].lower()))
-    logging.info(f"Unique ChEMBL IDs: {len(chembl)} | List: {chembl[:5]} (Sample)")
-    logging.info(f"Unique Wikidata IDs: {len(wikidata)} | List: {wikidata[:5]} (Sample)")
-
-    # api call
-    mc = get_client('chem')
-    df_chembl = mc.querymany(qterms=chembl, scopes=['chembl.molecule_chembl_id'], size=1, fields=['chembl.smiles'],as_dataframe=True) #9 out of1586 not found
-    df_wikidata = mc.querymany(qterms=wikidata, fields='chembl.smiles', size=1, as_dataframe=True) #8 out of 8 not found
-    logging.info(f"df_chembl entries: {df_chembl.shape[0]}")
-    logging.info(f"df_wikidata entries: {df_wikidata.shape[0]}")
-
-    ## CARMEN: older version that would break down if no elements were found
-    ##build dictionaries
-    #ids_chembl = df_chembl.reset_index().copy()
-    #if 'chembl.smiles' in ids_chembl.columns:
-    #    # turn ids into uris
-    #    ids_chembl['query'] = 'chembl:' + ids_chembl['query']
-    #    smiles2chembl = dict(zip(ids_chembl['chembl.smiles'], ids_chembl['query'])) 
-    #    concept_dct.update(smiles2chembl)
-    #else:
-    #    print('no chembl IDs can be mapped to smiles')
-    #
-    #ids_wikidata = df_wikidata.reset_index().copy()
-    #if 'chembl.smiles' in ids_wikidata.columns:
-    #    # turn ids into uris
-    #    ids_chembl['query'] = 'wikidata:' + ids_chembl['query']
-    #    smiles2wikidata = dict(zip(ids_wikidata['chembl.smiles'],ids_wikidata['query']))
-    #    concept_dct.update(smiles2wikidata)
-    #else:
-    #    print('no wikidata IDs can be mapped to smiles')
-
-    ## NICCOLO': new version that creates a 'query' column even if no matches are found
-    # process each DataFrame
     concept_dct = {}
-    for df, source in [(df_chembl, 'chembl'), (df_wikidata, 'wikidata')]:
-        df.reset_index(inplace=True)
-        if 'chembl.smiles' in df.columns and not df['chembl.smiles'].isna().all():
-            df['query'] = f'{source}:' + df['query'].astype(str)
-            smiles_dict = dict(zip(df['chembl.smiles'], df['query']))
-            concept_dct.update(smiles_dict)
-        else:
-            print(f'No {source} IDs can be mapped to smiles')
 
-    # remove drugs for which no smiles was found (value is nan)
-    #concept_dct = {k: concept_dct[k] for k in concept_dct if not pd.isna(concept_dct[k])}
-    ## NICCOLO': variant that focuses also on values and not just keys
-    concept_dct = {k: v for k, v in concept_dct.items() if pd.notna(k) and pd.notna(v)}
+    # get SMILES for 'chembl:' drug nodes
+    df_chembl = mc.querymany(qterms=[id for id, _ in chembl],
+                             scopes=['chembl.molecule_chembl_id'], size=1,
+                             fields=['chembl.smiles'], as_dataframe=True)
+    ids_chembl = df_chembl.reset_index().copy()
+    if 'chembl.smiles' in ids_chembl.columns:
+         for smile, (id, label) in zip(ids_chembl['chembl.smiles'], chembl):
+            concept_dct[smile] = {'id': f'chembl:{id}', 'label': label}
+    else:
+        logging.warning('no chembl IDs can be mapped to smiles')
+    
+    # get SMILES for 'wikidata:' drug nodes
+    smiles2wikidata = {}
+    sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
+    for qid, label in wikidata:
+        query = f"""
+        SELECT ?smiles WHERE {{
+        wd:{qid} wdt:P233 ?smiles.
+        }}
+        """
+        sparql.setQuery(query)
+        sparql.setReturnFormat(JSON)
+        try:
+            results = sparql.query().convert()
+            if results["results"]["bindings"]:
+                smiles = results["results"]["bindings"][0]["smiles"]["value"]
+                concept_dct[smiles] = {'id': f'wikidata:{qid}', 'label': label}
+            else:
+                logging.info(f'Wikidata ID {qid} cannot be mapped to smiles')
+        except Exception as e:
+            logging.warning('no wikidata IDs can be mapped to smiles: {e}')
+
     return concept_dct
 
-def get_mols(smiles_list):
-    """
-    This function converts a list of smiles into a list of RDKit molecules 
-    :param smiles_list: the list of smiles strings
-    :return: a list of RDKit molecules
-    """   
-    for i in smiles_list:
-        try:
-            mol = Chem.MolFromSmiles(i) 
-            if mol is not None:
-                yield mol
-                
-        except Exception as e:
-            logger.warning(e)
 
-def get_fingerprints(mols, radius=2, length=4096):
+def compute_similarity(smiles_dict,radius=2,length=4096):
     """
-    This function converts molecules to ECFP bitvectors.
-    :param mols: RDKit molecules
-    :param radius: ECFP fingerprint radius
-    :param length: number of bits
-    :return: a list of fingerprints
-    """
-    return [AllChem.GetMorganFingerprintAsBitVect(m, radius, length) for m in mols]
-
-
-def calculate_internal_pairwise_similarities(smiles_list):
-    """
-    This function computes the pairwise similarities of the provided list of smiles against itself.
-    It calculates the molecular similarity using Tanimoto coefficient.
-    (the higher the coefficent, the more similar the two chemicals are based on molecular structure)
-    :param smiles_list: the list of smiles
+    This function computes the pairwise similarities of the provided list of SMILES
+    notations, using Tanimoto coefficient.
+    To achieve that, it first converts SMILES into RDKit objects, and then ECFP bitvectors.
+    
+    :param smiles_dict: the list of smiles.
+    :param radius: ECFP fingerprint radius (default = 2, just for repetition).
+    :param length: number of ECFP bits (default = 4096, just for repetition).
     :return: symmetric matrix of pairwise similarities. Diagonal is set to zero. 
     """
+
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
+    
+    # extrapolate actual SMILES notations from the concept dictionary
+    smiles_list = list(smiles_dict.keys())
+
+    # store IDs for the matrix
+    id_list = list(smiles_dict.values())
+    
     if len(smiles_list) > 10000:
-        logger.warning(f'Calculating internal similarity on large set of '
-                        f'SMILES strings ({len(smiles_list)})')
+        logging.warning(f'Calculating internal similarity on large set of SMILES strings ({len(smiles_list)})')
+    
+    # define the fingerprint generator parameters
+    fingerprint_gen = rdFingerprintGenerator.GetMorganGenerator(radius=2,fpSize=4096)
 
-    mols = get_mols(smiles_list)
-    fps = get_fingerprints(mols)
-    nfps = len(fps)
+    fingerprint_list = []
+    
+    i = 0
+    while i < len(smiles_list):
+        sm = smiles_list[i]
+        if pd.notna(sm):
+            try:
+                mol = Chem.MolFromSmiles(sm)
+                if mol:
+                    fingerprint = fingerprint_gen.GetFingerprint(mol)
+                    fingerprint_list.append(fingerprint)
+                    i += 1  # only increment the index if the item is not removed
+                else:
+                    # if RDKit fails to create a molecule, but the SMILES is not NaN
+                    smiles_list.pop(i)
+                    id_list.pop(i)
+            except Exception as e:
+                logging.error(f"Error processing SMILES {sm}: {e}")
+                smiles_list.pop(i)
+                id_list.pop(i)
+        else:
+            # if SMILES is NaN
+            logging.warning(f"Skipping NaN SMILES entry: {sm}")
+            smiles_list.pop(i)
+            id_list.pop(i)
 
-    similarities = np.zeros((nfps, nfps))   # WRONG
+    n_fingerprints = len(fingerprint_list)
+    similarities = np.ones((n_fingerprints, n_fingerprints))
 
-    for i in range(1, nfps):
-        sims = DataStructs.BulkTanimotoSimilarity(fps[i], fps[:i])
-        similarities[i, :i] = sims
-        similarities[:i, i] = sims
+    for j in range(1, n_fingerprints):
+        similarity = DataStructs.BulkTanimotoSimilarity(fingerprint_list[j], fingerprint_list[:j])
+        similarities[j, :j] = similarity
+        similarities[:j, j] = similarity
 
-    return similarities 
+    return similarities, id_list
 
-def create_drug_sim_graph(smiles_conc_dict, K=10):
-    '''This function creates the KNN similarity drug graph using Tanimo similarity on smiles structures 
-    and saves it as a csv file.
-    :param smiles_conc_dict: dictionary that converts ensembl IDs to smiles strings
-    :param K: the number of nearest neighbours to select
-    :return: csv file with columns subj(=drug1), obj (=drug2), weight (=similarity score)
+
+def generate_drug_edges(similarity_matrix,sorted_matrix,ids,K,minimum=0.5):
     '''
-    # get list of all smiles strings in the dictionary
-    smiles_lst = list(smiles_conc_dict.keys())
-    # remove nan values
-    smiles_lst = [x for x in smiles_lst if pd.isnull(x) == False] 
-    # convert list of smiles to ids using the smiles_concept_dict
-    id_lst = list(smiles_conc_dict.get(item,item)  for item in smiles_lst) 
+    This function builds the edges object from the similarity matrix.
+
+    :param similarity_matrix: similarity matrix from compute_similarity().
+    :param sorted_matrix: result of KNN on similarity matrix .
+    :param ids: list of ids from compute_similarity().
+    :param K: number of top scoring drugs based on similarity.
+    :param min_simil: minimum similarity score (default = 0.5, just for repetition).
+    :return: drug-to-drug edges
+    '''
+
+    logging.info(f"NOW RUNNING: {current_function_name()}.")
     
-    # calculate the similarity between all molecules in this list 
-    similarity_matr = calculate_internal_pairwise_similarities(smiles_lst)
-    similarity_matr = similarity_matr * -1 # to make sure most similar is smallest
-    
-    sims_np_sort = np.argpartition(similarity_matr, K, axis=1) #indices of smallest similarities come first
-       # WRONG
-    
-    drug_similarity_graph = pd.DataFrame(columns=['subject_id','property_id', 'object_id','reference_uri',
-                                                  'reference_supporting_text', 'reference_date', 'property_label',
-                                                  'property_description', 'property_uri'])
-    
-    for i in range(similarity_matr.shape[0]):
-        for j in sims_np_sort[i, :K]:
-            subj = id_lst[i]
-            obj = id_lst[j]
-            weight = similarity_matr[i,j] *-1   # WRONG
+    similarity = []
+    added_edges_count = 0
+    skipped_edges_count = 0
+    chunk_size = 2000
+    num_chunks = (similarity_matrix.shape[0] // chunk_size) + 1
+
+    for chunk in range(num_chunks):
+        start_idx = chunk * chunk_size
+        end_idx = min((chunk + 1) * chunk_size, similarity_matrix.shape[0])
         
-            prop = 'CHEMINF:000481'
-            prop_label = 'similar to'
-            prop_uri = 'http://semanticscience.org/resource/CHEMINF_000481' # similar to in chemical inf ontology
-            ref_text = 'This edge comes from calculating the Tanimo similarity score on the smiles structures'
-            if weight !=0:
-                new_row = {'subject_id':subj, 'property_id': prop, 'object_id':obj, 'reference_uri': 'NA',
-                           'reference_supporting_text': ref_text, 'reference_date':today, 
-                           'property_label': prop_label, 'property_description': 'NA', 'property_uri': prop_uri}
-                drug_similarity_graph = drug_similarity_graph.append(new_row, ignore_index=True)
+        sub_similarity_matrix = similarity_matrix[start_idx:end_idx, :]
+        sub_sorted_matrix = sorted_matrix[start_idx:end_idx, :]
+        sub_ids = ids[start_idx:end_idx]
+
+        # further update to remove all ==1 and if so, raise K+ how many times ==1
+        for i in range(sub_similarity_matrix.shape[0]):
+            global_i = start_idx + i  # Adjust index for the original matrix
+            for j in sub_sorted_matrix[i, :K]:
+                # filter results below the 'min_simil' threshold (default = 0.5)
+                # and those at 0 even if 'min_simil == 0.0', as well as any isoform with == 1.0 other than identity
+                if sub_similarity_matrix[i, j] >= minimum and sub_similarity_matrix[i, j] != 0 and sub_similarity_matrix[i, j] != 1:
+                    new_row = [
+                        {'id': ids[global_i]['id'], 'label': ids[global_i]['label']},
+                        {'label': 'smiles: similar to'},
+                        {'id': ids[j]['id'], 'label': ids[j]['label']},
+                        {'notes': f'similarity score: {sub_similarity_matrix[i, j]}'}
+                    ]
+                    similarity.append(new_row)
     
-    # save output file
-    path = os.getcwd() + '/similaritygraph'
-    if not os.path.isdir(path): os.makedirs(path)
-    drug_similarity_graph.to_csv('{}/{}_v{}.csv'.format(path, 'drugdrugsim', today), index=False)
+    return similarity
     
-    return drug_similarity_graph
 
-def run_drugsimilarity():
-    """
-    This function runs the drugsimilarity script and saves nodes and edges files.
+def run_drugsimilarity(monarch_input,date,K=10,min_simil=None,input_radius=None,input_length=None):
+    '''
+    This function runs the whole drug_similarioty script and saves nodes and edges files.
 
-    :return: nodes and edges files in /similaritygraph folder
-    """
+    :param monarch_input: the input seed from the run_monarch() step.
+    :param date: the date of creation of the disease graph.
+    :param K: number of top scoring drugs based on similarity (default = 10).
+    :param min_simil: any value that would override default minimum=0.5 in compute_similarity().
+    :param input_radius: any value that would override default radius=2 in compute_similarity().
+    :param input_length: any value that would override default length=4096 in compute_similarity().
+    :return: list of edges with drug-to-drug associations.
+    '''
 
-    logging.info(f"NOW RUNNING: {current_function_name()}")
+    start_time = time.time()
+    
+    logging.info(f"NOW RUNNING: {current_function_name()} following 'run_dgidb({monarch_input},{today},layers={run_layers})'.")
 
-    # create drug similarity graph
-    dgidb_nodes_file_str = 'DGIdb_nodes_v{}.csv'.format(today) # drug file
-    smiles_concept_dict = drug_smiles_conversion(dgidb_nodes_file_str)
-    # get and save the drug similarity graph
-    create_drug_sim_graph(smiles_concept_dict, K=10) 
+    global nodes
+    global edges
+    global drug_nodes
 
+    if not input_radius:
+        input_radius = 2
+    if not input_length:
+        input_length = 4096
+    if not min_simil:
+        min_simil = 0.5
 
-if __name__ == '__main__':
-    run_drugsimilarity()
+    with open(input_file_path, 'a') as file:
+        file.write(f"The ({K}) top scoring drugs based on similarity are considered.\n")
+        file.write(f"The minimum similarity threshold is set to: {min_simil}\n")
+        file.write(f"The input radius of the ECFP ({input_length} features) is set to: {min_simil}\n\n")
 
- 
+    drugSimil_directory = os.path.join(today_directory, f'{disease_name_label} ({date_str})', 'drug_similarity')
+    os.makedirs(drugSimil_directory, exist_ok=True)
+    
+    # convert drug IDs into SMILES notations
+    nodes_list = [(node['id'], node['label']) for node in nodes]
+    alldrug_list = [(drug_node['id'], drug_node['label']) for drug_node in drug_nodes]
+    smiles = get_smiles(nodes_list)
+    alldrug_smiles = get_smiles(alldrug_list)
+    
+    # save SMILES notations as CSV
+    smiles_data = [{'SMILES': k, 'ID': v['id'], 'Label': v['label']} for k, v in smiles.items()]
+    smiles_df = pd.DataFrame(smiles_data)
+    smiles_df.to_csv(os.path.join(drugSimil_directory, f'{disease_name_label}_{date}_drugSim_smiles.csv'), index=False)
+    alldrugs_smiles_data = [{'SMILES': k, 'ID': v['id'], 'Label': v['label']} for k, v in alldrug_smiles.items()]
+    alldrugs_smiles_df = pd.DataFrame(alldrugs_smiles_data)
+    alldrugs_smiles_df.to_csv(os.path.join(drugSimil_directory, f'{disease_name_label}_{date}_alldrugSim_smiles.csv'), index=False)
+
+    # compute similarities
+    similarities, id_list = compute_similarity(smiles,radius=input_radius,length=input_length)
+    alldrug_simil, alldrug_id_list = compute_similarity(alldrug_smiles,radius=input_radius,length=input_length)
+    
+    # save the similarity matrix as CSV
+    ids = [d['id'] for d in id_list]
+    similarities_df = pd.DataFrame(similarities, index=ids, columns=ids)
+    similarities_df.to_csv(os.path.join(drugSimil_directory, f'{disease_name_label}_{date}_drugSim_similarityMatrix.csv'), index=True)
+    alldrug_ids = [d['id'] for d in alldrug_id_list]
+    alldrug_simil_df = pd.DataFrame(alldrug_simil, index=alldrug_ids, columns=alldrug_ids)
+    alldrug_simil_df.to_csv(os.path.join(drugSimil_directory, f'{disease_name_label}_{date}_alldrugSim_similarityMatrix.csv'), index=True)
+    
+    # sort based on similarity scores (ignore identity, first element for any sorting)
+    # later on remove and handle in generate_drug_edges()
+    sortedSimilarities = np.argsort(-similarities, axis=1)[:, 1:K+1]
+    alldrug_sorted = np.argsort(-alldrug_simil, axis=1)[:, 1:K+1]
+    
+    # generate drug-to-drug edges
+    drug_similarity = generate_drug_edges(similarities,sortedSimilarities,id_list,K,minimum=min_simil)
+    drug_edges = generate_drug_edges(alldrug_simil,alldrug_sorted,alldrug_id_list,K,minimum=min_simil)
+
+    # MERGE new edges with the existing ones
+    all_edges = edges + drug_similarity
+    unique_edges = unique_elements(all_edges)
+    unique_drug_edges = unique_elements(drug_edges)
+
+    # save the unique edges as CSV
+    edges_df = pd.DataFrame(unique_edges)
+    edges_df.to_csv(os.path.join(drugSimil_directory, f'{disease_name_label}_{date_str}_drugSim_edges.csv'), index=False)
+    drug_edges_df = pd.DataFrame(drug_edges)
+    drug_edges_df.to_csv(os.path.join(drugSimil_directory, f'{disease_name_label}_{date_str}_alldrugSim_edges.csv'), index=False)
+    
+    logging.info("CSV files saved in drug_similarity directory.")
+
+    end_time = time.time()
+    duration = end_time - start_time  # calculate duration in seconds
+    minutes = int(duration // 60)  # convert seconds to whole minutes
+    seconds = int(duration % 60)  # get the remaining seconds
+    print(f"'drugsimilarity.py' run finished in {minutes} minutes and {seconds} seconds.")
+    logging.info(f"'drugsimilarity.py' run finished in {minutes} minutes and {seconds} seconds.")
+
+    return unique_edges, unique_drug_edges

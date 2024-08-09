@@ -1,11 +1,16 @@
 # DrugRepurposing
 
 ## Notes on updating the pipeline (Niccolò Bianchi)
-Due to many issues with the tool –further notes available in the README.md files in previous commits– I developed new code that is aimed at performing the same tasks as in the python files (<i>i.e.</i> ```Monarch.py```, ```DGIdb.py```, ```drugsimilarity.py```, ```combine_graphs.py``` and ```rdf2vec.py```) in a Jupyter Notebook.
+Due to many issues with the tool –further notes available in the README.md files in previous commits– I developed new code that is aimed at performing the same tasks as in the original python files by Carmen Reep (<i>i.e.</i> ```Monarch.py```, ```DGIdb.py```, ```drugsimilarity.py```, ```combine_graphs.py``` and ```rdf2vec.py```) in a Jupyter Notebook.
 
-After writing the whole code, functions will once again be divided in python scripts that can be called by the code in <b>```routes.py```</b> which manages the code after input in the flaskApp: I indeed still want this tool to run as a self-contained docker that can be:
-	- either installed locally by tech-savy users that want to customise operations and tweak the code,
-	- or accessed remotely online through a client-server connection while the flaskApp runs in a server.
+The Jupyter notebook itself is finished and working. I am now at the last steps in also fully implementing the tool as a Flask App within a Docker image. My major contribution are:
+1. updating scripts that interacted with database APIs (<i>i.e.</i> Monarch Initiative, DGIdb)
+2. fixing issue with defunct Python packages (<i>e.g.</i> pyRDF2vec)
+3. changing the code for the training, testing ang prediction steps in order to make the prediction on drugs that are not only those already part of the network of nodes associated to the disease of interest, in ```networkmodel.py```
+4. adding a step that computes negative triples, in ```negsamples.py```
+5. updating the training, testing and prediction steps accordingly, in ```networkmodel.py```
+
+The <b>```routes.py```</b> file is also almost complete: I just have to update it to some of the new toggles I added. The tool in fact now accomodates for many parameter inputs, or toggle to extrapolate complex parameters that result from hours longs steps, or processed data to save time for testing.
 
 ![README_image-1_bis](https://github.com/NCMBianchi/DrugRepurposing/assets/111352723/7db18469-0998-42f7-8bb2-23ee2af35f3c)
 
@@ -45,14 +50,17 @@ Based on that, similarity is computed based on Tanimoto's coefficient.
 ### ```combine_graphs.py``` SKIPPED
 This section is no longer necessary, as data objects have been structured coherently throughout the entire pipeline.
 
-### ```rdf2vec.py``` FIXED (renamed as ```network_model.py```)
+### ```rdf2vec.py``` FIXED (renamed as ```networkmodel.py```)
 Due to issues with PyPi package ```pyrdf2vec``` requireing a version of ```torch``` that is no longer supported, I switched to a non-RDF approach via ```node2vec```: data is still structured as a knowledge graph. I changed the logic of which data the model is trained (<i>i.e.</i> no longer on a subset of the drug-to-gene associations, but their entirety) and of which the prediction is made on (<i>i.e.</i> no longer the other subset of drug-to-gene associations, but the entire biological and drug associations network, plus all other drugs on DGIdb) in order to effectively 'discover' new repurposed drugs outside of those already related to the disease of interest.
+
+### ```negsamples.py``` ADDED
+This section is performs computation of valid negative edges (0) based on the positive edges (1) in the network: missing edges are considered valid if they would involve gene and drug nodes that are within any subnetwork built from any positive gene-to-drug edge in the network, any gene one degree of distance from the gene in the edge, and any drug one degree of distance from the drug in the edge and with a similarity score above a certain threshold. The resulting list of valid negative drugs allows also to mark as invalid (-1) any other edge that has been ignored in the process: training would be performed on all labels, while prediction will only be performed on edges that were previous labeled (1) or (0).
 
 ![Huntington disease_2024-05-22_full_network_plot](https://github.com/NCMBianchi/DrugRepurposing/assets/111352723/04788652-457c-4a7a-977a-7b2debe3b391)
 
 ## Notes on the Docker Image / FlaskApp (Niccolò Bianchi)
 
-Later on I will also work on more changes in the <b>.html</b> and <b>.css</b> files used by the flask App, in order to enhance the UI of the tool.
+I am currently making changes to the <b>.html</b> and <b>.css</b> files used by the flask App: first to test its functionality on a very basic UI. Then I will specifically focus on the <b>.css</b> file to enhance it graphically -while still having a rather simple-looking tool.
 
 ![README_image-4b](https://github.com/NCMBianchi/DrugRepurposing/assets/111352723/87091903-4416-40b4-a6a1-9c1f6b7334a3)
 
