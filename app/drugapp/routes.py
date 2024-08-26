@@ -77,12 +77,17 @@ def config():
             file.write(f"The current machine has {num_cores} CPU cores.\n")
             file.write("\n\n")
 
+        ## LOGGING: inputs info
+        with open(input_file_path, 'w') as file:
+            (...) # also add in network_model if 'random'
+            file.write("\n\n")
+
         ## PACKAGES: python-included packages
         import tqdm
         import re
         import json  # to save .json files returned by the API
         import logging  # to check for running variables
-        import inspect  # to chec for running functions
+        import inspect  # to check for running functions
         import shutil  # to properly copy and rename files in run_monarch_mock()
         import ast  # for syntax trees in 'DGIdb.py' steps
         from unittest.mock import Mock  # to reverse requests.Response()

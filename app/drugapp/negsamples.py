@@ -91,10 +91,4 @@ def generate_negative_samples(positive_edges, similarity_threshold=0.90):
     num_valid_negative_edges = len(val_neg_edges)
     num_invalid_negative_edges = all_gene_drug_combinations - num_positive_edges - num_valid_negative_edges
 
-    ## TEMPORARY DEBUGGING
-    print(f"Number of valid negative edges: {num_valid_negative_edges}")
-    print(f"Number of gene-to-drug edges: {num_positive_edges}")
-    print(f"Number of invalid negative edges (calculated): {num_invalid_negative_edges}")
-    print(f"Number of negative edges: {num_valid_negative_edges + num_invalid_negative_edges}")
-
     return val_neg_edges

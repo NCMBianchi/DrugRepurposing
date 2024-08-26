@@ -188,7 +188,7 @@ def get_embeddings_with_NS(input_network,emb_t,node_type_select=None):
 
     logging.info(f"NOW RUNNING: {current_function_name()}.")
     
-    global network_directory, node_type_dict
+    global network_with_NS_directory, node_type_dict
     valid_node_types = set(node_type_dict.keys())
     
     if node_type_select and node_type_select not in valid_node_types:
@@ -196,9 +196,9 @@ def get_embeddings_with_NS(input_network,emb_t,node_type_select=None):
 
     # PKL file path
     if node_type_select is not None:
-        embedding_path = os.path.join(network_directory, f'{disease_name_label}_{date_str}_embedding_dict_NS_{node_type_select}.pkl')
+        embedding_path = os.path.join(network_with_NS_directory, f'{disease_name_label}_{date_str}_embedding_dict_NS_{node_type_select}.pkl')
     else:
-        embedding_path = os.path.join(network_directory, f'{disease_name_label}_{date_str}_embedding_dict_NS_full.pkl')
+        embedding_path = os.path.join(network_with_NS_directory, f'{disease_name_label}_{date_str}_embedding_dict_NS_full.pkl')
 
     # check if they already exist, if toggled
     if emb_t == 1 and os.path.exists(embedding_path):
@@ -346,17 +346,17 @@ def fuse_embeddings(gene_embedding_dict, drug_embedding_dict, alldrug_embedding_
     return train_df, predict_df
 
 
-def fuse_embeddings_with_NS(gene_embedding_dict, drug_embedding_dict, alldrug_embedding_dict, DGIdb_edges_list, nodes_list, alldrug_nodes_list,emb_t):
+def fuse_embeddings_with_NS(gene_embedding_dict, drug_embedding_dict, alldrug_embedding_dict, DGIdb_edges_list, nodes_list, alldrug_nodes_list, emb_t):
     '''
     This function fuses the embeddings for the genes and drugs that have a known link,
     and adds additional drug-gene pairs with random non-known links for prediction.
     Structure of embedding dictionaries: {key: gene/drug, value: embedding}
 
-    :param gene_embedding_dict: all gene embeddings associated to 'input_seed'.
-    :param drug_embedding_dict: all drug embeddings associated to 'input_seed'.
+    :param gene_embedding_dict: all gene embeddings associated with 'input_seed'.
+    :param drug_embedding_dict: all drug embeddings associated with 'input_seed'.
     :param alldrug_embedding_dict: all drug embeddings with entire 'DGIdb'.
     :param DGIdb_edges_list: list of gene-to-drug edges from 'run_dgidb()'.
-    :param nodes_list: list of nodes associated to 'input_seed'.
+    :param nodes_list: list of nodes associated with 'input_seed'.
     :param alldrug_nodes_list: list of nodes with entire 'DGIdb'.
     :param emb_t: 1 to look for existing embedding files to load instead of generating new ones,
         0 to ignore the loading check.
@@ -370,8 +370,8 @@ def fuse_embeddings_with_NS(gene_embedding_dict, drug_embedding_dict, alldrug_em
     print('Embeddings are being fused, be patient.')
 
     # CSV file paths
-    train_df_path = os.path.join(network_directory, f'{disease_name_label}_{date_str}_training_df_with_NS.csv')
-    predict_df_path = os.path.join(network_directory, f'{disease_name_label}_{date_str}_prediction_df_with_NS.csv')
+    train_df_path = os.path.join(network_with_NS_directory, f'{disease_name_label}_{date_str}_training_df_with_NS.csv')
+    predict_df_path = os.path.join(network_with_NS_directory, f'{disease_name_label}_{date_str}_prediction_df_with_NS.csv')
     
     # check if already present, if toggled:
     if emb_t == 1 and os.path.exists(train_df_path) and os.path.exists(predict_df_path):
@@ -403,10 +403,9 @@ def fuse_embeddings_with_NS(gene_embedding_dict, drug_embedding_dict, alldrug_em
             for drug in array_drugs:
                 fused_emb = np.multiply(gene_emb, drug_embedding_dict[drug])
                 class_label = is_interaction_present_with_NS(gene, drug, DGIdb_edges_df)
-                if class_label != -1:  # Include only positive and valid negative interactions
-                    train_rows.append({
-                        'gene': gene, 'drug': drug, 'fused_embedding': fused_emb, 'class': class_label
-                    })
+                train_rows.append({
+                    'gene': gene, 'drug': drug, 'fused_embedding': fused_emb, 'class': class_label
+                })
         train_df = pd.DataFrame(train_rows)
 
         # create interaction dataframe for prediction with additional drugs
@@ -614,7 +613,7 @@ def ml_prediction(train_df,predict_df,param_t,input_jobs=(num_cores // 2),depth=
     return interaction_predictions_df
 
 
-def ml_prediction_with_NS(train_df,predict_df,param_t,input_jobs=(num_cores // 2),depth='light',input_seed='random'):
+def ml_prediction_with_NS(train_df, predict_df, param_t, input_jobs=(num_cores // 2), depth='light', input_seed='random'):
     '''
     This function builds a supervised learning model using as training data 
     the network of interactions between biological associations (via 'Monarch.py'),
@@ -653,9 +652,27 @@ def ml_prediction_with_NS(train_df,predict_df,param_t,input_jobs=(num_cores // 2
     X = pd.DataFrame(emb_col.tolist())
     X = X.astype(float)
 
-    # y = labels
-    y = train_df['class'].astype(int)
-    unique_classes = np.unique(y)
+    # y_1: Convert `0` to `1` and `-1` to `0` in train_df (valid negative as positive)
+    print('The training dataframe is being converted: "valid negative" to "positive".')
+    y_1_start_time = time.time()
+    y_1 = train_df['class'].replace({0: 1, -1: 0}).astype(int)
+    y_1_end_time = time.time()
+    duration = y_1_end_time - y_1_start_time
+    minutes = int(duration // 60)
+    seconds = int(duration % 60)
+    print(f"Conversion finished in {minutes} minutes and {seconds} seconds.")
+    logging.info(f"Conversion finished in {minutes} minutes and {seconds} seconds.")
+
+    # y_2: Convert only `-1` to `0` in train_df (valid negative as negative)
+    print('The training dataframe is being converted: "valid negative" to "negative".')
+    y_2_start_time = time.time()
+    y_2 = train_df['class'].replace({-1: 0}).astype(int)
+    y_2_end_time = time.time()
+    duration = y_2_end_time - y_2_start_time
+    minutes = int(duration // 60)
+    seconds = int(duration % 60)
+    print(f"Conversion finished in {minutes} minutes and {seconds} seconds.")
+    logging.info(f"Conversion finished in {minutes} minutes and {seconds} seconds.")
 
     # define parameters to be tuned, and model
     if depth == 'full':
@@ -704,10 +721,10 @@ def ml_prediction_with_NS(train_df,predict_df,param_t,input_jobs=(num_cores // 2
         n_r = 1
         n_i = 5
 
-    params_file_path = os.path.join(network_directory, f'{disease_name_label}_{date_str}_hyperparameters.txt')
+    params_file_path = os.path.join(network_with_NS_directory, f'{disease_name_label}_{date_str}_hyperparameters.txt')
 
     # check if the parameters file is already present: if so and if toggled, run with unique parameters
-    if param_t==1 and os.path.exists(params_file_path):
+    if param_t == 1 and os.path.exists(params_file_path):
         with open(params_file_path, 'r') as file:
             param_dict = ast.literal_eval(file.read())
         parameters = {k: [v] for k, v in param_dict.items()}
@@ -715,57 +732,55 @@ def ml_prediction_with_NS(train_df,predict_df,param_t,input_jobs=(num_cores // 2
         n_r = 1
         n_i = 1
 
-    xgb_model_hyp = XGBClassifier(objective='multi:softmax', eval_metric='mlogloss', num_class=len(unique_classes), random_state=input_seed, n_jobs=input_jobs)
+    # define and train model on y_1
+    xgb_model_hyp_1 = XGBClassifier(objective='multi:softmax', eval_metric='mlogloss', num_class=2, random_state=input_seed, n_jobs=input_jobs)
+    rskf_1 = RepeatedStratifiedKFold(n_splits=n_s, n_repeats=n_r, random_state=input_seed)
+    randomized_search_1 = RandomizedSearchCV(xgb_model_hyp_1, param_distributions=parameters,
+                                             scoring='f1_weighted', n_iter=n_i, n_jobs=input_jobs,
+                                             error_score='raise', cv=rskf_1.split(X, y_1), verbose=1,
+                                             refit=True, random_state=input_seed)
+    weight_1 = class_weight.compute_sample_weight('balanced', y_1)
+    randomized_search_1.fit(X, y_1, sample_weight=weight_1)
+    best_model_1 = randomized_search_1.best_estimator_
 
-    rskf = RepeatedStratifiedKFold(n_splits=n_s, n_repeats=n_r, random_state=input_seed)
-    randomized_search = RandomizedSearchCV(xgb_model_hyp, param_distributions=parameters,
-                                            scoring='f1_weighted', n_iter=n_i, n_jobs=input_jobs,
-                                            error_score='raise', cv=rskf.split(X, y), verbose=1,
-                                            refit=True, random_state=input_seed)  # refit: train with best hyperparameters found
-    # make sure weights for training are added to avoid unbalanced training
-    weight = class_weight.compute_sample_weight('balanced', y)
-    randomized_search.fit(X, y, sample_weight=weight)
+    # define and train model on y_2
+    xgb_model_hyp_2 = XGBClassifier(objective='multi:softmax', eval_metric='mlogloss', num_class=2, random_state=input_seed, n_jobs=input_jobs)
+    rskf_2 = RepeatedStratifiedKFold(n_splits=n_s, n_repeats=n_r, random_state=input_seed)
+    randomized_search_2 = RandomizedSearchCV(xgb_model_hyp_2, param_distributions=parameters,
+                                             scoring='f1_weighted', n_iter=n_i, n_jobs=input_jobs,
+                                             error_score='raise', cv=rskf_2.split(X, y_2), verbose=1,
+                                             refit=True, random_state=input_seed)
+    weight_2 = class_weight.compute_sample_weight('balanced', y_2)
+    randomized_search_2.fit(X, y_2, sample_weight=weight_2)
+    best_model_2 = randomized_search_2.best_estimator_
 
-    # save the best parameters
-    best_params = randomized_search.best_params_
-    best_score = randomized_search.best_score_
-    xgb_model_hyp = randomized_search.best_estimator_
-    
-    xgb_model_hyp.set_params(**best_params)
-
-    # report best parameters and best model (scores)
-    logging.info(f'best found hyperparameters: {best_params}')
-    print(f'best found hyperparameters: {best_params}')
-    if best_score is not None:
-        logging.info(f'score of the model: {best_score}')
-        print(f'score of the model: {best_score}')
-        with open(input_file_path, 'a') as file:
-            file.write(f"The model with parameters ({best_params}) obtained a ({best_score}) score.\n\n")
-
-    ml_train_end_time = time.time()
-    duration = ml_train_end_time - ml_train_start_time
-    minutes = int(duration // 60)
-    seconds = int(duration % 60)
-    print(f"XGBoost model training finished in {minutes} minutes and {seconds} seconds.")
-    logging.info(f"XGBoost model training finished in {minutes} minutes and {seconds} seconds.")
-
+    # prediction and averaging the results
     print('Prediction is being made, be patient.')
     ml_predict_start_time = time.time()
 
-    # remove -1 labels from predict_df
-    predict_df_filtered = predict_df[predict_df['class'] != -1]
-
     # INTERACTION PREDICTION
+    predict_df_filtered = predict_df.copy()
     emb_col_pred = predict_df_filtered['fused_embedding']
     X_pred = pd.DataFrame(emb_col_pred.tolist())
     X_pred = X_pred.astype(float)
-    predictions = xgb_model_hyp.predict(X_pred)
-    predictions_prob = xgb_model_hyp.predict_proba(X_pred)
+
+    predictions_1 = best_model_1.predict(X_pred)
+    predictions_prob_1 = best_model_1.predict_proba(X_pred)
+
+    predictions_2 = best_model_2.predict(X_pred)
+    predictions_prob_2 = best_model_2.predict_proba(X_pred)
+
+    # logical 'OR' for predictions: 1 if either model predicts 1
+    final_predictions = (predictions_1 | predictions_2)
+
+    # AVERAGE the prediction probabilities
+    averaged_predictions_prob = (predictions_prob_1 + predictions_prob_2) / 2
+
     interaction_predictions_df = pd.DataFrame(
         {'drug': predict_df_filtered['drug'],
          'gene': predict_df_filtered['gene'],
-         'predicted_interaction': predictions,
-         'prob': np.max(predictions_prob, axis=1)
+         'predicted_interaction': final_predictions,
+         'prob': np.max(averaged_predictions_prob, axis=1)
          })
 
     # add labels to the drugs and genes for better readability
@@ -780,7 +795,7 @@ def ml_prediction_with_NS(train_df,predict_df,param_t,input_jobs=(num_cores // 2
     )
 
     # save output files
-    interaction_predictions_path = os.path.join(network_directory, f'{disease_name_label}_{date_str}_predicted_df.csv')
+    interaction_predictions_path = os.path.join(network_with_NS_directory, f'{disease_name_label}_{date_str}_predicted_df.csv')
     interaction_predictions_df.to_csv(interaction_predictions_path, index=False)
 
     ml_predict_end_time = time.time()
@@ -811,7 +826,7 @@ def extract_id_label(href):
         return None, None
 
 
-def filter_rank_drugs(predict_df,prob_threshold=0.65,cluster_threshold=0.8):
+def filter_rank_drugs(predict_df,prob_threshold=0.65,cluster_threshold=0.8,over_under=1):
     '''
     This function filters predicted drug-gene interactions based on probability
     and ranks drugs based on their interactions with genes.
@@ -820,6 +835,7 @@ def filter_rank_drugs(predict_df,prob_threshold=0.65,cluster_threshold=0.8):
         ['drug', 'gene', 'predicted_interaction', 'prob']
     :param prob_threshold: probability threshold for filtering predictions
     :param cluster_threshold: cluster threshold for ranking drugs
+    :param over_under: toggle to filter above or below cluster_threshold
     :return: ranked list of drugs with counter, and list of predicted edges
     '''
 
@@ -838,8 +854,11 @@ def filter_rank_drugs(predict_df,prob_threshold=0.65,cluster_threshold=0.8):
     drug_counts = new_df['drug'].value_counts()
     max_count = drug_counts.max()
     threshold_count = max_count * cluster_threshold
-    ranked_drugs = drug_counts[drug_counts >= threshold_count].index.tolist()
-
+    if over_under == 1:
+        ranked_drugs = drug_counts[drug_counts >= threshold_count].index.tolist()
+    elif over_under == 0:
+        ranked_drugs = drug_counts[drug_counts <= threshold_count].index.tolist()
+    
     # create the ranked list with counts
     ranked_list = []
     for drug_href in ranked_drugs:
@@ -885,7 +904,7 @@ def absolute_value(val, sizes):
     return f'{absolute}\n({val:.1f}%)'
 
 
-def run_network_model(monarch_input,date,run_jobs=None,run_depth=None,run_seed=None,prob_input=None,clust_input=None,emb_toggle=1,param_toggle=1):
+def run_network_model(monarch_input,date,run_jobs=None,run_depth=None,run_seed=None,prob_input=None,clust_input=None,emb_toggle=1,param_toggle=1,ou_toggle=1):
     '''
     This function runs the entire network_model script and saves nodes and edges files
     after a prediction made via XGBoost.
@@ -902,6 +921,7 @@ def run_network_model(monarch_input,date,run_jobs=None,run_depth=None,run_seed=N
         0 to ignore the loading check in get_embeddings() and fuse_embeddings().
     :param param_toggle: 1 to look for existing optimised parameter file to load instead of performing
         a new parameter optimisation step, 0 to ignore the parameter check in ml_prediction().
+    :param out_toggle: 1 to consider over clust_input, 0 to consider under clust_input in filter_rank_drugs().
     :return: list of edges after the prediction, list of nodes after the prediction, list of newly
         repurposed drugs found by the prediction.
     '''
@@ -987,7 +1007,7 @@ def run_network_model(monarch_input,date,run_jobs=None,run_depth=None,run_seed=N
         prob_input = 0.65
     if not clust_input:
         clust_input = 0.8
-    ranked_drug_list, predicted_edges = filter_rank_drugs(predicted_df,prob_threshold=prob_input,cluster_threshold=clust_input)
+    ranked_drug_list, predicted_edges = filter_rank_drugs(predicted_df,prob_threshold=prob_input,cluster_threshold=clust_input, over_under=ou_toggle)
     for ranked_drug_elem in ranked_drug_list:
         logging.info(f"{ranked_drug_elem['count']} new edge(s) for drug {ranked_drug_elem['id']}.")
         print(f"{ranked_drug_elem['count']} new edge(s) for drug {ranked_drug_elem['id']}.")
@@ -1014,7 +1034,7 @@ def run_network_model(monarch_input,date,run_jobs=None,run_depth=None,run_seed=N
     return full_edges, full_nodes, ranked_drug_list, plot_paths
 
 
-def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,run_seed=None,prob_input=None,clust_input=None,emb_toggle=1,param_toggle=1):
+def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,run_seed=None,prob_input=None,clust_input=None,emb_toggle=1,param_toggle=1,ou_toggle=1):
     '''
     This function runs the entire network_model script and saves nodes and edges files
     after a prediction made via XGBoost.
@@ -1031,6 +1051,7 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
         0 to ignore the loading check in get_embeddings_with_NS() and fuse_embeddings_with_NS().
     :param param_toggle: 1 to look for existing optimised parameter file to load instead of performing
         a new parameter optimisation step, 0 to ignore the parameter check in ml_prediction_with_NS().
+    :param out_toggle: 1 to consider over clust_input, 0 to consider under clust_input in filter_rank_drugs().
     :return: list of edges after the prediction, list of nodes after the prediction, list of newly
         repurposed drugs found by the prediction.
     '''
@@ -1048,8 +1069,8 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
         'drug': ['chembl', 'wikidata']
     }
     
-    network_directory = os.path.join(today_directory, f'{disease_name_label} ({date_str})', 'network_with_NS')
-    os.makedirs(network_directory, exist_ok=True)
+    network_with_NS_directory = os.path.join(today_directory, f'{disease_name_label} ({date_str})', 'network_with_NS')
+    os.makedirs(network_with_NS_directory, exist_ok=True)
 
     # generate networks for biological associations and drug database
     embedding_start_time = time.time()
@@ -1070,7 +1091,7 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
     logging.info(f"Embedding generation finished in {minutes} minutes and {seconds} seconds.")
 
     DGIdb_edges = [edge for edge in edges if 'dgidb' in edge[1]['label']]
-    training_df, prediction_df = fuse_embeddings(gene_embeddings,drug_embeddings,alldrug_embeddings,DGIdb_edges,nodes,drug_nodes,emb_toggle)
+    training_df, prediction_df = fuse_embeddings_with_NS(gene_embeddings,drug_embeddings,alldrug_embeddings,DGIdb_edges,nodes,drug_nodes,emb_toggle)
 
     # train the model and make the predictions
     if not run_seed:
@@ -1092,7 +1113,7 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
     plt.pie(sizes, explode=explode, labels=labels, colors=colors,
             autopct=lambda val: absolute_value(val, sizes), shadow=True, startangle=90)
     plt.axis('equal')
-    pie_chart_path = os.path.join(network_directory, f'{disease_name_label}_{date_str}_interaction_pie_chart.png')
+    pie_chart_path = os.path.join(network_with_NS_directory, f'{disease_name_label}_{date_str}_interaction_pie_chart.png')
     plt.savefig(pie_chart_path, transparent=True)
     plt.close()
     
@@ -1105,7 +1126,7 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
     plt.xlabel('Probability')
     plt.ylabel('Frequency')
     plt.grid(True)
-    hist_plot_path = os.path.join(network_directory, f'{disease_name_label}_{date_str}_probability_distribution.png')
+    hist_plot_path = os.path.join(network_with_NS_directory, f'{disease_name_label}_{date_str}_probability_distribution.png')
     plt.savefig(hist_plot_path, transparent=True)
     plt.close()
 
@@ -1116,7 +1137,7 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
         prob_input = 0.65
     if not clust_input:
         clust_input = 0.8
-    ranked_drug_list, predicted_edges = filter_rank_drugs(predicted_df,prob_threshold=prob_input,cluster_threshold=clust_input)
+    ranked_drug_list, predicted_edges = filter_rank_drugs(predicted_df,prob_threshold=prob_input,cluster_threshold=clust_input,over_under=ou_toggle)
     for ranked_drug_elem in ranked_drug_list:
         logging.info(f"{ranked_drug_elem['count']} new edge(s) for drug {ranked_drug_elem['id']}.")
         print(f"{ranked_drug_elem['count']} new edge(s) for drug {ranked_drug_elem['id']}.")
@@ -1127,7 +1148,7 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
 
     # save nodes and edges as CSV
     full_edges_df = pd.DataFrame(full_edges)
-    full_edges_df.to_csv(os.path.join(network_directory, f'{disease_name_label}_{date_str}_fullnetwork_edges.csv'), index=False)
+    full_edges_df.to_csv(os.path.join(network_with_NS_directory, f'{disease_name_label}_{date_str}_fullnetwork_edges.csv'), index=False)
     full_nodes_df = pd.DataFrame(full_nodes)
     full_nodes_df.to_csv(os.path.join(network_directory, f'{disease_name_label}_{date_str}_fullnetwork_nodes.csv'), index=False)
     

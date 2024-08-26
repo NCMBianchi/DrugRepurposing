@@ -7,7 +7,7 @@ Created on August 3rd 2024
 import sys,os,platform,datetime,logging,builtins,time,multiprocessing
 
 
-def hit_monarch_api(seed = 'MONDO:0007739', rows = 2000):
+def hit_monarch_api(seed='MONDO:0007739',rows=2000,direct_true=1):
     """
     Originally part of NQR's "bioknowledgeReviewer" tool.
     
@@ -29,6 +29,7 @@ def hit_monarch_api(seed = 'MONDO:0007739', rows = 2000):
 
     :param node: node ID to query (string) (default = 'MONDO:0007739' for Huntington's Disease).
     :param rows: the maximum number of results to return (integer) (default = 2000).
+    :param direct_true: if ==1 then 'direct=True' is added to the API call URL to filter out all URI aliases
     :return: two API response objects: 'OUT' and 'IN' response objects, in this order.
     """
     
@@ -43,13 +44,19 @@ def hit_monarch_api(seed = 'MONDO:0007739', rows = 2000):
     parameters = {'fl_excludes_evidence': False, 'rows': rows}
 
     # OUT edges API call  ('?subject=')
-    out_url = f'{biolink}?subject={seed_call}'
+    if direct_true == 1:
+        out_url = f'{biolink}?subject={seed_call}&direct=true'
+    elif direct_true == 0:
+        out_url = f'{biolink}?subject={seed_call}'
     r_out = requests.get(out_url, params=parameters)  # API call
     logging.info(f"Out edges request URL: {out_url} with parameters {parameters}")
     logging.info(f"Out edges response status: {r_out.status_code}")
 
     # IN edges API call (?object=)
-    in_url = f'{biolink}?object={seed_call}'
+    if direct_true == 1:
+        in_url = f'{biolink}?object={seed_call}&direct=true'
+    elif direct_true == 0:
+        in_url = f'{biolink}?object={seed_call}'
     r_in = requests.get(in_url, params=parameters)  # API call
     logging.info(f"In edges request URL: {in_url} with parameters {parameters}")
     logging.info(f"In edges response status: {r_in.status_code}")
