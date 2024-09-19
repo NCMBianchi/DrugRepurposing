@@ -12,11 +12,12 @@ from drugapp.platform import *
 from flask import Flask, render_template, url_for, request, session, redirect
 from drugapp import app 
 from drugapp.forms import *
-from drugapp.monarch import *
+from drugapp.Monarch import *
 from drugapp.dgidb import *
 from drugapp.drugsimilarity import *
 from drugapp.negsamples import *
 from drugapp.networkmodel import *
+from drugapp.filepaths import *
 
 ## PLATFORM INFO
 python_executable = sys.executable
@@ -28,35 +29,43 @@ num_cores = multiprocessing.cpu_count()
 def config():
 
     form = user_input()
+
     if form.validate_on_submit():
-        d_toggle = form.user_input.data #date_t
-        d_override = form.user_input.data #date_OR
-        input_seed = form.user_input.data #disease_URI
-        run_layers = form.user_input.data #deg_of_dist
-        input_min_simil = form.user_input.data #inp_minimum_sim
-        negs_toggle = form.user_input.data #ns_toggle
-        sim_threshold = form.user_input.data #sim_t
-        num_jobs = form.user_input.data #n_cores
-        depth_input = form.user_input.data #po_mode
-        seed_input = form.user_input.data #ML_seed
+
+        d_toggle = form.date_t.data  # Date override toggle
+        date_OR_day = form.date_OR_day.data
+        date_OR_month = form.date_OR_month.data
+        date_OR_year = form.date_OR_year.data
+
+        # generate the override date if toggle is active
+        if d_toggle:
+            d_override = datetime.date(date_OR_year, date_OR_month, date_OR_day)
+        else:
+            d_override = None
+        
+        input_seed = form.disease_URI.data  # disease URI
+        run_layers = form.deg_of_dist.data  # degree of distance
+        input_min_simil = float(form.inp_minimum_sim.data)  # minimum drug similarity
+        negs_toggle = form.ns_toggle.data  # negative samples toggle
+        sim_threshold = float(form.sim_t.data)  # drug similarity threshold
+        num_jobs = form.n_cores.data  # number of CPU cores
+        depth_input = form.po_mode.data  # mode of operation
+        seed_input = form.ML_seed.data  # ML seed
 
         ## DATES
         today, actual_today, date_str, curr_year, overall_start_time, formatted_start_time = set_date(d_toggle, d_override)
         logging.info(f"'DrugRepurposing' pipeline started at {formatted_start_time}.\n")
 
         ## DIRECTORY NAMES
-        base_data_directory = os.path.join(os.getcwd(), 'drugapp', 'data')
-        today_directory = os.path.join(base_data_directory, date_str)
-        os.makedirs(today_directory, exist_ok=True)
-        disease_name_label = None #placeholder
+        base_directories = initialise_base_directories(date_str)
 
         ## LOGGING: set-up
         platform_filename = "running_platform.txt"
-        platform_file_path = os.path.join(today_directory, platform_filename)
+        platform_file_path = os.path.join(base_directories['today_directory'], platform_filename)
         log_filename = "logfile.log"
-        log_file_path = os.path.join(today_directory, log_filename)
+        log_file_path = os.path.join(base_directories['today_directory'], log_filename)
         input_filename = "inputs.txt"
-        input_file_path = os.path.join(today_directory, input_filename)
+        input_file_path = os.path.join(base_directories['today_directory'], input_filename)
         logger = logging.getLogger()
         logger.setLevel(logging.DEBUG)  # highest level to capture all logs
         file_handler = logging.FileHandler(log_file_path)
@@ -79,7 +88,7 @@ def config():
 
         ## LOGGING: inputs info
         with open(input_file_path, 'w') as file:
-            (...) # also add in network_model if 'random'
+            ## (...) 
             file.write("\n\n")
 
         ## PACKAGES: python-included packages
@@ -131,7 +140,7 @@ def config():
         ## 'scikit-learn': the old PyPi 'sklearn' is deprecated 
 
         ## NETWORK CONSTRUCTION
-        nodes, edges, disease_name_id, disease_name_label = run_monarch(input_seed)
+        nodes, edges, disease_name_id, disease_name_label, disease_directories = run_monarch(input_seed)
         nodes, edges, drug_nodes = run_dgidb(input_seed,today, layers = run_layers)
         edges, drug_edges = run_drugsimilarity(input_seed,today,min_simil=input_min_simil)
         
@@ -151,9 +160,9 @@ def config():
         seconds = int(overall_duration % 60)  # get the remaining seconds
         logging.info(f"PIPELINE run finished in {minutes} minutes and {seconds} seconds.")
 
-    return render_template('home.html', folders = folderlist, form=form, folders_output=folders_output)
+    return render_template('home.html', form=form)
 
 @app.route("/about")
 def about():
-    return render_template('about.html', title='About', folders_output=folders_output)
+    return render_template('about.html', title='About')
 

@@ -12,13 +12,17 @@ My major contributions to the project are:
 4. adding a step that computes negative triples, in ```negsamples.py```
 5. updating the training, testing and prediction steps accordingly, in ```networkmodel.py```
 
-![Huntington disease_2024-05-22_full_network_plot](https://github.com/NCMBianchi/DrugRepurposing/assets/111352723/04788652-457c-4a7a-977a-7b2debe3b391)
+![Huntington disease_2024-07-31_full_network_plot_with_NS](https://github.com/user-attachments/assets/eed9bbfc-5168-4a6b-a19c-ba7b2e91c25e)
+
+A link to my dissertation will be posted here in the short future, where I discussed the results and future research.
 
 ## BROWSER APP: Flask and Docker (Niccolò Bianchi)
 
-All the scripts for the app to run are complete (<i>i.e.</i> ```routes.py```, ```monarch.py```, ```DGIdb.py```, ```drugsimilarity.py```, ```networkmodel.py```, ```negsamples.py``` and ```networkmodel.py```). I have to finish the .html and .css files that will be used by Flask to generate the browser app.
+All the scripts for the app to run are complete (<i>i.e.</i> ```routes.py```, ```monarch.py```, ```DGIdb.py```, ```drugsimilarity.py```, ```networkmodel.py```, ```negsamples.py``` and ```networkmodel.py```), as well as the .html, .css and .js files for the web app to render.
 
-![README_image-4b](https://github.com/NCMBianchi/DrugRepurposing/assets/111352723/87091903-4416-40b4-a6a1-9c1f6b7334a3)
+I have to solve a few minor issues with the input formatting and the exceptions –which now cause the app to halt at start when running 'random' as seed. Afterwards, I want to implement an advancement bar that would appear when launching the app, as shown below:
+
+![DRUGAPP_home-4-EDIT](https://github.com/user-attachments/assets/74c5c9e7-d4f9-4fc2-8c9c-483c72c075d7)
 
 ## Aknowledgements
 ### LUMC and LIACS (NL)

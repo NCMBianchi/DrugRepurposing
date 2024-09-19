@@ -6,9 +6,6 @@ Created on August 3rd 2024
 
 import sys,os,platform,datetime,logging,builtins,time,multiprocessing
 
-## REMOVE DEBUGGING PRINTS
-
-
 def generate_negative_samples(positive_edges, similarity_threshold=0.90):
     """
     Generate valid negative samples based on the existing edges in the network.
@@ -41,11 +38,11 @@ def generate_negative_samples(positive_edges, similarity_threshold=0.90):
     all_genes = unique_elements(all_genes)
     all_drugs = unique_elements(all_drugs)
 
-    print(f"Total genes: {len(all_genes)}")  # Debugging print
-    print(f"Total drugs: {len(all_drugs)}")  # Debugging print
+    logging.info(f"Total genes: {len(all_genes)}")  # Debugging print
+    logging.info(f"Total drugs: {len(all_drugs)}")  # Debugging print
 
     if not all_genes or not all_drugs:
-        print("No genes or drugs found to generate negative samples.")
+        logging.info("No genes or drugs found to generate negative samples.")
         return []
 
     # iterate through gene-to-drug edges to generate valid negative samples
@@ -84,11 +81,5 @@ def generate_negative_samples(positive_edges, similarity_threshold=0.90):
                         val_neg_edges.append(valid_edge)
 
     val_neg_edges = unique_elements(val_neg_edges)
-
-    # Compute the total number of possible gene-to-drug combinations
-    all_gene_drug_combinations = len(all_genes) * len(all_drugs)
-    num_positive_edges = len(gene_to_drug_edges)
-    num_valid_negative_edges = len(val_neg_edges)
-    num_invalid_negative_edges = all_gene_drug_combinations - num_positive_edges - num_valid_negative_edges
 
     return val_neg_edges

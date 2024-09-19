@@ -11,18 +11,18 @@ from importlib import import_module
 
 
 def set_date(date_toggle, date_override = datetime.date(2024,7,31)):
-	if date_toggle == 0:
-    	today = datetime.date.today()
-	elif date_toggle == 1:
-    	today = date_override
+    if date_toggle == 0:
+        today = datetime.date.today()
+    elif date_toggle == 1:
+        today = date_override
 
-	actual_today = datetime.date.today()
-	date_str = today.strftime('%Y-%m-%d')
-	curr_year = int(str(today)[:4])
-	overall_start_time = time.time()
-	formatted_start_time = datetime.datetime.now().strftime("%H:%M:%S")
+    actual_today = datetime.date.today()
+    date_str = today.strftime('%Y-%m-%d')
+    curr_year = int(str(today)[:4])
+    overall_start_time = time.time()
+    formatted_start_time = datetime.datetime.now().strftime("%H:%M:%S")
 
-	return today, actual_today, date_str, curr_year, overall_start_time, formatted_start_time
+    return today, actual_today, date_str, curr_year, overall_start_time, formatted_start_time
 
 
 def current_function_name():

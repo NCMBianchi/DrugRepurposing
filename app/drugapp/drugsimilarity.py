@@ -6,8 +6,8 @@ Created on August 3rd 2024
 
 import sys,os,platform,datetime,logging,builtins,time,multiprocessing
 
-## REMOVE DEBUGGING PRINTS
-
+global base_directories
+global disease_directories
 
 def get_smiles(nodes):
     """
@@ -84,7 +84,7 @@ def compute_similarity(smiles_dict,radius=2,length=4096):
         logging.warning(f'Calculating internal similarity on large set of SMILES strings ({len(smiles_list)})')
     
     # define the fingerprint generator parameters
-    fingerprint_gen = rdFingerprintGenerator.GetMorganGenerator(radius=2,fpSize=4096)
+    fingerprint_gen = rdFingerprintGenerator.GetMorganGenerator(fpradius=radius,fpSize=length)
 
     fingerprint_list = []
     
@@ -202,8 +202,7 @@ def run_drugsimilarity(monarch_input,date,K=10,min_simil=None,input_radius=None,
         file.write(f"The minimum similarity threshold is set to: {min_simil}\n")
         file.write(f"The input radius of the ECFP ({input_length} features) is set to: {min_simil}\n\n")
 
-    drugSimil_directory = os.path.join(today_directory, f'{disease_name_label} ({date_str})', 'drug_similarity')
-    os.makedirs(drugSimil_directory, exist_ok=True)
+    drugSimil_directory = disease_directories['drugsimil_directory']
     
     # convert drug IDs into SMILES notations
     nodes_list = [(node['id'], node['label']) for node in nodes]

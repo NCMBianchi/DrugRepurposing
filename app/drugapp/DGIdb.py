@@ -6,8 +6,8 @@ Created on August 3rd 2024
 
 import sys,os,platform,datetime,logging,builtins,time,multiprocessing
 
-## REMOVE DEBUGGING PRINTS
-
+global base_directories
+global disease_directories
 
 def hit_dgidb_api(gene_name=None, gene_id=None, max_retries=3):
     """
@@ -26,13 +26,12 @@ def hit_dgidb_api(gene_name=None, gene_id=None, max_retries=3):
     else:
         logging.info(f"NOW RUNNING: {current_function_name()} to retrieve all drugs in DGIdb.")
 
-    # Load strings required for path location
+    # load strings required for path location (other than in 'filepaths.py')
     global disease_name_label
-    global disease_id_label
+    #global disease_id_label (can be removed)
     global base_data_directory
 
-    dgidb_directory = os.path.join(today_directory, f'{disease_name_label} ({date_str})', 'dgidb')
-    os.makedirs(dgidb_directory, exist_ok=True)
+    dgidb_directory = disease_directories['dgidb_directory']
 
     # GraphQL API endpoint and query
     dgidb_link = 'https://dgidb.org/api/graphql'
@@ -223,7 +222,6 @@ def run_dgidb(monarch_input,date,layers = 3):
         query_nodes = [node for node in nodes if node['id'] in node_ids]
 
     logging.info(f"{len(query_nodes)} nodes and {len(query_edges)} edges from 'run_monarch({monarch_input})'.")
-    print(f"{len(query_nodes)} nodes and {len(query_edges)} edges from 'run_monarch({monarch_input})'.")
     
     valid_prefixes = ['flybase:', 'wormbase:', 'mgi:', 'hgnc:', 'ensembl:', 'zfin:']
 

@@ -12,7 +12,7 @@
   src: url('/static/fonts/SourceCodePro-SemiBold.woff2') format('woff2'),
        url('/static/fonts/SourceCodePro-SemiBold.woff') format('woff'),
        url('/static/fonts/SourceCodePro-SemiBold.ttf') format('truetype');
-  font-weight: 600; /* SemiBold */
+  font-weight: 600;
   font-style: normal;
 }
 
@@ -30,88 +30,171 @@
   src: url('/static/fonts/NotoSans-SemiBold.woff2') format('woff2'),
        url('/static/fonts/NotoSans-SemiBold.woff') format('woff'),
        url('/static/fonts/NotoSans-SemiBold.ttf') format('truetype');
-  font-weight: 600; /* SemiBold */
+  font-weight: 600;
   font-style: normal;
 }
 
 
-
+/* Set global background color and text color */
 body {
-  background: white;
-  color: #07304C;
+  background-color: #ffffff;
+  color: #13505b;
   margin-top: 5rem;
 }
 
+/* Align icon and login box to the top */
+.col-md-2.d-flex.align-items-start {
+    align-items: center !important;
+}
 
+/* Headings custom text color */
 h1, h2, h3, h4, h5, h6 {
-  color: #07304C;
+  color: #13505b;
 }
 
-.bg-steel {
-  background-color: #FFE8B6;
+/* Form Styles */
+.form-container {
+    font-size: 80%;
 }
 
-.site-header .navbar-nav .nav-link {
-  color: white;
+/* Custom padding for elements */
+.custom-padding {
+    margin-top: 20px;
 }
 
-.site-header .navbar-nav .nav-link:hover {
-  color: ##FEBE76;
+/* Input Box Default State */
+input, textarea, select {
+    background-color: #ffffff;
+    color: #13505b;
+    border: 2px solid #13505b;
+    padding: 8px;
+    border-radius: 4px;
+}
+/* NOTE: all sizes expressed in pixels could then be converted in PERCENTAGES
+
+/* Placeholder Text Styling */
+::placeholder {
+    color: #13505b;
 }
 
-.site-header .navbar-nav .nav-link.active {
-  font-weight: 500;
+/* Input box when focused or filled */
+input:focus, textarea:focus, select:focus, input:valid, textarea:valid, select:valid {
+    background-color: #ffffff;
+    color: #13505b;
+    border-color: #13505b;
 }
 
-.content-section {
-  background: #ffffff;
-  padding: 10px 20px;
-  border: 1px solid #dddddd;
-  border-radius: 3px;
-  margin-bottom: 20px;
+/* Checkboxes */
+input[type="checkbox"] {
+    appearance: none;
+    background-color: #ffffff;
+    border: 2px solid #13505b;
+    width: 40px;
+    height: 40px;
+    border-radius: 3px;
+    position: relative;
+    display: inline-block;
+    margin: 0 auto;
+    vertical-align: middle;
 }
+input[type="checkbox"]:checked {
+    background-color: #13505b;
+}
+input[type="checkbox"]:checked::before {
+    content: '✔';
+    font-size: 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ffffff;
+}
+.checkbox-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.checkbox-background {
+    background-color: rgba(19, 80, 91, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+}
+/* NOTES: not currently used, but could be used in the future for better UI
 
-
-
+/* Button Styles */
 .btn {
-
-  color: #07304C;
-  border: none;
-  outline: none;
-  border-radius: 3px;
-  cursor: pointer;
-
-}
-
-.btn:hover {
-  background: #8EE4AF;
-  color: #07304C;
-}
-
-.mystyle {
-    font-size: 11pt; 
-    font-family: Arial;
-    border-collapse: collapse; 
-    text-align: left;
-    border: 1px solid #dddddd;
-	border-radius: 3px;
-
-}
-
-.mystyle thead th {
-  background-color: #F8F8F8;
-  color: #05386B;
-}
-
-.mystyle td, th {
-    padding: 5px;
-    border-bottom: 1px solid #ddd;
-}
-
-
-
-
-.mystyle tr:hover {
+    background-color: #13505b !important;
+    color: #ffffff !important;
+    border: none;
+    outline: none;
+    border-radius: 3px;
     cursor: pointer;
-    background-color: #F8F8F8
+    width: 100%;
+}
+
+/* Button Hover */
+.btn:hover {
+    background-color: #febe76 !important;
+    color: #e07058 !important;
+}
+
+/* Style for the Right Column Log In Box */
+.log-in-box {
+    width: 100%;
+    padding-top: 100%;
+    background-color: #4db7c7;
+    border-radius: 10%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+}
+.log-in-box:hover {
+    background-color: #febe76;
+    color: #e07058;
+}
+.log-in-box p {
+    color: #ffffff;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    text-align: center;
+}
+.log-in-box {
+    text-decoration: none;
+}
+.log-in-box:hover {
+    text-decoration: none;
+}
+
+/* Align footer to center */
+footer {
+    text-align: center;
+    margin-top: 20px;
+    color: #13505b;
+    font-size: small;
+}
+
+/* Flexbox layout for the form rows to display multiple inputs on one line */
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.form-group-inline {
+    flex: 1 1 22%;
+    margin: 0 5px;
+}
+
+@media (max-width: 768px) {
+    .form-group-inline {
+        flex: 1 1 100%;
+    }
 }

@@ -4,38 +4,68 @@ Created on August 3rd 2024
 @author: Niccolò Bianchi [https://github.com/NCMBianchi]
 """
 
+import multiprocessing
 from flask_wtf import FlaskForm
 from flask import session
-from wtforms import StringField, SubmitField, SelectField
-from wtforms.validators import DataRequired, Length, Email, EqualTo
-
+from wtforms import StringField, SubmitField, SelectField, BooleanField, IntegerField, DecimalField
+from wtforms.validators import DataRequired, Length, NumberRange, Optional
 
 class user_input(FlaskForm):
 
-    date_t = # 1 if flagged, or 0 if not (default = 0)
+    # date toggle (1 if flagged, or 0 if not)
+    date_t = BooleanField('Date Override', default=False)
 
-    date_OR_day = # optional, or necessary if month or year are filled 
-    date_OR_month = # optional, or necessary if day or year are filled
-    date_OR_year = # optional, or necessary if day or month are filled
-    if date_OR_day and date_OR_month and date_OR_year:
-        date_OR = datetime.date(date_OR_year, date_OR_month, date_OR_day)
-    else:
-        date_OR = datetime.date(2024, 7, 31)
+    # date override (Day, Month, Year)
+    date_OR_day = IntegerField('Override Day', validators=[NumberRange(min=1, max=31)], default=31)
+    date_OR_month = IntegerField('Override Month', validators=[NumberRange(min=1, max=12)], default=7)
+    date_OR_year = IntegerField('Override Year', validators=[NumberRange(min=2020, max=2050)], default=2024)
+    # eventually change the upper bound for the year
 
-    disease_URI = StringField('Insert the disease \'MONDO:\' URI (Monarch Initiative\'s own identifier) of the disease of interest (e.g. MONDO:0007739 for Huntington Disease) since OMIMs no longer are supported as query seeds.', validators =[DataRequired(), Length(min=5, max=20)])
+    # disease URI/ID
+    disease_URI = StringField('Insert the \'MONDO:\' URI for the disease of interest\n(e.g. MONDO:0007739 for Huntington Disease)', 
+                               validators=[DataRequired(), Length(min=5, max=20)], default='MONDO:0007739')
     
-    deg_of_dist = # 2 or 3, from a drop menu (default = 3)
+    # degree of distance (drop down)
+    deg_of_dist = SelectField('Degrees of Distance', choices=[(2, '2'), (3, '3')], default=3, coerce=int)
 
-    inp_minimum_sim = #
+    # minimum similarity threshold
+    inp_minimum_sim = DecimalField('Minimum Drug Similarity', validators=[NumberRange(min=0.0, max=1.0)], places=2, default=0.5, render_kw={"id": "inp_minimum_sim"})
 
-    ns_toggle = # 1 if flagged, or 0 if not (default = 1)
+    # negative samples toggle (1 if flagged, or 0 if not)
+    ns_toggle = BooleanField('Negative Samples', default=True)
 
-    sim_t = # (default = 0.9)
+    # drug similarity threshold
+    sim_t = DecimalField('Drug Similarity Threshold', validators=[NumberRange(min=0.5, max=1.0)], places=2, default=0.9, render_kw={"id": "sim_t"})
+    # fix to avoid only 0 and 1
 
-    n_cores = # 1 to num_cores
-    
-    po_mode = # from menu: 'ultralight', 'light', 'full'
-    
-    ML_seed = # integer as input from 1 to 1000000, (default = 'random')
+    # number of cores (from 1 to num_cores)
+    num_cores = multiprocessing.cpu_count()
+    n_cores = IntegerField('Number of CPU Cores', validators=[NumberRange(min=1, max=num_cores)], default=1)
 
-    submit = SubmitField('LAUNCH RUN') 
+    # mode of operation (drop down)
+    po_mode = SelectField('Mode of Operation', choices=[('ultralight', 'Ultralight'), 
+                                                        ('light', 'Light'), 
+                                                        ('full', 'Full')],
+                          default='light')
+
+    # machine learning seed
+    ML_seed = StringField('ML Seed', validators=[Optional()], default='random')
+
+    # submit button
+    submit = SubmitField('LAUNCH RUN')
+
+    def validate_ML_seed(self, field):
+        """
+        Custom validation for ML Seed to accept integers or the word 'random'.
+        """
+        if field.data and field.data.lower() == 'random':
+            field.data = 'random'
+        if field.data == '':
+            field.data = None
+        else:
+            try:
+                if field.data:
+                    field.data = int(field.data)  # Try converting to an integer
+            except ValueError:
+                raise ValueError("ML Seed must be an integer or 'Random'")
+    ## fix not to return an error

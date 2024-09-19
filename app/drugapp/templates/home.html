@@ -1,44 +1,125 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-12 text-center">
-        <img src="{{ url_for('static', filename='images/DrugRepurposing-ICON-2b.svg') }}" alt="Drug Repurposing Icon" style="max-width: 100px;"> <!-- Adjust size/style as needed -->
+
+<div class="container">
+    <div class="row">
+        <!-- Left Column: Icon -->
+        <div class="col-md-2 d-flex align-items-start" data-toggle="tooltip" title="A MSc project by Niccolò Bianchi, based on the works of Carmen Reep and Nuria Queralt Rosinach.">
+            <img src="{{ url_for('static', filename='images/DrugRepurposing-ICON-2b.svg') }}" alt="Drug Repurposing Icon" style="max-width: 100%;">
+        </div> 
+
+        <!-- Middle Column: Form -->
+        <div class="col-md-8 text-center">
+            <h1>Drug Repurposing</h1>
+            <p>Fill in the details below to create a new disease graph.<br>
+            <b>Note: this may take a while. Please be patient.</b></p>
+
+            <div class="custom-padding"></div>
+
+            <div class="form-container">
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-row">
+                        <!-- Date Override Toggle -->
+                        <div class="form-group col-md-3 text-center checkbox-container">
+                            {{ form.date_t.label(class="form-control-label") }}
+                            {{ form.date_t(class="form-control") }}
+                        </div>
+
+                        <!-- Date Override Fields -->
+                        <div class="form-group col-md-3 text-center">
+                            {{ form.date_OR_day.label(class="form-control-label") }}
+                            {{ form.date_OR_day(class="form-control") }}
+                        </div>
+                        <div class="form-group col-md-3 text-center">
+                            {{ form.date_OR_month.label(class="form-control-label") }}
+                            {{ form.date_OR_month(class="form-control") }}
+                        </div>
+                        <div class="form-group col-md-3 text-center">
+                            {{ form.date_OR_year.label(class="form-control-label") }}
+                            {{ form.date_OR_year(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <div class="custom-padding"></div>
+
+                    <!-- Disease URI Input -->
+                    <div class="form-group text-center">
+                        {{ form.disease_URI.label(class="form-control-label") }}
+                        {{ form.disease_URI(class="form-control") }}
+                    </div>
+
+                    <div class="custom-padding"></div>
+
+                    <div class="form-row">
+                        <!-- Degree of Distance -->
+                        <div class="form-group col-md-3 text-center">
+                            {{ form.deg_of_dist.label(class="form-control-label") }}
+                            {{ form.deg_of_dist(class="form-control") }}
+                        </div>
+
+                        <!-- Minimum Similarity -->
+                        <div class="form-group col-md-3 text-center">
+                            {{ form.inp_minimum_sim.label(class="form-control-label") }}
+                            {{ form.inp_minimum_sim(class="form-control") }}
+                        </div>
+
+                        <!-- Negative Samples Toggle -->
+                        <div class="form-group col-md-3 text-center checkbox-container">
+                            {{ form.ns_toggle.label(class="form-control-label") }}
+                            {{ form.ns_toggle(class="form-control") }}
+                        </div>
+
+                        <!-- Similarity Threshold -->
+                        <div class="form-group col-md-3 text-center">
+                            {{ form.sim_t.label(class="form-control-label") }}
+                            {{ form.sim_t(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <div class="custom-padding"></div>
+
+                    <div class="form-row">
+                        <!-- Number of CPU Cores -->
+                        <div class="form-group col-md-4 text-center">
+                            {{ form.n_cores.label(class="form-control-label") }}
+                            {{ form.n_cores(class="form-control") }}
+                        </div>
+
+                        <!-- Mode of Operation -->
+                        <div class="form-group col-md-4 text-center">
+                            {{ form.po_mode.label(class="form-control-label") }}
+                            {{ form.po_mode(class="form-control") }}
+                        </div>
+
+                        <!-- ML Seed -->
+                        <div class="form-group col-md-4 text-center">
+                            {{ form.ML_seed.label(class="form-control-label") }}
+                            {{ form.ML_seed(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <div class="custom-padding"></div>
+
+                    <!-- Submit Button -->
+                    <div class="form-group">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                    <!-- NOTES: after the run is launched, this could be converted into the advancement bar, not to disrupt the layout -->
+
+                    <div class="custom-padding"></div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Column: Future Log In Box -->
+        <div class="col-md-2 d-flex justify-content-center align-items-start">
+            <a href="#" class="log-in-box">
+                <p class="m-0">LOG IN</p>
+            </a>
+        </div>
     </div>
 </div>
-<h3>Existing disease graphs</h3>
-Choose an existing disease graph from the list below.
-The date shows the creation of the graph.
-If the disease of interest not in list, or a newer version is wanted, create a new graph with the input box at the bottom of this page. 
-<br><br>
-<ul>
-{% for folder in folders %}
-    <li><a href="{{ url_for('symptoms_from_folder', diseasename=folder) }}">{{ folder }} </a></li>
-{% endfor %}
-</ul>
-    
-        <form method="POST" action="">
-            {{ form.hidden_tag() }}
-            <fieldset class="form-group">
-				<h3>Create new disease graph</h3>
-                (Note: this may take a while. Please be patient.)
-				<div class="form-group">
-                    {{ form.URIphenotype.label(class="form-control-label") }}
 
-                    {% if form.URIphenotype.errors %}
-                        {{ form.URIphenotype(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.URIphenotype.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.URIphenotype(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-          </fieldset>
-            <div class="form-group">
-                {{ form.submit(class="btn") }}
-            </div>
-        </form>
-    
 {% endblock content %}

@@ -6,8 +6,8 @@ Created on August 3rd 2024
 
 import sys,os,platform,datetime,logging,builtins,time,multiprocessing
 
-## REMOVE DEBUGGING PRINTS + ADD TOGGLES FOR FILE/PARAMETER FETCHING
-
+global base_directories
+global disease_directories
 
 def get_network(input_nodes,input_edges,exclude=None):
     '''
@@ -97,20 +97,20 @@ def get_network(input_nodes,input_edges,exclude=None):
 
 
 def plot_network(network):
-	pos = nx.spring_layout(network)
-	ordered_node_colors = [network.nodes[node].get('colour', '#000000') for node in network.nodes()]
-	node_sizes = [30 if node == 'MONDO:0007739' else 10 for node in network.nodes()]
-	plt.figure(figsize=(3000/300, 2000/300))  # 300dpi
-	nx.draw_networkx_nodes(network, pos, node_size=node_sizes, node_color=ordered_node_colors, alpha=0.6)
-	for u, v, data in network.edges(data=True):
-    	edge_color = data['colour']
-    	if edge_color == '#00ff00':  # Adjust the properties for the green edges
-        	nx.draw_networkx_edges(network, pos, edgelist=[(u, v)], width=0.8, alpha=0.5, edge_color=edge_color)
-    	else:  # Default properties for other edges
-        	nx.draw_networkx_edges(network, pos, edgelist=[(u, v)], width=0.2, alpha=0.2, edge_color=edge_color)
-	plt.axis('off')
-	plot_path = os.path.join(network_directory, f'{disease_name_label}_{date_str}_full_network_plot.png')
-	plt.savefig(plot_path, format="png", dpi=300, bbox_inches='tight', pad_inches=0.1, transparent=True)
+    pos = nx.spring_layout(network)
+    ordered_node_colors = [network.nodes[node].get('colour', '#000000') for node in network.nodes()]
+    node_sizes = [30 if node == 'MONDO:0007739' else 10 for node in network.nodes()]
+    plt.figure(figsize=(3000/300, 2000/300))  # 300dpi
+    nx.draw_networkx_nodes(network, pos, node_size=node_sizes, node_color=ordered_node_colors, alpha=0.6)
+    for u, v, data in network.edges(data=True):
+        edge_color = data['colour']
+        if edge_color == '#00ff00':  # Adjust the properties for the green edges
+            nx.draw_networkx_edges(network, pos, edgelist=[(u, v)], width=0.8, alpha=0.5, edge_color=edge_color)
+        else:  # Default properties for other edges
+            nx.draw_networkx_edges(network, pos, edgelist=[(u, v)], width=0.2, alpha=0.2, edge_color=edge_color)
+    plt.axis('off')
+    plot_path = os.path.join(network_directory, f'{disease_name_label}_{date_str}_full_network_plot.png')
+    plt.savefig(plot_path, format="png", dpi=300, bbox_inches='tight', pad_inches=0.1, transparent=True)
 
 
 def get_embeddings(input_network,emb_t,node_type_select=None):
@@ -143,7 +143,6 @@ def get_embeddings(input_network,emb_t,node_type_select=None):
 
     # check if they already exist, if toggled
     if emb_t == 1 and os.path.exists(embedding_path):
-        print(f"Loading embeddings from existing file: {embedding_path}")
         logging.info(f"Loading embeddings from existing file: {embedding_path}")
         
         with open(embedding_path, "rb") as file:
@@ -166,7 +165,6 @@ def get_embeddings(input_network,emb_t,node_type_select=None):
         # save the embeddings dictionary to a PKL file
         with open(embedding_path, "wb") as file:
             pickle.dump(output_embeddings, file)
-        print("PKL files saved in network directory.")
         logging.info("PKL files saved in network directory.")
 
     return output_embeddings
@@ -202,7 +200,6 @@ def get_embeddings_with_NS(input_network,emb_t,node_type_select=None):
 
     # check if they already exist, if toggled
     if emb_t == 1 and os.path.exists(embedding_path):
-        print(f"Loading embeddings from existing file: {embedding_path}")
         logging.info(f"Loading embeddings from existing file: {embedding_path}")
         
         with open(embedding_path, "rb") as file:
@@ -225,7 +222,6 @@ def get_embeddings_with_NS(input_network,emb_t,node_type_select=None):
         # save the embeddings dictionary to a PKL file
         with open(embedding_path, "wb") as file:
             pickle.dump(output_embeddings, file)
-        print("PKL files saved in network directory.")
         logging.info("PKL files saved in network directory.")
 
     return output_embeddings
@@ -279,7 +275,7 @@ def fuse_embeddings(gene_embedding_dict, drug_embedding_dict, alldrug_embedding_
 
     embedding_start_time = time.time()
 
-    print('Embeddings are being fused, be patient.')
+    logging.info('Embeddings are being fused, be patient.')
 
     # CSV file paths
     train_df_path = os.path.join(network_directory, f'{disease_name_label}_{date_str}_training_df.csv')
@@ -340,7 +336,6 @@ def fuse_embeddings(gene_embedding_dict, drug_embedding_dict, alldrug_embedding_
     duration = embedding_end_time - embedding_start_time  # calculate duration in seconds
     minutes = int(duration // 60)  # convert seconds to whole minutes
     seconds = int(duration % 60)  # get the remaining seconds
-    print(f"Embedding fusion finished in {minutes} minutes and {seconds} seconds.")
     logging.info(f"Embedding fusion finished in {minutes} minutes and {seconds} seconds.")
 
     return train_df, predict_df
@@ -367,7 +362,7 @@ def fuse_embeddings_with_NS(gene_embedding_dict, drug_embedding_dict, alldrug_em
 
     embedding_start_time = time.time()
 
-    print('Embeddings are being fused, be patient.')
+    logging.info('Embeddings are being fused, be patient.')
 
     # CSV file paths
     train_df_path = os.path.join(network_with_NS_directory, f'{disease_name_label}_{date_str}_training_df_with_NS.csv')
@@ -428,13 +423,12 @@ def fuse_embeddings_with_NS(gene_embedding_dict, drug_embedding_dict, alldrug_em
     duration = embedding_end_time - embedding_start_time  # calculate duration in seconds
     minutes = int(duration // 60)  # convert seconds to whole minutes
     seconds = int(duration % 60)  # get the remaining seconds
-    print(f"Embedding fusion finished in {minutes} minutes and {seconds} seconds.")
     logging.info(f"Embedding fusion finished in {minutes} minutes and {seconds} seconds.")
 
     return train_df, predict_df
 
 
-def ml_prediction(train_df,predict_df,param_t,input_jobs=(num_cores // 2),depth='light',input_seed='random'):
+def ml_prediction(train_df,predict_df,param_t,input_jobs=None,depth=None,input_seed=None):
     '''
     This function builds a supervised learning model using as training data 
     the network of interactions between biological associations (via 'Monarch.py'),
@@ -457,14 +451,25 @@ def ml_prediction(train_df,predict_df,param_t,input_jobs=(num_cores // 2),depth=
     global nodes
     global drug_nodes
 
-    if input_seed == 'random':
+    if input_seed == 'random' or input_seed is None:
         input_seed = np.random.randint(1, 1e6)
+
+        ## LOGGING: random seed
+        with open(input_file_path, 'w') as file:
+            file.write(f"Random seed generated for the run: {input_seed}\n")
+            file.write("\n\n")
+
+    if depth is None:
+        depth = 'light'
+
+    if input_jobs is None:
+        input_jobs = num_cores // 2
 
     with open(input_file_path, 'a') as file:
         file.write(f"The XGBoost prediction is run on ({input_jobs}) cores with seed ({input_seed}).\n")
         file.write(f"A ({depth}) parameter optimisation step is performed.\n")
 
-    print('ML model is being trained, be patient.')
+    logging.info('ML model is being trained, be patient.')
     ml_train_start_time = time.time()
 
     # MODEL TRAINING
@@ -558,10 +563,8 @@ def ml_prediction(train_df,predict_df,param_t,input_jobs=(num_cores // 2),depth=
 
     # report best parameters and best model (scores)
     logging.info(f'best found hyperparameters: {best_params}')
-    print(f'best found hyperparameters: {best_params}')
     if best_score is not None:
         logging.info(f'score of the model: {best_score}')
-        print(f'score of the model: {best_score}')
         with open(input_file_path, 'a') as file:
             file.write(f"The model with parameters ({best_params}) obtained a ({best_score}) score.\n\n")
 
@@ -569,10 +572,9 @@ def ml_prediction(train_df,predict_df,param_t,input_jobs=(num_cores // 2),depth=
     duration = ml_train_end_time - ml_train_start_time  # calculate duration in seconds
     minutes = int(duration // 60)  # convert seconds to whole minutes
     seconds = int(duration % 60)  # get the remaining seconds
-    print(f"XGBoost model training finished in {minutes} minutes and {seconds} seconds.")
     logging.info(f"XGBoost model training finished in {minutes} minutes and {seconds} seconds.")
 
-    print('Prediction is being made, be patient.')
+    logging.info('Prediction is being made, be patient.')
     ml_predict_start_time = time.time()
 
     # INTERACTION PREDICTION
@@ -607,13 +609,12 @@ def ml_prediction(train_df,predict_df,param_t,input_jobs=(num_cores // 2),depth=
     duration = ml_predict_end_time - ml_predict_start_time  # calculate duration in seconds
     minutes = int(duration // 60)  # convert seconds to whole minutes
     seconds = int(duration % 60)  # get the remaining seconds
-    print(f"XGBoost model prediction finished in {minutes} minutes and {seconds} seconds.")
     logging.info(f"XGBoost model prediction finished in {minutes} minutes and {seconds} seconds.")
 
     return interaction_predictions_df
 
 
-def ml_prediction_with_NS(train_df, predict_df, param_t, input_jobs=(num_cores // 2), depth='light', input_seed='random'):
+def ml_prediction_with_NS(train_df, predict_df, param_t, input_jobs=None, depth=None, input_seed=None):
     '''
     This function builds a supervised learning model using as training data 
     the network of interactions between biological associations (via 'Monarch.py'),
@@ -636,14 +637,25 @@ def ml_prediction_with_NS(train_df, predict_df, param_t, input_jobs=(num_cores /
     global nodes
     global drug_nodes
 
-    if input_seed == 'random':
+    if input_seed == 'random' or input_seed is None:
         input_seed = np.random.randint(1, 1e6)
+
+        ## LOGGING: random seed
+        with open(input_file_path, 'w') as file:
+            file.write(f"Random seed generated for the run: {input_seed}\n")
+            file.write("\n\n")
+
+    if depth is None:
+        depth = 'light'
+
+    if input_jobs is None:
+        input_jobs = num_cores // 2
 
     with open(input_file_path, 'a') as file:
         file.write(f"The XGBoost prediction is run on ({input_jobs}) cores with seed ({input_seed}).\n")
         file.write(f"A ({depth}) parameter optimization step is performed.\n")
 
-    print('ML model is being trained, be patient.')
+    logging.info('ML model is being trained, be patient.')
     ml_train_start_time = time.time()
 
     # MODEL TRAINING
@@ -653,25 +665,23 @@ def ml_prediction_with_NS(train_df, predict_df, param_t, input_jobs=(num_cores /
     X = X.astype(float)
 
     # y_1: Convert `0` to `1` and `-1` to `0` in train_df (valid negative as positive)
-    print('The training dataframe is being converted: "valid negative" to "positive".')
+    logging.info('The training dataframe is being converted: "valid negative" to "positive".')
     y_1_start_time = time.time()
     y_1 = train_df['class'].replace({0: 1, -1: 0}).astype(int)
     y_1_end_time = time.time()
     duration = y_1_end_time - y_1_start_time
     minutes = int(duration // 60)
     seconds = int(duration % 60)
-    print(f"Conversion finished in {minutes} minutes and {seconds} seconds.")
     logging.info(f"Conversion finished in {minutes} minutes and {seconds} seconds.")
 
     # y_2: Convert only `-1` to `0` in train_df (valid negative as negative)
-    print('The training dataframe is being converted: "valid negative" to "negative".')
+    logging.info('The training dataframe is being converted: "valid negative" to "negative".')
     y_2_start_time = time.time()
     y_2 = train_df['class'].replace({-1: 0}).astype(int)
     y_2_end_time = time.time()
     duration = y_2_end_time - y_2_start_time
     minutes = int(duration // 60)
     seconds = int(duration % 60)
-    print(f"Conversion finished in {minutes} minutes and {seconds} seconds.")
     logging.info(f"Conversion finished in {minutes} minutes and {seconds} seconds.")
 
     # define parameters to be tuned, and model
@@ -755,7 +765,7 @@ def ml_prediction_with_NS(train_df, predict_df, param_t, input_jobs=(num_cores /
     best_model_2 = randomized_search_2.best_estimator_
 
     # prediction and averaging the results
-    print('Prediction is being made, be patient.')
+    logging.info('Prediction is being made, be patient.')
     ml_predict_start_time = time.time()
 
     # INTERACTION PREDICTION
@@ -802,7 +812,6 @@ def ml_prediction_with_NS(train_df, predict_df, param_t, input_jobs=(num_cores /
     duration = ml_predict_end_time - ml_predict_start_time
     minutes = int(duration // 60)
     seconds = int(duration % 60)
-    print(f"XGBoost model prediction finished in {minutes} minutes and {seconds} seconds.")
     logging.info(f"XGBoost model prediction finished in {minutes} minutes and {seconds} seconds.")
 
     return interaction_predictions_df
@@ -939,12 +948,11 @@ def run_network_model(monarch_input,date,run_jobs=None,run_depth=None,run_seed=N
         'drug': ['chembl', 'wikidata']
     }
     
-    network_directory = os.path.join(today_directory, f'{disease_name_label} ({date_str})', 'network')
-    os.makedirs(network_directory, exist_ok=True)
+    network_directory = disease_directories['network_directory']
 
     # generate networks for biological associations and drug database
     embedding_start_time = time.time()
-    print('Embeddings are being generated, be patient.')
+    logging.info('Embeddings are being generated, be patient.')
     
     full_network = get_network(nodes,edges)
     partial_alldrug_network = get_network(drug_nodes,drug_edges,exclude='dgidb:')
@@ -957,19 +965,12 @@ def run_network_model(monarch_input,date,run_jobs=None,run_depth=None,run_seed=N
     duration = embedding_end_time - embedding_start_time  # calculate duration in seconds
     minutes = int(duration // 60)  # convert seconds to whole minutes
     seconds = int(duration % 60)  # get the remaining seconds
-    print(f"Embedding generation finished in {minutes} minutes and {seconds} seconds.")
     logging.info(f"Embedding generation finished in {minutes} minutes and {seconds} seconds.")
 
     DGIdb_edges = [edge for edge in edges if 'dgidb' in edge[1]['label']]
     training_df, prediction_df = fuse_embeddings(gene_embeddings,drug_embeddings,alldrug_embeddings,DGIdb_edges,nodes,drug_nodes,emb_toggle)
 
     # train the model and make the predictions
-    if not run_seed:
-        run_seed = 'random'
-    if not run_depth:
-        run_depth = 'light'
-    if not run_jobs:
-        run_jobs = (num_cores//2)
     predicted_df = ml_prediction(training_df,prediction_df,param_toggle,input_jobs=run_jobs,depth=run_depth,input_seed=run_seed)
 
     # generate prediction outcome proportion plot
@@ -1010,7 +1011,6 @@ def run_network_model(monarch_input,date,run_jobs=None,run_depth=None,run_seed=N
     ranked_drug_list, predicted_edges = filter_rank_drugs(predicted_df,prob_threshold=prob_input,cluster_threshold=clust_input, over_under=ou_toggle)
     for ranked_drug_elem in ranked_drug_list:
         logging.info(f"{ranked_drug_elem['count']} new edge(s) for drug {ranked_drug_elem['id']}.")
-        print(f"{ranked_drug_elem['count']} new edge(s) for drug {ranked_drug_elem['id']}.")
     
     full_edges = edges + drug_edges + predicted_edges
     full_nodes = [edge[0] for edge in full_edges] + [edge[2] for edge in full_edges]
@@ -1028,7 +1028,6 @@ def run_network_model(monarch_input,date,run_jobs=None,run_depth=None,run_seed=N
     duration = end_time - start_time  # calculate duration in seconds
     minutes = int(duration // 60)  # convert seconds to whole minutes
     seconds = int(duration % 60)  # get the remaining seconds
-    print(f"'network_model.py' run finished in {minutes} minutes and {seconds} seconds.")
     logging.info(f"'network_model.py' run finished in {minutes} minutes and {seconds} seconds.")
     
     return full_edges, full_nodes, ranked_drug_list, plot_paths
@@ -1069,12 +1068,11 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
         'drug': ['chembl', 'wikidata']
     }
     
-    network_with_NS_directory = os.path.join(today_directory, f'{disease_name_label} ({date_str})', 'network_with_NS')
-    os.makedirs(network_with_NS_directory, exist_ok=True)
+    network_with_NS_directory = disease_directories['NSnetwork_directory']
 
     # generate networks for biological associations and drug database
     embedding_start_time = time.time()
-    print('Embeddings are being generated, be patient.')
+    logging.info('Embeddings are being generated, be patient.')
     
     full_network = get_network(nodes,edges)
     partial_alldrug_network = get_network(drug_nodes,drug_edges,exclude='dgidb:')
@@ -1087,19 +1085,12 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
     duration = embedding_end_time - embedding_start_time  # calculate duration in seconds
     minutes = int(duration // 60)  # convert seconds to whole minutes
     seconds = int(duration % 60)  # get the remaining seconds
-    print(f"Embedding generation finished in {minutes} minutes and {seconds} seconds.")
     logging.info(f"Embedding generation finished in {minutes} minutes and {seconds} seconds.")
 
     DGIdb_edges = [edge for edge in edges if 'dgidb' in edge[1]['label']]
     training_df, prediction_df = fuse_embeddings_with_NS(gene_embeddings,drug_embeddings,alldrug_embeddings,DGIdb_edges,nodes,drug_nodes,emb_toggle)
 
     # train the model and make the predictions
-    if not run_seed:
-        run_seed = 'random'
-    if not run_depth:
-        run_depth = 'light'
-    if not run_jobs:
-        run_jobs = (num_cores//2)
     predicted_df = ml_prediction_with_NS(training_df,prediction_df,param_toggle,input_jobs=run_jobs,depth=run_depth,input_seed=run_seed)
 
     # generate prediction outcome proportion plot
@@ -1140,7 +1131,6 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
     ranked_drug_list, predicted_edges = filter_rank_drugs(predicted_df,prob_threshold=prob_input,cluster_threshold=clust_input,over_under=ou_toggle)
     for ranked_drug_elem in ranked_drug_list:
         logging.info(f"{ranked_drug_elem['count']} new edge(s) for drug {ranked_drug_elem['id']}.")
-        print(f"{ranked_drug_elem['count']} new edge(s) for drug {ranked_drug_elem['id']}.")
     
     full_edges = edges + drug_edges + predicted_edges
     full_nodes = [edge[0] for edge in full_edges] + [edge[2] for edge in full_edges]
@@ -1158,7 +1148,6 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
     duration = end_time - start_time  # calculate duration in seconds
     minutes = int(duration // 60)  # convert seconds to whole minutes
     seconds = int(duration % 60)  # get the remaining seconds
-    print(f"'network_model.py' run finished in {minutes} minutes and {seconds} seconds.")
     logging.info(f"'network_model.py' run finished in {minutes} minutes and {seconds} seconds.")
     
     return full_edges, full_nodes, ranked_drug_list, plot_paths

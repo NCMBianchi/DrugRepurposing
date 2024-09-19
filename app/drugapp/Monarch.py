@@ -5,7 +5,9 @@ Created on August 3rd 2024
 """
 
 import sys,os,platform,datetime,logging,builtins,time,multiprocessing
+from drugapp.filepaths import initialise_disease_directories
 
+global base_directories
 
 def hit_monarch_api(seed='MONDO:0007739',rows=2000,direct_true=1):
     """
@@ -65,10 +67,10 @@ def hit_monarch_api(seed='MONDO:0007739',rows=2000,direct_true=1):
     if not r_out.ok or not r_in.ok:
         error_message = f"Error fetching data for seed {seed}: OUT status {r_out.status_code}, IN status {r_in.status_code}"
         logging.error(error_message)
-        # Handle error appropriately, could raise an exception or return an error code
+        # handle error appropriately, could raise an exception or return an error code
         raise Exception(error_message)
     
-    # (eventually) create disease directory
+    # extract disease name and ID from the API response
     r_out_json = r_out.json()
     r_in_json = r_in.json()
     if seed == input_seed[0]:
@@ -78,8 +80,12 @@ def hit_monarch_api(seed='MONDO:0007739',rows=2000,direct_true=1):
         else:
             logging.warning("Warning: 'associations' key not found in response or no associations present.")
             return None, None
-        disease_directory = os.path.join(today_directory, f'{disease_name} ({date_str})')
-        os.makedirs(disease_directory, exist_ok=True)  # the date is repeated just for archival purposes
+        
+        # initialise disease directories
+        disease_directories = initialise_disease_directories(today_directory, disease_name, date_str)
+        disease_directory = disease_directories['disease_directory'] # the date is repeated just for archival purposes
+
+        # store disease ID and name in a file
         disease_id_file_path = os.path.join(disease_directory, 'disease_id.txt')
         with open(disease_id_file_path, "w") as text_file:
             
@@ -89,13 +95,16 @@ def hit_monarch_api(seed='MONDO:0007739',rows=2000,direct_true=1):
             # store the list of subject closure for the input_seed
             # (information on the ontology of the disease)
             text_file.write(f"Subject closure:{r_out_json['items'][0]['subject_closure']}")
-            logging.info(f"Information on the disease saved to {disease_id_file_path}")
+        logging.info(f"Information on the disease saved to {disease_id_file_path}")
             
     else:
         disease_id = disease_id_label
         disease_name = disease_name_label
-        disease_directory = os.path.join(today_directory, f'{disease_name} ({date_str})')
-    monarch_directory = os.path.join(disease_directory, 'monarch')
+        disease_directories = initialise_disease_directories(today_directory, disease_name, date_str)
+        disease_directory = disease_directories['disease_directory']
+    monarch_directory = disease_directories['monarch_directory']
+    
+    # create a directory for each seed and store API responses
     seed_new = seed.split(':')
     seed_dir = seed_new[0]+'_'+seed_new[1]
     seed_directory = os.path.join(monarch_directory, seed_dir)
@@ -119,7 +128,7 @@ def hit_monarch_api(seed='MONDO:0007739',rows=2000,direct_true=1):
     else:
         logging.error(f"Failed to fetch IN edges: {r_in.status_code} - {r_in.reason}")
     
-    return r_out, r_in, disease_id, disease_name
+    return r_out, r_in, disease_id, disease_name, disease_directories
 
 
 def unique_elements(nonUnique_list):
@@ -282,17 +291,17 @@ def run_monarch(input_id = 'MONDO:0007739'):
     start_time = time.time()
     
     # First layer: use the flaskApp input
-    firstLayer_nodes, firstLayer_edges, disease_id_label, disease_name_label = get_neighbours(input_id,'first_layer')
+    firstLayer_nodes, firstLayer_edges, disease_id_label, disease_dir = get_neighbours(input_id,'first_layer')
 
     # Second layer: use the nodes in the first layer
     firstLayer_seeds = [item['id'] for item in firstLayer_nodes]  # turn into a list of IDs
     firstLayer_seeds = [fl_id for fl_id in firstLayer_seeds if fl_id not in input_id]  # to avoid re-running nodes and counting them in the second layer
-    secondLayer_nodes, secondLayer_edges, disease_id_label, disease_name_label = get_neighbours(firstLayer_seeds,'second_layer')
+    secondLayer_nodes, secondLayer_edges, disease_id_label, disease_name_label, _ = get_neighbours(firstLayer_seeds,'second_layer')
 
     # Third layer: use the nodes in the second layer
     secondLayer_seeds = [item['id'] for item in secondLayer_nodes]  # turn into a list of IDs
     secondLayer_seeds = [sl_id for sl_id in secondLayer_seeds if sl_id not in firstLayer_seeds]  # to avoid re-running nodes and counting them in the third layer
-    thirdLayer_nodes, thirdLayer_edges, disease_id_label, disease_name_label = get_neighbours(secondLayer_seeds,'third_layer')
+    thirdLayer_nodes, thirdLayer_edges, disease_id_label, disease_name_label, _ = get_neighbours(secondLayer_seeds,'third_layer')
     
     # MERGE the nodes' lists
     nonUnique_nodes = firstLayer_nodes + secondLayer_nodes + thirdLayer_nodes
@@ -303,7 +312,8 @@ def run_monarch(input_id = 'MONDO:0007739'):
     unique_edges = unique_elements(nonUnique_edges)
     
     # save the unique nodes and edges as CSV
-    monarch_directory = os.path.join(today_directory, f'{disease_name_label} ({date_str})', 'monarch')
+    #monarch_directory = os.path.join(today_directory, f'{disease_name_label} ({date_str})', 'monarch')
+    monarch_directory = disease_dir['monarch_directory']
     nodes_df = pd.DataFrame(unique_nodes)
     nodes_df.to_csv(os.path.join(monarch_directory, f'{disease_name_label}_{date_str}_monarch_nodes.csv'), index=False)
     edges_df = pd.DataFrame(unique_edges)
@@ -317,4 +327,4 @@ def run_monarch(input_id = 'MONDO:0007739'):
     seconds = int(duration % 60)  # get the remaining seconds
     logging.info(f"'Monarch.py' run finished in {minutes} minutes and {seconds} seconds.")
     
-    return unique_nodes, unique_edges, disease_id_label, disease_name_label
+    return unique_nodes, unique_edges, disease_id_label, disease_name_label, disease_dir
