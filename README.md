@@ -6,7 +6,7 @@
 
 Here's how the tool works in its 2024.1.5 release:
 
-(...)
+![GITHUB_update-20250103-1](https://github.com/user-attachments/assets/88773663-84a1-422f-bf92-1e0a926bcf2d)
 
 I am currently developing a new version of the tool that allows for:
 - **scalability**, so that if this tool would ever be implemented in a server and multiple users would access it, they could all run their queries cuncurrently and avoid long cues as the modules that require more time would exist in multiple copies with their own dedicated core
@@ -15,7 +15,7 @@ I am currently developing a new version of the tool that allows for:
 
 Here's how the new tool will be in its future 2025.1.0 release:
 
-(...)
+![GITHUB_update-20250103-2](https://github.com/user-attachments/assets/cd844433-c210-4791-94b4-ec6acc236cf3)
 
 These changes will be tested on a smaller artificial network –based on Huntington's Disease, but with limited number of nodes compared to the original 61K nodes in the network in my [2024 MSc thesis](https://www.dropbox.com/scl/fi/6vzgfld7riqb19hm5wj6u/DRUG_REPURPOSING_thesis_Premium.pdf?rlkey=y9xm7zuxm4q035byvhe496m9k&dl=0)– to determine if different methods lead to a higher prediction rate. Other than the two ML appraoches described above, I will also test whether other methods of generating semantically valid negative samples lead to better results.
 
