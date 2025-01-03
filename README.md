@@ -2,6 +2,23 @@
 
 ![README_image-1_bis](https://github.com/NCMBianchi/DrugRepurposing/assets/111352723/7db18469-0998-42f7-8bb2-23ee2af35f3c)
 
+## 2025 UPDATES: scalability (iterations of dockerised modules), additional neural network ML option, batch runs
+
+Here's how the tool works in its 2024.1.5 release:
+
+(...)
+
+I am currently developing a new version of the tool that allows for:
+- **scalability**, so that if this tool would ever be implemented in a server and multiple users would access it, they could all run their queries cuncurrently and avoid long cues as the modules that require more time would exist in multiple copies with their own dedicated core
+- a new ML approach based on **graphic neural networks** (GNNs) so that the user could choose from a dropdown menu whether to run a gradient boosting method (*i.e.* with Python package `XGboost`) or a neural network method (*i.e.* with Python package `PyG`, a.k.a. PyTorch Geometric)
+- **batch runs**, so that the user can launch a series of *n* runs with different seeds and obtain a distribution of results from the gene-to-drug prediction, and determine which of the repurposed drugs were returned by the most runs: this is meant to solve the issue of having a certain range of variability based on the seed for the ML step, altough running times will then be much longer
+
+Here's how the new tool will be in its future 2025.1.0 release:
+
+(...)
+
+These changes will be tested on a smaller artificial network –based on Huntington's Disease, but with limited number of nodes compared to the original 61K nodes in the network in my [2024 MSc thesis](https://www.dropbox.com/scl/fi/6vzgfld7riqb19hm5wj6u/DRUG_REPURPOSING_thesis_Premium.pdf?rlkey=y9xm7zuxm4q035byvhe496m9k&dl=0)– to determine if different methods lead to a higher prediction rate. Other than the two ML appraoches described above, I will also test whether other methods of generating semantically valid negative samples lead to better results.
+
 ## PIPELINE: Jupyter Notebook (Niccolò Bianchi)
 The entire pipeline can be launched within the Jupyter Notebook. A full run dataset is available on [dropbox](https://www.dropbox.com/scl/fi/prvqajjau227741z5ve91/data.7z?rlkey=qjumdz9r93y0yv6mhc21a7bir&st=jqsfgypj&dl=0).
 
