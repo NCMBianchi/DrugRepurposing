@@ -25,8 +25,9 @@ class user_input(FlaskForm):
     disease_URI = StringField('Insert the \'MONDO:\' URI for the disease of interest\n(e.g. MONDO:0007739 for Huntington Disease)', 
                                validators=[DataRequired(), Length(min=5, max=20)], default='MONDO:0007739')
     
-    # degree of distance (drop down)
-    deg_of_dist = SelectField('Degrees of Distance', choices=[(2, '2'), (3, '3')], default=3, coerce=int)
+    # degree of distance (drop down) [denugger mode adds 1 as an option: TO REMOVE]
+    #deg_of_dist = SelectField('Degrees of Distance', choices=[(2, '2'), (3, '3')], default=3, coerce=int)
+    deg_of_dist = SelectField('Degrees of Distance', choices=[(1, '1'), (2, '2'), (3, '3')], default=3, coerce=int)
 
     # minimum similarity threshold
     inp_minimum_sim = DecimalField('Minimum Drug Similarity', validators=[NumberRange(min=0.0, max=1.0)], places=2, default=0.5, render_kw={"id": "inp_minimum_sim"})
@@ -60,12 +61,8 @@ class user_input(FlaskForm):
         """
         if field.data and field.data.lower() == 'random':
             field.data = 'random'
-        if field.data == '':
-            field.data = None
-        else:
+        elif field.data:
             try:
-                if field.data:
-                    field.data = int(field.data)  # Try converting to an integer
+                field.data = int(field.data)
             except ValueError:
                 raise ValueError("ML Seed must be an integer or 'Random'")
-    ## fix not to return an error

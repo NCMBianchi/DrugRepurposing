@@ -37,28 +37,28 @@
       </p>
     </footer>
 
-
-    <!-- Optional JavaScript -->
-
+    <!-- Core JavaScript dependencies -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
-    <!-- also locally stored, for future compatibility 
+    <!-- OMIM conversion scripts (must be loaded in this order) -->
+    <script src="{{ url_for('static', filename='js/mapper.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mapper_helper.js') }}"></script>
+
+    <!-- Additional page functionality -->
+    <script src="{{ url_for('static', filename='js/dynamic_sim_t.js') }}"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+    </script>
+
+    <!-- Local fallback scripts (commented out for now)
     <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script> -->
 
-    <script src="{{ url_for('static', filename='js/dynamic_sim_t.js') }}"></script>
-    <script>
-    $(document).ready(function(){
-      $('[data-toggle="tooltip"]').tooltip();   
-    });
-    </script>
-    <!-- NOTES: fix position of the tooltip when hovering -->
 </body>
-
 </html>
-
-

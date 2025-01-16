@@ -198,3 +198,27 @@ footer {
         flex: 1 1 100%;
     }
 }
+
+/* Styles for input placeholder effect */
+.input-wrapper {
+    position: relative;
+}
+
+.input-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 8px;
+    transform: translateY(-50%);
+    color: #888;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 1;
+}
+
+.input-wrapper input:not(:placeholder-shown) + .input-placeholder,
+.input-wrapper input:focus + .input-placeholder,
+.input-wrapper input:not(:empty) + .input-placeholder {
+    opacity: 0;
+}
+
+

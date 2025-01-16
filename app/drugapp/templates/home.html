@@ -3,10 +3,12 @@
 
 <div class="container">
     <div class="row">
+
+
         <!-- Left Column: Icon -->
         <div class="col-md-2 d-flex align-items-start" data-toggle="tooltip" title="A MSc project by Niccolò Bianchi, based on the works of Carmen Reep and Nuria Queralt Rosinach.">
             <img src="{{ url_for('static', filename='images/DrugRepurposing-ICON-2b.svg') }}" alt="Drug Repurposing Icon" style="max-width: 100%;">
-        </div> 
+        </div>
 
         <!-- Middle Column: Form -->
         <div class="col-md-8 text-center">
@@ -44,10 +46,43 @@
 
                     <div class="custom-padding"></div>
 
+                    <!-- OMIM ID Input -->
+                    <div class="form-group text-center">
+                        <label for="omim_id" class="form-control-label">OMIM to MONDO converter</label>
+                        <div class="input-group">
+                            <input type="text" 
+                                   id="omim_id" 
+                                   name="omim_id" 
+                                   class="form-control" 
+                                   placeholder="143100">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button" id="convert-omim-button">CONVERT</button>
+                            </div>
+                        </div>
+                        <div class="input-help-text mt-2">
+                            Enter an OMIM ID (number only)
+                        </div>
+                        <!-- Conversion Alert Area -->
+                        <div id="omim-alert" class="alert mt-2" style="display: none;"></div>
+                    </div>
+
+                    <div class="custom-padding"></div>
+
                     <!-- Disease URI Input -->
                     <div class="form-group text-center">
-                        {{ form.disease_URI.label(class="form-control-label") }}
-                        {{ form.disease_URI(class="form-control") }}
+                        <label for="disease_URI" class="form-control-label">Disease URI input for drug repurposing</label>
+                        <div class="input-group">
+                            <input type="text" 
+                                   id="disease_URI" 
+                                   name="disease_URI" 
+                                   class="form-control" 
+                                   placeholder="MONDO:0007739">
+                        </div>
+                        <div class="input-help-text mt-2">
+                            Enter a Monarch (MONDO) Disease ID
+                        </div>
+                        <!-- Input Alert Area -->
+                        <div id="mondo-alert" class="alert mt-2" style="display: none;"></div>
                     </div>
 
                     <div class="custom-padding"></div>

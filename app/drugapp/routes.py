@@ -27,7 +27,7 @@ num_cores = multiprocessing.cpu_count()
 @app.route("/", methods = ['GET', 'POST'])
 @app.route("/home", methods = ['GET', 'POST'])
 def config():
-
+    
     form = user_input()
 
     if form.validate_on_submit():
