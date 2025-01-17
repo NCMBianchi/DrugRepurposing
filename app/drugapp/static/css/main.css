@@ -215,6 +215,41 @@ footer {
     z-index: 1;
 }
 
+.omim-collapse-btn {
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+}
+
+.omim-converter-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.omim-converter-container label {
+    margin-right: 0.5rem;
+}
+
+.collapse-toggle-icon {
+    font-weight: bold;
+    font-size: 1em;
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+    line-height: 1;
+}
+
+.btn-xs {
+    padding: 0;
+    font-size: 0.75rem;
+    line-height: 1;
+}
+
 .input-wrapper input:not(:placeholder-shown) + .input-placeholder,
 .input-wrapper input:focus + .input-placeholder,
 .input-wrapper input:not(:empty) + .input-placeholder {

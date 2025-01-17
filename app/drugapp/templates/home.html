@@ -47,20 +47,28 @@
                     <div class="custom-padding"></div>
 
                     <!-- OMIM ID Input -->
-                    <div class="form-group text-center">
-                        <label for="omim_id" class="form-control-label">OMIM to MONDO converter</label>
-                        <div class="input-group">
-                            <input type="text" 
-                                   id="omim_id" 
-                                   name="omim_id" 
-                                   class="form-control" 
-                                   placeholder="143100">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="button" id="convert-omim-button">CONVERT</button>
-                            </div>
+                    <div class="form-group text-center position-relative">
+                        <div class="omim-converter-container">
+                            <label for="omim_id" class="form-control-label">OMIM to MONDO converter</label>
+                            <button class="btn btn-xs btn-outline-secondary omim-collapse-btn" type="button" data-toggle="collapse" data-target="#omimConverterContent" aria-expanded="false" aria-controls="omimConverterContent">
+                                <span class="collapse-toggle-icon">+</span>
+                            </button>
                         </div>
-                        <div class="input-help-text mt-2">
-                            Enter an OMIM ID (number only)
+                        
+                        <div class="collapse" id="omimConverterContent">
+                            <div class="input-group mt-2">
+                                <input type="text" 
+                                       id="omim_id" 
+                                       name="omim_id" 
+                                       class="form-control" 
+                                       placeholder="143100">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="button" id="convert-omim-button">CONVERT</button>
+                                </div>
+                            </div>
+                            <div class="input-help-text mt-2">
+                                Enter an OMIM ID (number only)
+                            </div>
                         </div>
                         <!-- Conversion Alert Area -->
                         <div id="omim-alert" class="alert mt-2" style="display: none;"></div>
@@ -132,6 +140,8 @@
                         <div class="form-group col-md-4 text-center">
                             {{ form.ML_seed.label(class="form-control-label") }}
                             {{ form.ML_seed(class="form-control") }}
+                            <!-- ML seed Alert Area -->
+                            <div id="ml-seed-alert" class="alert mt-2" style="display: none;"></div>
                         </div>
                     </div>
 

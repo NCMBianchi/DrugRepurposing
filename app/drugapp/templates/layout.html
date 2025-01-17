@@ -43,15 +43,37 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
-    <!-- OMIM conversion scripts (must be loaded in this order) -->
+    <!-- OMIM conversion scripts-->
     <script src="{{ url_for('static', filename='js/mapper.js') }}"></script>
     <script src="{{ url_for('static', filename='js/mapper_helper.js') }}"></script>
+
+    <!-- input checker script for 'Disease URI' and 'ML seed'-->
+    <script src="{{ url_for('static', filename='js/input_checker.js') }}"></script>
 
     <!-- Additional page functionality -->
     <script src="{{ url_for('static', filename='js/dynamic_sim_t.js') }}"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         $('[data-toggle="tooltip"]').tooltip();
+    });
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle +/- icon when collapse is triggered
+        const collapseToggleButtons = document.querySelectorAll('[data-toggle="collapse"]');
+        
+        collapseToggleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const icon = this.querySelector('.collapse-toggle-icon');
+                const target = document.querySelector(this.dataset.target);
+                
+                if (target.classList.contains('show')) {
+                    icon.textContent = '+';
+                } else {
+                    icon.textContent = '-';
+                }
+            });
+        });
     });
     </script>
 
