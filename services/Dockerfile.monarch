@@ -1,0 +1,20 @@
+FROM python:3.8-slim
+
+WORKDIR /app
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app/drugapp/Monarch.py .
+COPY app/drugapp/platform.py .
+COPY app/drugapp/filepaths.py .
+
+RUN pip install requests networkx matplotlib
+
+COPY app/drugapp/data drugapp/data
+RUN mkdir -p drugapp/data/reference
+ENV PYTHONUNBUFFERED=1
+CMD ["python", "-c", "from drugapp.Monarch import run_monarch; run_monarch()"]

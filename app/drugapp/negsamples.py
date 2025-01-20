@@ -6,6 +6,52 @@ Created on August 3rd 2024
 
 import sys,os,platform,datetime,logging,builtins,time,multiprocessing
 
+from drugapp.unique import unique_elements
+from drugapp.filepaths import initialise_base_directories
+from flask import request, jsonify
+from flask import current_app as app
+
+global base_directories
+
+@app.route('/generate', methods=['POST'])
+def negsample_service_run():
+    """
+    Flask route to generate negative samples for distributed architecture
+    """
+    # Extract payload from the request
+    payload = request.json
+
+    # Extract parameters from payload with defaults
+    input_seed = payload.get('input_seed', 'MONDO:0007739')
+    today = payload.get('today', datetime.date.today().strftime('%Y-%m-%d'))
+    date_str = payload.get('date_str', today)
+    edges = payload.get('edges', [])
+    similarity_threshold = payload.get('similarity_threshold', 0.90)
+
+    # Use initialise_base_directories to set up paths
+    base_directories = initialise_base_directories(date_str)
+    today_directory = base_directories['today_directory']
+    
+    try:
+        # Call the existing generate_negative_samples function
+        valid_negative_edges = generate_negative_samples(edges, similarity_threshold)
+
+        # Prepare the response
+        response = {
+            'valid_negative_edges': valid_negative_edges,
+            # Re-include payload data to pass to next service
+            **{k: v for k, v in payload.items() if k not in ['edges', 'similarity_threshold']}
+        }
+
+        return jsonify(response)
+
+    except Exception as e:
+        logging.error(f"Error in Negative Samples service: {str(e)}")
+        return jsonify({
+            'error': str(e),
+            'status': 'failed'
+        }), 500
+
 def generate_negative_samples(positive_edges, similarity_threshold=0.90):
     """
     Generate valid negative samples based on the existing edges in the network.

@@ -6,8 +6,72 @@ Created on August 3rd 2024
 
 import sys,os,platform,datetime,logging,builtins,time,multiprocessing
 
+from drugapp.filepaths import initialise_base_directories
+from drugapp.unique import unique_elements
+from flask import request, jsonify
+from flask import current_app as app
+
 global base_directories
 global disease_directories
+
+@app.route('/run', methods=['POST'])
+def drugsim_service_run():
+    """
+    Flask route to run Drug Similarity service for distributed architecture
+    """
+    # Extract payload from the request
+    payload = request.json
+
+    # Extract parameters from payload with defaults
+    input_seed = payload.get('input_seed', 'MONDO:0007739')
+    today = payload.get('today', datetime.date.today().strftime('%Y-%m-%d'))
+    date_str = payload.get('date_str', today)
+    input_min_simil = payload.get('input_min_simil', 0.5)
+    nodes = payload.get('nodes', [])
+    edges = payload.get('edges', [])
+    drug_nodes = payload.get('drug_nodes', [])
+
+    # Use initialise_base_directories to set up paths
+    base_directories = initialise_base_directories(date_str)
+    today_directory = base_directories['today_directory']
+    
+    # Helper function to manage global-like variables
+    def setup_drugsim_globals(today_directory, date_str, input_seed):
+        global today_directory, date_str, input_seed, input_file_path, disease_name_label
+        
+        # Set up input_file_path
+        input_file_path = os.path.join(today_directory, 'inputs.txt')
+        
+        # Set disease_name_label (assuming it's passed in payload or can be derived)
+        disease_name_label = payload.get('disease_name_label', 'Huntington disease')
+        
+        return today_directory, date_str, input_seed, input_file_path, disease_name_label
+
+    # Setup globals
+    today_directory, date_str, input_seed, input_file_path, disease_name_label = setup_drugsim_globals(
+        today_directory, date_str, input_seed
+    )
+
+    try:
+        # Call the existing run_drugsimilarity function
+        edges, drug_edges = run_drugsimilarity(input_seed, today, min_simil=input_min_simil)
+
+        # Prepare the response
+        response = {
+            'edges': edges,
+            'drug_edges': drug_edges,
+            # Re-include payload data to pass to next service
+            **{k: v for k, v in payload.items() if k not in ['input_seed', 'today', 'input_min_simil']}
+        }
+
+        return jsonify(response)
+
+    except Exception as e:
+        logging.error(f"Error in Drug Similarity service: {str(e)}")
+        return jsonify({
+            'error': str(e),
+            'status': 'failed'
+        }), 500
 
 def get_smiles(nodes):
     """

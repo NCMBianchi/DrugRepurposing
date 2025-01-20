@@ -6,8 +6,82 @@ Created on August 3rd 2024
 
 import sys,os,platform,datetime,logging,builtins,time,multiprocessing
 
+from drugapp.filepaths import initialise_base_directories, initialise_disease_directories
+from drugapp.unique import unique_elements
+from flask import request, jsonify
+from flask import current_app as app
+import requests
+import json
+from unittest.mock import Mock
+import pandas as pd
+
 global base_directories
 global disease_directories
+
+@app.route('/run', methods=['POST'])
+def dgidb_service_run():
+    """
+    Flask route to run DGIdb service for distributed architecture
+    """
+    # Extract payload from the request
+    payload = request.json
+
+    # Extract parameters from payload with defaults
+    input_seed = payload.get('input_seed', 'MONDO:0007739')
+    today = payload.get('today', datetime.date.today().strftime('%Y-%m-%d'))
+    date_str = payload.get('date_str', today)
+    layers = payload.get('run_layers', 3)
+    
+    # Use initialise_base_directories to set up paths
+    base_directories = initialise_base_directories(date_str)
+    today_directory = base_directories['today_directory']
+    
+    # Helper function to manage global-like variables
+    def setup_dgidb_globals(today_directory, date_str, input_seed):
+        global today_directory, date_str, input_seed, input_file_path
+        
+        # Set up input_file_path
+        input_file_path = os.path.join(today_directory, 'inputs.txt')
+        
+        return today_directory, date_str, input_seed, input_file_path
+
+    # Setup globals
+    today_directory, date_str, input_seed, input_file_path = setup_dgidb_globals(
+        today_directory, date_str, input_seed
+    )
+    
+    try:
+        # Call the existing run_dgidb function
+        nodes, edges, drug_nodes = run_dgidb(input_seed, today, layers=layers)
+
+        # Prepare the response
+        response = {
+            'nodes': nodes,
+            'edges': edges,
+            'drug_nodes': drug_nodes,
+            # Include any additional payload data that might be needed
+            **{k: v for k, v in payload.items() if k not in ['input_seed', 'today', 'run_layers']}
+        }
+
+        return jsonify(response)
+
+    except Exception as e:
+        logging.error(f"Error in DGIdb service: {str(e)}")
+        return jsonify({
+            'error': str(e),
+            'status': 'failed'
+        }), 500
+
+def json_reverse(json_dict):
+    """
+    Short function that converts calls turned into JSON files by the json() function
+    into a request.Response object
+    """
+    json_file = Mock()
+    json_file.json.return_value = json_dict
+    json_file.status_code = 200
+    json_file.ok = True
+    return json_file
 
 def hit_dgidb_api(gene_name=None, gene_id=None, max_retries=3):
     """

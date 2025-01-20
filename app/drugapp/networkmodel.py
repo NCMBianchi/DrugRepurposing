@@ -6,8 +6,98 @@ Created on August 3rd 2024
 
 import sys,os,platform,datetime,logging,builtins,time,multiprocessing
 
+from drugapp.unique import unique_elements
+from drugapp.filepaths import initialise_base_directories
+from flask import request, jsonify
+from flask import current_app as app
+
 global base_directories
 global disease_directories
+
+@app.route('/run', methods=['POST'])
+def networkmodel_service_run():
+    """
+    Flask route to run Network Model service for distributed architecture
+    """
+    # Extract payload from the request
+    payload = request.json
+
+    # Extract parameters from payload with defaults
+    input_seed = payload.get('input_seed', 'MONDO:0007739')
+    today = payload.get('today', datetime.date.today().strftime('%Y-%m-%d'))
+    date_str = payload.get('date_str', today)
+    nodes = payload.get('nodes', [])
+    edges = payload.get('edges', [])
+    drug_nodes = payload.get('drug_nodes', [])
+    drug_edges = payload.get('drug_edges', [])
+    negs_toggle = payload.get('negs_toggle', False)
+
+    # Use initialise_base_directories to set up paths
+    base_directories = initialise_base_directories(date_str)
+    today_directory = base_directories['today_directory']
+    
+    # Helper function to manage global-like variables
+    def setup_networkmodel_globals(today_directory, date_str, input_seed):
+        global today_directory, date_str, input_seed, input_file_path, disease_name_label
+        
+        # Set up input_file_path
+        input_file_path = os.path.join(today_directory, 'inputs.txt')
+        
+        # Set disease_name_label 
+        disease_name_label = payload.get('disease_name_label', 'Huntington disease')
+        
+        return today_directory, date_str, input_seed, input_file_path, disease_name_label
+
+    # Setup globals
+    today_directory, date_str, input_seed, input_file_path, disease_name_label = setup_networkmodel_globals(
+        today_directory, date_str, input_seed
+    )
+
+    try:
+        # Call the appropriate network model function based on negative samples toggle
+        if negs_toggle:
+            network_edges, network_nodes, ranked_drugs, plots = run_network_model_with_NS(
+                input_seed, today, 
+                run_jobs=payload.get('run_jobs', None),
+                run_depth=payload.get('run_depth', None),
+                run_seed=payload.get('run_seed', None),
+                prob_input=payload.get('prob_input', None),
+                clust_input=payload.get('clust_input', None),
+                emb_toggle=payload.get('emb_toggle', 1),
+                param_toggle=payload.get('param_toggle', 1),
+                ou_toggle=payload.get('ou_toggle', 1)
+            )
+        else:
+            network_edges, network_nodes, ranked_drugs, plots = run_network_model(
+                input_seed, today, 
+                run_jobs=payload.get('run_jobs', None),
+                run_depth=payload.get('run_depth', None),
+                run_seed=payload.get('run_seed', None),
+                prob_input=payload.get('prob_input', None),
+                clust_input=payload.get('clust_input', None),
+                emb_toggle=payload.get('emb_toggle', 1),
+                param_toggle=payload.get('param_toggle', 1),
+                ou_toggle=payload.get('ou_toggle', 1)
+            )
+
+        # Prepare the response
+        response = {
+            'network_edges': network_edges,
+            'network_nodes': network_nodes,
+            'ranked_drugs': ranked_drugs,
+            'plots': plots,
+            # Re-include payload data to pass to next service
+            **{k: v for k, v in payload.items() if k not in ['nodes', 'edges', 'drug_nodes', 'drug_edges']}
+        }
+
+        return jsonify(response)
+
+    except Exception as e:
+        logging.error(f"Error in Network Model service: {str(e)}")
+        return jsonify({
+            'error': str(e),
+            'status': 'failed'
+        }), 500
 
 def get_network(input_nodes,input_edges,exclude=None):
     '''

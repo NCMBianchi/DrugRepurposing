@@ -8,6 +8,11 @@ Created on August 3rd 2024
 import sys,os,platform,datetime,logging,builtins,time,multiprocessing
 from drugapp.platform import *
 
+# for service communication in Docker Swarm
+import requests
+import json
+from urllib.parse import urljoin
+
 # for Flask App operations
 from flask import Flask, render_template, url_for, request, session, redirect
 from drugapp import app 
@@ -18,11 +23,34 @@ from drugapp.drugsimilarity import *
 from drugapp.negsamples import *
 from drugapp.networkmodel import *
 from drugapp.filepaths import *
+from drugapp.unique import *
 
 ## PLATFORM INFO
 python_executable = sys.executable
 python_version = platform.python_version()
 num_cores = multiprocessing.cpu_count()
+
+## SERVICE CONFIGURATION
+SERVICE_URLS = {
+    'monarch': os.environ.get('MONARCH_SERVICE_URL', 'http://monarch:5000'),
+    'dgidb': os.environ.get('DGIDB_SERVICE_URL', 'http://dgidb:5000'),
+    'drugsim': os.environ.get('DRUGSIM_SERVICE_URL', 'http://drugsim:5000'),
+    'negsample': os.environ.get('NEGSAMPLE_SERVICE_URL', 'http://negsample:5000'),
+    'networkmodel': os.environ.get('NETWORKMODEL_SERVICE_URL', 'http://networkmodel:5000')
+}
+
+def call_service(service_name, endpoint, payload):
+    """
+    Generic method to call microservices in Docker Swarm
+    """
+    try:
+        service_url = urljoin(SERVICE_URLS[service_name], endpoint)
+        response = requests.post(service_url, json=payload)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        logging.error(f"Service {service_name} call failed: {e}")
+        raise
 
 @app.route("/", methods = ['GET', 'POST'])
 @app.route("/home", methods = ['GET', 'POST'])
@@ -32,28 +60,33 @@ def config():
 
     if form.validate_on_submit():
 
-        d_toggle = form.date_t.data  # Date override toggle
-        date_OR_day = form.date_OR_day.data
-        date_OR_month = form.date_OR_month.data
-        date_OR_year = form.date_OR_year.data
+        payload = {
+            'd_toggle': form.date_t.data,  # Date override toggle
+            'date_OR_day': form.date_OR_day.data,
+            'date_OR_month': form.date_OR_month.data,
+            'date_OR_year': form.date_OR_year.data,
+            'input_seed': form.disease_URI.data,  # disease URI
+            'run_layers': form.deg_of_dist.data,  # degree of distance
+            'input_min_simil': float(form.inp_minimum_sim.data),  # minimum drug similarity
+            'negs_toggle': form.ns_toggle.data,  # negative samples toggle
+            'sim_threshold': float(form.sim_t.data),  # drug similarity threshold
+            'num_jobs': form.n_cores.data,  # number of CPU cores
+            'depth_input': form.po_mode.data,  # mode of operation
+            'seed_input': form.ML_seed.data  # ML seed
+        }
 
         # generate the override date if toggle is active
-        if d_toggle:
-            d_override = datetime.date(date_OR_year, date_OR_month, date_OR_day)
+        if payload['d_toggle']:
+            d_override = datetime.date(
+                payload['date_OR_year'], 
+                payload['date_OR_month'], 
+                payload['date_OR_day']
+            )
         else:
             d_override = None
-        
-        input_seed = form.disease_URI.data  # disease URI
-        run_layers = form.deg_of_dist.data  # degree of distance
-        input_min_simil = float(form.inp_minimum_sim.data)  # minimum drug similarity
-        negs_toggle = form.ns_toggle.data  # negative samples toggle
-        sim_threshold = float(form.sim_t.data)  # drug similarity threshold
-        num_jobs = form.n_cores.data  # number of CPU cores
-        depth_input = form.po_mode.data  # mode of operation
-        seed_input = form.ML_seed.data  # ML seed
 
         ## DATES
-        today, actual_today, date_str, curr_year, overall_start_time, formatted_start_time = set_date(d_toggle, d_override)
+        today, actual_today, date_str, curr_year, overall_start_time, formatted_start_time = set_date(payload['d_toggle'], d_override)
         logging.info(f"'DrugRepurposing' pipeline started at {formatted_start_time}.\n")
 
         ## DIRECTORY NAMES
@@ -88,7 +121,6 @@ def config():
 
         ## LOGGING: inputs info
         with open(input_file_path, 'w') as file:
-            ## (...) 
             file.write("\n\n")
 
         ## PACKAGES: python-included packages
@@ -139,19 +171,103 @@ def config():
         ## REMEMBER that 'sklearn' is used to call the package otherwise installed as
         ## 'scikit-learn': the old PyPi 'sklearn' is deprecated 
 
-        ## NETWORK CONSTRUCTION
-        nodes, edges, disease_name_id, disease_name_label, disease_directories = run_monarch(input_seed)
-        nodes, edges, drug_nodes = run_dgidb(input_seed,today, layers = run_layers)
-        edges, drug_edges = run_drugsimilarity(input_seed,today,min_simil=input_min_simil)
+        ## DISTRIBUTED SERVICE CALLS
+        try:
+            ## NETWORK CONSTRUCTION
+            monarch_result = call_service('monarch', '/run', {
+                **payload, 
+                'today': today.strftime('%Y-%m-%d'),
+                'actual_today': actual_today.strftime('%Y-%m-%d'),
+                'date_str': date_str,
+                'curr_year': curr_year,
+                'overall_start_time': overall_start_time
+            })
+
+            # Extract variables from monarch_result
+            nodes = monarch_result.get('nodes', [])
+            edges = monarch_result.get('edges', [])
+            disease_name_id = monarch_result.get('disease_name_id', None)
+            disease_name_label = monarch_result.get('disease_name_label', None)
+            disease_directories = monarch_result.get('disease_directories', {})
+
+            dgidb_result = call_service('dgidb', '/run', {
+                **payload, 
+                **monarch_result,  # Pass all previous results
+                'today': today.strftime('%Y-%m-%d'),
+                'run_layers': payload['run_layers']
+            })
+
+            # Extract variables from dgidb_result
+            nodes = dgidb_result.get('nodes', nodes)
+            edges = dgidb_result.get('edges', edges)
+            drug_nodes = dgidb_result.get('drug_nodes', [])
+
+            drugsim_result = call_service('drugsim', '/run', {
+                **payload, 
+                **dgidb_result,  # Pass all previous results
+                'today': today.strftime('%Y-%m-%d'),
+                'input_min_simil': payload['input_min_simil']
+            })
+
+            # Extract variables from drugsim_result
+            edges = drugsim_result.get('edges', edges)
+            drug_edges = drugsim_result.get('drug_edges', [])
+            
+            ## DRUG PREDICTION
+            if payload['negs_toggle'] == 1:
+                negsample_result = call_service('negsample', '/generate', {
+                    **payload, 
+                    **drugsim_result,
+                    'edges': edges,
+                    'similarity_threshold': payload['sim_threshold']
+                })
+
+                # Extract valid negative edges
+                valid_negative_edges = negsample_result.get('valid_negative_edges', [])
+                edges = unique_elements(edges + valid_negative_edges)
+
+                network_result = call_service('networkmodel', '/run-with-ns', {
+                    **payload,
+                    **negsample_result,
+                    'today': today.strftime('%Y-%m-%d'),
+                    'run_jobs': payload['num_jobs'],
+                    'run_depth': payload['depth_input'],
+                    'run_seed': payload['seed_input']
+                })
+            else:
+                network_result = call_service('networkmodel', '/run', {
+                    **payload,
+                    **drugsim_result,
+                    'today': today.strftime('%Y-%m-%d'),
+                    'run_jobs': payload['num_jobs'],
+                    'run_depth': payload['depth_input'],
+                    'run_seed': payload['seed_input']
+                })
+
+            # RESULTS EXTRACTIONS
+            network_edges = network_result.get('network_edges', [])
+            network_nodes = network_result.get('network_nodes', [])
+            ranked_drugs = network_result.get('ranked_drugs', [])
+            plots = network_result.get('plots', [])
+
+        except Exception as e:
+            logging.error(f"Pipeline execution failed: {e}")
+            ## FUTURE: make error.html or a custom response
+            return render_template('error.html', error=str(e))
+
+        # ## NETWORK CONSTRUCTION
+        # nodes, edges, disease_name_id, disease_name_label, disease_directories = run_monarch(input_seed)
+        # nodes, edges, drug_nodes = run_dgidb(input_seed,today, layers = run_layers)
+        # edges, drug_edges = run_drugsimilarity(input_seed,today,min_simil=input_min_simil)
         
-        ## DRUG PREDICTION
-        if negs_toggle == 1:
-            valid_negative_edges = generate_negative_samples(edges,similarity_threshold=sim_threshold)
-            edges = edges + valid_negative_edges
-            edges = unique_elements(edges)
-            network_edges, network_nodes, ranked_drugs, plots = run_network_model_with_NS(input_seed,today,run_jobs=num_jobs,run_depth=depth_input, run_seed=seed_input)
-        elif negs_toggle == 0:
-            network_edges, network_nodes, ranked_drugs, plots = run_network_model(input_seed,today,run_jobs=num_jobs,run_depth=depth_input, run_seed=seed_input)
+        # ## DRUG PREDICTION
+        # if negs_toggle == 1:
+        #     valid_negative_edges = generate_negative_samples(edges,similarity_threshold=sim_threshold)
+        #     edges = edges + valid_negative_edges
+        #     edges = unique_elements(edges)
+        #     network_edges, network_nodes, ranked_drugs, plots = run_network_model_with_NS(input_seed,today,run_jobs=num_jobs,run_depth=depth_input, run_seed=seed_input)
+        # elif negs_toggle == 0:
+        #     network_edges, network_nodes, ranked_drugs, plots = run_network_model(input_seed,today,run_jobs=num_jobs,run_depth=depth_input, run_seed=seed_input)
 
         ## LOGGING: report run duration
         overall_end_time = time.time()
