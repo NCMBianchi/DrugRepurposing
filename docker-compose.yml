@@ -1,70 +1,17 @@
-version: '3.8'
-
 services:
-  main:
-    image: drugapp/main-service:latest
+
+  app:
+    build:
+      context: ./main
+      dockerfile: Dockerfile
     ports:
       - "5001:5000"
-    volumes:
-      - shared-data:/data
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-
-  monarch:
-    image: drugapp/monarch-service:latest
-    volumes:
-      - shared-data:/data
-    deploy:
-      replicas: ${MONARCH_INSTANCES:-1}
-      restart_policy:
-        condition: on-failure
-
-  dgidb:
-    image: drugapp/dgidb-service:latest
-    volumes:
-      - shared-data:/data
-    deploy:
-      replicas: ${DGIDB_INSTANCES:-1}
-      restart_policy:
-        condition: on-failure
-
-  drugsim:
-    image: drugapp/drugsim-service:latest
-    volumes:
-      - shared-data:/data
-    deploy:
-      replicas: ${DRUGSIM_INSTANCES:-1}
-      restart_policy:
-        condition: on-failure
-
-  negsample:
-    image: drugapp/negsample-service:latest
-    volumes:
-      - shared-data:/data
-    deploy:
-      replicas: ${NEGSAMPLE_INSTANCES:-1}
-      restart_policy:
-        condition: on-failure
-
-  networkmodel:
-    image: drugapp/networkmodel-service:latest
-    volumes:
-      - shared-data:/data
-    deploy:
-      replicas: ${NETWORKMODEL_INSTANCES:-1}
-      restart_policy:
-        condition: on-failure
-
-volumes:
-  shared-data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/drugapp/data
-
-networks:
-  default:
-    driver: overlay
+    environment:
+      - MONARCH_SERVICE_URL=http://monarch:5000
+      - DGIDB_SERVICE_URL=http://dgidb:5000  
+      - DRUGSIM_SERVICE_URL=http://drugsim:5000
+      - NEGSAMPLE_SERVICE_URL=http://negsample:5000
+      - NETWORKMODEL_SERVICE_URL=http://networkmodel:5000
+      - PYTHONPATH=/app
+    working_dir: /app
+    command: python run.py
