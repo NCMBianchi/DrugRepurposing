@@ -1,13 +1,13 @@
 """
-MONARCH MODULE: MAKES API CALL AND ITERATES THROUGH DEGREES OF DISTANCE
-Created on August 3rd 2024
+MONARCH MODULE FOR DISTRIBUTED SERVICES: MAKES API CALL AND ITERATES THROUGH DEGREES OF DISTANCE
+Created on JANUARY 27TH 2025
 @author: Niccolò Bianchi [https://github.com/NCMBianchi]
 """
 
 import sys,os,platform,datetime,logging,builtins,time,multiprocessing
 
-from drugapp.unique import unique_elements
-from drugapp.filepaths import initialise_disease_directories, setup_service_globals
+from unique import unique_elements
+from filepaths import initialise_disease_directories, setup_service_globals
 
 import requests
 import json
@@ -17,18 +17,18 @@ import pandas as pd
 def hit_monarch_api(seed='MONDO:0007739',rows=2000,direct_true=1):
     """
     Originally part of NQR's "bioknowledgeReviewer" tool.
-    
+
     This function performs API calls to Monarch to retrieve 'OUT' and 'IN' edges from a query node.
     It retrieves entities plus associations via the Monarch Initiative new V3 API (2023 onward).
-    
+
     The original version used the older Biolink API, no longer supported:
     https://api-biolink.monarchinitiative.org/api/association
-     
+
     Moreover:
        - Biolink supported 'OMIM:' URIs, V3 doesn't and 'MONDO:' is used
        - Biolink required 'association/____', V3 requires 'association?____='
        - Biolink supported the ":" character, V3 requires its ASCII version (i.e.%3A)
-       
+
     It hits two endpoints:
        - association?subject= (for 'OUT' edges)
        - association?object= (for 'IN' edges)
@@ -39,7 +39,7 @@ def hit_monarch_api(seed='MONDO:0007739',rows=2000,direct_true=1):
     :param direct_true: if ==1 then 'direct=True' is added to the API call URL to filter out all URI aliases
     :return: two API response objects: 'OUT' and 'IN' response objects, in this order.
     """
-    
+
     logging.info(f"NOW RUNNING: {current_function_name()} with seed {seed}.")
 
     # API address
@@ -74,7 +74,7 @@ def hit_monarch_api(seed='MONDO:0007739',rows=2000,direct_true=1):
         logging.error(error_message)
         # handle error appropriately, could raise an exception or return an error code
         raise Exception(error_message)
-    
+
     # extract disease name and ID from the API response
     r_out_json = r_out.json()
     r_in_json = r_in.json()
@@ -85,7 +85,7 @@ def hit_monarch_api(seed='MONDO:0007739',rows=2000,direct_true=1):
         else:
             logging.warning("Warning: 'associations' key not found in response or no associations present.")
             return None, None
-        
+
         # initialise disease directories
         disease_directories = initialise_disease_directories(today_directory, disease_name, date_str)
         disease_directory = disease_directories['disease_directory'] # the date is repeated just for archival purposes
@@ -93,28 +93,28 @@ def hit_monarch_api(seed='MONDO:0007739',rows=2000,direct_true=1):
         # store disease ID and name in a file
         disease_id_file_path = os.path.join(disease_directory, 'disease_id.txt')
         with open(disease_id_file_path, "w") as text_file:
-            
+
             # store 'disease_name' and 'disease_id'
             text_file.write(f"{disease_id};{disease_name}\n")
-            
+
             # store the list of subject closure for the input_seed
             # (information on the ontology of the disease)
             text_file.write(f"Subject closure:{r_out_json['items'][0]['subject_closure']}")
         logging.info(f"Information on the disease saved to {disease_id_file_path}")
-            
+
     else:
         disease_id = disease_id_label
         disease_name = disease_name_label
         disease_directories = initialise_disease_directories(today_directory, disease_name, date_str)
         disease_directory = disease_directories['disease_directory']
     monarch_directory = disease_directories['monarch_directory']
-    
+
     # create a directory for each seed and store API responses
     seed_new = seed.split(':')
     seed_dir = seed_new[0]+'_'+seed_new[1]
     seed_directory = os.path.join(monarch_directory, seed_dir)
     os.makedirs(seed_directory, exist_ok=True)
-    
+
     # store OUT .json file
     out_file_path = os.path.join(seed_directory, f'{seed_dir}_api_response_OUT.json')
     if r_out.ok:
@@ -132,7 +132,7 @@ def hit_monarch_api(seed='MONDO:0007739',rows=2000,direct_true=1):
         logging.info(f"API response saved to {in_file_path}")
     else:
         logging.error(f"Failed to fetch IN edges: {r_in.status_code} - {r_in.reason}")
-    
+
     return r_out, r_in, disease_id, disease_name, disease_directories
 
 
@@ -144,7 +144,7 @@ def json_reverse(json_dict):
     :param seed_list: JSON response stored as a dictionary.
     :return: Mock object mimicking requests.Response with the provided JSON data.
     """
-    
+
     json_file = Mock()
     json_file.json.return_value = json_dict
     json_file.status_code = 200
@@ -156,10 +156,10 @@ def json_reverse(json_dict):
 def get_neighbours(seed_list,layer):
     """
     Originally part of NQR's "bioknowledgeReviewer" tool.
-    
+
     This function parses through the .json files obtained from the hit_monarch_api()
     function, in order to obtain nodes that are related to any seed provided.
-    
+
     If the API call for a given seed has already been run –and therefore a directory
     named with the same URI is present in
     ~/drugapp/data/YYYY-MM-DD/disease YYYY-MM-DD/monarch– then relevant information
@@ -188,7 +188,7 @@ def get_neighbours(seed_list,layer):
         seed_new = seed.split(':')
         seed_dir = seed_new[0]+'_'+seed_new[1]
         seed_path = os.path.join(today_directory, f'{disease_name_label} ({date_str})', 'monarch', seed_dir)
-        
+
         # run API calls (OUT and IN) for the given seed in the 'FOR' loop
         if os.path.exists(seed_path):
             out_json_path = os.path.join(seed_path, f'{seed_dir}_api_response_OUT.json')
@@ -202,11 +202,11 @@ def get_neighbours(seed_list,layer):
             logging.info(f"API call for {seed} already performed. Files fetched from {seed_path}.")
         else:
             r_out, r_in, disease_id_label, disease_name_label = hit_monarch_api(seed)
-        
+
         # .json file handling
         for associations in [r_out.json()['items'], r_in.json()['items']]:
             for association in associations:
-                
+
                 # parse through the files and store the associations in edges_list
                 subj = {'id': association['subject'], 'label': association['subject_label']}
                 rel = {'label': association['predicate']} # relation ID no longer present
@@ -226,7 +226,7 @@ def get_neighbours(seed_list,layer):
 
     logging.info(f"Sample of nodes (20): {nodes_list[:20]})")
     logging.info(f"Sample of edges (10): {edges_list[:10]})")
-    
+
     # to fill in - and ADD LOG LINES
     return nodes_list, edges_list, disease_id_label, disease_name_label
 
@@ -239,14 +239,14 @@ def run_monarch(input_id = 'MONDO:0007739'):
         Huntington's disease).
     :return: nodes and edges files in /monarch folder.
     """
-    
+
     logging.info(f"NOW RUNNING: {current_function_name()} with seed {input_id}.")
 
     with open(input_file_path, 'w') as file: # 'w' to overwrite, as this is the first step of the run
         file.write(f"Disease ID used in Monarch Initiative: {input_id}\n\n")
 
     start_time = time.time()
-    
+
     # First layer: use the flaskApp input
     firstLayer_nodes, firstLayer_edges, disease_id_label, disease_dir = get_neighbours(input_id,'first_layer')
 
@@ -259,15 +259,15 @@ def run_monarch(input_id = 'MONDO:0007739'):
     secondLayer_seeds = [item['id'] for item in secondLayer_nodes]  # turn into a list of IDs
     secondLayer_seeds = [sl_id for sl_id in secondLayer_seeds if sl_id not in firstLayer_seeds]  # to avoid re-running nodes and counting them in the third layer
     thirdLayer_nodes, thirdLayer_edges, disease_id_label, disease_name_label, _ = get_neighbours(secondLayer_seeds,'third_layer')
-    
+
     # MERGE the nodes' lists
     nonUnique_nodes = firstLayer_nodes + secondLayer_nodes + thirdLayer_nodes
     unique_nodes = unique_elements(nonUnique_nodes)
-    
+
     # MERGE the edges' lists
     nonUnique_edges = firstLayer_edges + secondLayer_edges + thirdLayer_edges
     unique_edges = unique_elements(nonUnique_edges)
-    
+
     # save the unique nodes and edges as CSV
     #monarch_directory = os.path.join(today_directory, f'{disease_name_label} ({date_str})', 'monarch')
     monarch_directory = disease_dir['monarch_directory']
@@ -283,5 +283,19 @@ def run_monarch(input_id = 'MONDO:0007739'):
     minutes = int(duration // 60)  # convert seconds to whole minutes
     seconds = int(duration % 60)  # get the remaining seconds
     logging.info(f"'Monarch.py' run finished in {minutes} minutes and {seconds} seconds.")
-    
+
     return unique_nodes, unique_edges, disease_id_label, disease_name_label, disease_dir
+
+def main():
+    # Logging setup
+    logging.basicConfig(level=logging.INFO)
+
+    try:
+        # Run the discovery
+        run_monarch(input_seed='MONDO:0007739', base_directory='/tmp')
+    except Exception as e:
+        logging.error(f"Monarch service failed: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

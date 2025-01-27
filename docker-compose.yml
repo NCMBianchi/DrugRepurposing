@@ -1,5 +1,4 @@
 services:
-
   app:
     build:
       context: ./main
@@ -8,10 +7,17 @@ services:
       - "5001:5000"
     environment:
       - MONARCH_SERVICE_URL=http://monarch:5000
-      - DGIDB_SERVICE_URL=http://dgidb:5000  
+      - DGIDB_SERVICE_URL=http://dgidb:5000
       - DRUGSIM_SERVICE_URL=http://drugsim:5000
       - NEGSAMPLE_SERVICE_URL=http://negsample:5000
       - NETWORKMODEL_SERVICE_URL=http://networkmodel:5000
       - PYTHONPATH=/app
+    volumes:
+      - ./main/app/data:/data
     working_dir: /app
     command: python run.py
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

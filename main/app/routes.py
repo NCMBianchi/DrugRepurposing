@@ -8,13 +8,6 @@ Created on August 3rd 2024
 import sys,os,platform,datetime,logging,builtins,time,multiprocessing
 from logger_utils import *
 
-# for service activation and communication in Docker Swarm
-import requests
-import json
-from urllib.parse import urljoin
-import docker
-from docker import DockerClient
-
 # for Flask App operations
 from flask import Flask, render_template, url_for, request, session, redirect
 from __init__ import app
@@ -22,6 +15,15 @@ from forms import *
 from filepaths import *
 from unique import *
 from queue_manager import *
+
+# for Docker micro services implementation
+from servicerun import (
+    MonarchServiceOrchestrator,
+    DGIdbServiceOrchestrator,
+    DrugSimilarityServiceOrchestrator,
+    NegativeSamplesServiceOrchestrator,
+    NetworkModelServiceOrchestrator
+)
 
 ## PLATFORM INFO
 python_executable = sys.executable
@@ -31,7 +33,7 @@ num_cores = multiprocessing.cpu_count()
 @app.route("/", methods = ['GET', 'POST'])
 @app.route("/home", methods = ['GET', 'POST'])
 def config():
-    
+
     form = user_input()
 
     if form.validate_on_submit():
@@ -46,7 +48,7 @@ def config():
             d_override = datetime.date(date_OR_year, date_OR_month, date_OR_day)
         else:
             d_override = None
-        
+
         input_seed = form.disease_URI.data  # disease URI
         run_layers = form.deg_of_dist.data  # degree of distance
         input_min_simil = float(form.inp_minimum_sim.data)  # minimum drug similarity
@@ -92,7 +94,7 @@ def config():
 
         ## LOGGING: inputs info
         with open(input_file_path, 'w') as file:
-            ## (...) 
+            ## (...)
             file.write("\n\n")
 
         ## PACKAGES: python-included packages
@@ -141,9 +143,235 @@ def config():
         from scipy.stats import uniform
         from IPython.display import HTML,Image,display
         ## REMEMBER that 'sklearn' is used to call the package otherwise installed as
-        ## 'scikit-learn': the old PyPi 'sklearn' is deprecated 
+        ## 'scikit-learn': the old PyPi 'sklearn' is deprecated
 
-        ## placeholder
+        ## NETWORK CONSTRUCTION
+        try:
+            # Monarch Service
+            monarch_launch_status = service_queue_manager.request_service_instance(
+                'monarch', 
+                {
+                    'input_seed': input_seed,
+                    'date': date_str,
+                    'base_directory': base_directories['today_directory']
+                }
+            )
+            
+            if not monarch_launch_status['can_launch']:
+                flash(f"Monarch service is currently busy. You are in queue position {monarch_launch_status.get('queue_position', 'unknown')}. " 
+                      f"Active instances: {monarch_launch_status['active_instances']}/{monarch_launch_status['max_instances']}")
+                return render_template('queue_wait.html', service='Monarch', status=monarch_launch_status)
+            
+            monarch_orchestrator = MonarchServiceOrchestrator(
+                input_seed=input_seed,
+                date=date_str,
+                base_directory=base_directories['today_directory']
+            )
+            try:
+                nodes, edges, disease_name_id, disease_name_label, disease_directories = monarch_orchestrator.run()
+            except Exception as e:
+                service_queue_manager.release_service_instance('monarch')
+                logging.error(f"Monarch service failed: {e}")
+                flash("Monarch service encountered an error. Please try again.")
+                return render_template('home.html', form=form)
+            
+            # DGIdb Service
+            dgidb_launch_status = service_queue_manager.request_service_instance(
+                'dgidb', 
+                {
+                    'input_seed': input_seed,
+                    'date': date_str,
+                    'base_directory': base_directories['today_directory'],
+                    'nodes': nodes,
+                    'run_layers': run_layers
+                }
+            )
+            
+            if not dgidb_launch_status['can_launch']:
+                # Release previously acquired services
+                service_queue_manager.release_service_instance('monarch')
+                
+                flash(f"DGIdb service is currently busy. You are in queue position {dgidb_launch_status.get('queue_position', 'unknown')}. " 
+                      f"Active instances: {dgidb_launch_status['active_instances']}/{dgidb_launch_status['max_instances']}")
+                return render_template('queue_wait.html', service='DGIdb', status=dgidb_launch_status)
+            
+            dgidb_orchestrator = DGIdbServiceOrchestrator(
+                input_seed=input_seed,
+                date=date_str,
+                base_directory=base_directories['today_directory']
+            )
+            try:
+                nodes, edges, drug_nodes = dgidb_orchestrator.run(nodes, run_layers)
+            except Exception as e:
+                # Release previously acquired services
+                service_queue_manager.release_service_instance('monarch')
+                service_queue_manager.release_service_instance('dgidb')
+                
+                logging.error(f"DGIdb service failed: {e}")
+                flash("DGIdb service encountered an error. Please try again.")
+                return render_template('home.html', form=form)
+            
+            # Drug Similarity Service
+            drugsim_launch_status = service_queue_manager.request_service_instance(
+                'drugsimilarity', 
+                {
+                    'input_seed': input_seed,
+                    'date': date_str,
+                    'base_directory': base_directories['today_directory'],
+                    'nodes': nodes,
+                    'input_min_simil': input_min_simil
+                }
+            )
+            
+            if not drugsim_launch_status['can_launch']:
+                # Release previously acquired services
+                service_queue_manager.release_service_instance('monarch')
+                service_queue_manager.release_service_instance('dgidb')
+                
+                flash(f"Drug Similarity service is currently busy. You are in queue position {drugsim_launch_status.get('queue_position', 'unknown')}. " 
+                      f"Active instances: {drugsim_launch_status['active_instances']}/{drugsim_launch_status['max_instances']}")
+                return render_template('queue_wait.html', service='Drug Similarity', status=drugsim_launch_status)
+            
+            drugsim_orchestrator = DrugSimilarityServiceOrchestrator(
+                input_seed=input_seed,
+                date=date_str,
+                base_directory=base_directories['today_directory']
+            )
+            try:
+                edges, drug_edges = drugsim_orchestrator.run(nodes, input_min_simil)
+            except Exception as e:
+                # Release previously acquired services
+                service_queue_manager.release_service_instance('monarch')
+                service_queue_manager.release_service_instance('dgidb')
+                service_queue_manager.release_service_instance('drugsimilarity')
+                
+                logging.error(f"Drug Similarity service failed: {e}")
+                flash("Drug Similarity service encountered an error. Please try again.")
+                return render_template('home.html', form=form)
+            
+            ## DRUG PREDICTION
+            network_model_launch_status = service_queue_manager.request_service_instance(
+                'networkmodel', 
+                {
+                    'input_seed': input_seed,
+                    'date': date_str,
+                    'base_directory': base_directories['today_directory'],
+                    'nodes': nodes,
+                    'edges': edges,
+                    'drug_nodes': drug_nodes,
+                    'drug_edges': drug_edges,
+                    'negs_toggle': negs_toggle
+                }
+            )
+            
+            if not network_model_launch_status['can_launch']:
+                # Release previously acquired services
+                service_queue_manager.release_service_instance('monarch')
+                service_queue_manager.release_service_instance('dgidb')
+                service_queue_manager.release_service_instance('drugsimilarity')
+                
+                flash(f"Network Model service is currently busy. You are in queue position {network_model_launch_status.get('queue_position', 'unknown')}. " 
+                      f"Active instances: {network_model_launch_status['active_instances']}/{network_model_launch_status['max_instances']}")
+                return render_template('queue_wait.html', service='Network Model', status=network_model_launch_status)
+            
+            network_model_orchestrator = NetworkModelServiceOrchestrator(
+                input_seed=input_seed,
+                date=date_str,
+                base_directory=base_directories['today_directory']
+            )
+            
+            try:
+                if negs_toggle == 1:
+                    # Negative Samples Service
+                    negsamples_launch_status = service_queue_manager.request_service_instance(
+                        'negsample', 
+                        {
+                            'input_seed': input_seed,
+                            'date': date_str,
+                            'base_directory': base_directories['today_directory'],
+                            'edges': edges,
+                            'sim_threshold': sim_threshold
+                        }
+                    )
+                    
+                    if not negsamples_launch_status['can_launch']:
+                        # Release previously acquired services
+                        service_queue_manager.release_service_instance('monarch')
+                        service_queue_manager.release_service_instance('dgidb')
+                        service_queue_manager.release_service_instance('drugsimilarity')
+                        service_queue_manager.release_service_instance('networkmodel')
+                        
+                        flash(f"Negative Samples service is currently busy. You are in queue position {negsamples_launch_status.get('queue_position', 'unknown')}. " 
+                              f"Active instances: {negsamples_launch_status['active_instances']}/{negsamples_launch_status['max_instances']}")
+                        return render_template('queue_wait.html', service='Negative Samples', status=negsamples_launch_status)
+                    
+                    negsamples_orchestrator = NegativeSamplesServiceOrchestrator(
+                        input_seed=input_seed,
+                        date=date_str,
+                        base_directory=base_directories['today_directory']
+                    )
+                    try:
+                        valid_negative_edges = negsamples_orchestrator.run(edges, sim_threshold)
+                        edges = edges + valid_negative_edges
+                        edges = unique_elements(edges)
+                    except Exception as e:
+                        # Release all previously acquired services
+                        service_queue_manager.release_service_instance('monarch')
+                        service_queue_manager.release_service_instance('dgidb')
+                        service_queue_manager.release_service_instance('drugsimilarity')
+                        service_queue_manager.release_service_instance('networkmodel')
+                        service_queue_manager.release_service_instance('negsample')
+                        
+                        logging.error(f"Negative Samples service failed: {e}")
+                        flash("Negative Samples service encountered an error. Please try again.")
+                        return render_template('home.html', form=form)
+                
+                # Run Network Model
+                network_edges, network_nodes, ranked_drugs, plots = network_model_orchestrator.run(
+                    nodes=nodes,
+                    edges=edges,
+                    drug_nodes=drug_nodes,
+                    drug_edges=drug_edges,
+                    negs_toggle=negs_toggle,
+                    run_depth=depth_input,
+                    num_jobs=num_jobs,
+                    seed_input=seed_input,
+                    input_min_simil=input_min_simil,
+                    sim_threshold=sim_threshold
+                )
+                
+                # Successfully completed - release all service instances
+                service_queue_manager.release_service_instance('monarch')
+                service_queue_manager.release_service_instance('dgidb')
+                service_queue_manager.release_service_instance('drugsimilarity')
+                service_queue_manager.release_service_instance('networkmodel')
+                if negs_toggle == 1:
+                    service_queue_manager.release_service_instance('negsample')
+                
+            except Exception as e:
+                # Release all previously acquired services
+                service_queue_manager.release_service_instance('monarch')
+                service_queue_manager.release_service_instance('dgidb')
+                service_queue_manager.release_service_instance('drugsimilarity')
+                service_queue_manager.release_service_instance('networkmodel')
+                if negs_toggle == 1:
+                    service_queue_manager.release_service_instance('negsample')
+                
+                logging.error(f"Network Model service failed: {e}")
+                flash("Network Model service encountered an error. Please try again.")
+                return render_template('home.html', form=form)
+
+        except Exception as e:
+            logging.error(f"Overall pipeline execution failed: {e}")
+            flash("An unexpected error occurred during pipeline execution.")
+            return render_template('home.html', form=form)
+
+        ## LOGGING: report run duration
+        overall_end_time = time.time()
+        overall_duration = overall_end_time - overall_start_time
+        minutes = int(overall_duration // 60)
+        seconds = int(overall_duration % 60)
+        logging.info(f"PIPELINE run finished in {minutes} minutes and {seconds} seconds.")
 
     return render_template('home.html', form=form)
 
