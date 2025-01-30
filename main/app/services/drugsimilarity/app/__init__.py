@@ -1,0 +1,1 @@
+from .drugsimilarity_service import process_service_request

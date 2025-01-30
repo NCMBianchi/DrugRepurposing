@@ -4,22 +4,38 @@ Created on August 3rd 2024
 @author: Niccolò Bianchi [https://github.com/NCMBianchi]
 """
 
-import sys,os,platform,datetime,logging,builtins,time,multiprocessing
+import sys
+import os
+import platform
+import datetime
+import logging
+import builtins
+import time
+import multiprocessing
+import json
+import numpy as np
+import pandas as pd
+import networkx as nx
 
-from drugapp.filepaths import initialise_base_directories, setup_service_globals
-from drugapp.unique import unique_elements
+from .unique import unique_elements
+from .filepaths import initialise_disease_directories
+
+# These global variables will be set by the calling function
+global today_directory, date_str, input_seed, input_file_path
+global disease_name_label, disease_directories, base_data_directory
+disease_name_label = 'Huntington disease'  # default value
 
 def get_smiles(nodes):
     """
     This function performs drug ID conversion from chembl and wikidata ID to SMILES
     chemical structure notation.
-    
+
     :param nodes: list of tuples (id, label) containing all drugs to convert.
     :return: concept dictionary (key = smiles structures: values = old ontology IDs).
     """
 
     logging.info(f"NOW RUNNING: {current_function_name()}.")
-    
+
     chembl = [(id.split(':')[1], label) for id, label in nodes if 'chembl' in id.split(':')[0].lower()]
     wikidata = [(id.split(':')[1], label) for id, label in nodes if 'wikidata' in id.split(':')[0].lower()]
 
@@ -35,7 +51,7 @@ def get_smiles(nodes):
             concept_dct[smile] = {'id': f'chembl:{id}', 'label': label}
     else:
         logging.warning('no chembl IDs can be mapped to smiles')
-    
+
     # get SMILES for 'wikidata:' drug nodes
     smiles2wikidata = {}
     sparql = SPARQLWrapper("https://query.wikidata.org/sparql")
@@ -65,29 +81,29 @@ def compute_similarity(smiles_dict,radius=2,length=4096):
     This function computes the pairwise similarities of the provided list of SMILES
     notations, using Tanimoto coefficient.
     To achieve that, it first converts SMILES into RDKit objects, and then ECFP bitvectors.
-    
+
     :param smiles_dict: the list of smiles.
     :param radius: ECFP fingerprint radius (default = 2, just for repetition).
     :param length: number of ECFP bits (default = 4096, just for repetition).
-    :return: symmetric matrix of pairwise similarities. Diagonal is set to zero. 
+    :return: symmetric matrix of pairwise similarities. Diagonal is set to zero.
     """
 
     logging.info(f"NOW RUNNING: {current_function_name()}.")
-    
+
     # extrapolate actual SMILES notations from the concept dictionary
     smiles_list = list(smiles_dict.keys())
 
     # store IDs for the matrix
     id_list = list(smiles_dict.values())
-    
+
     if len(smiles_list) > 10000:
         logging.warning(f'Calculating internal similarity on large set of SMILES strings ({len(smiles_list)})')
-    
+
     # define the fingerprint generator parameters
     fingerprint_gen = rdFingerprintGenerator.GetMorganGenerator(fpradius=radius,fpSize=length)
 
     fingerprint_list = []
-    
+
     i = 0
     while i < len(smiles_list):
         sm = smiles_list[i]
@@ -136,7 +152,7 @@ def generate_drug_edges(similarity_matrix,sorted_matrix,ids,K,minimum=0.5):
     '''
 
     logging.info(f"NOW RUNNING: {current_function_name()}.")
-    
+
     similarity = []
     added_edges_count = 0
     skipped_edges_count = 0
@@ -146,7 +162,7 @@ def generate_drug_edges(similarity_matrix,sorted_matrix,ids,K,minimum=0.5):
     for chunk in range(num_chunks):
         start_idx = chunk * chunk_size
         end_idx = min((chunk + 1) * chunk_size, similarity_matrix.shape[0])
-        
+
         sub_similarity_matrix = similarity_matrix[start_idx:end_idx, :]
         sub_sorted_matrix = sorted_matrix[start_idx:end_idx, :]
         sub_ids = ids[start_idx:end_idx]
@@ -165,9 +181,9 @@ def generate_drug_edges(similarity_matrix,sorted_matrix,ids,K,minimum=0.5):
                         {'notes': f'similarity score: {sub_similarity_matrix[i, j]}'}
                     ]
                     similarity.append(new_row)
-    
+
     return similarity
-    
+
 
 def run_drugsimilarity(monarch_input,date,K=10,min_simil=None,input_radius=None,input_length=None):
     '''
@@ -183,7 +199,7 @@ def run_drugsimilarity(monarch_input,date,K=10,min_simil=None,input_radius=None,
     '''
 
     start_time = time.time()
-    
+
     logging.info(f"NOW RUNNING: {current_function_name()} following 'run_dgidb({monarch_input},{today},layers={run_layers})'.")
 
     global nodes
@@ -203,13 +219,13 @@ def run_drugsimilarity(monarch_input,date,K=10,min_simil=None,input_radius=None,
         file.write(f"The input radius of the ECFP ({input_length} features) is set to: {min_simil}\n\n")
 
     drugSimil_directory = disease_directories['drugsimil_directory']
-    
+
     # convert drug IDs into SMILES notations
     nodes_list = [(node['id'], node['label']) for node in nodes]
     alldrug_list = [(drug_node['id'], drug_node['label']) for drug_node in drug_nodes]
     smiles = get_smiles(nodes_list)
     alldrug_smiles = get_smiles(alldrug_list)
-    
+
     # save SMILES notations as CSV
     smiles_data = [{'SMILES': k, 'ID': v['id'], 'Label': v['label']} for k, v in smiles.items()]
     smiles_df = pd.DataFrame(smiles_data)
@@ -221,7 +237,7 @@ def run_drugsimilarity(monarch_input,date,K=10,min_simil=None,input_radius=None,
     # compute similarities
     similarities, id_list = compute_similarity(smiles,radius=input_radius,length=input_length)
     alldrug_simil, alldrug_id_list = compute_similarity(alldrug_smiles,radius=input_radius,length=input_length)
-    
+
     # save the similarity matrix as CSV
     ids = [d['id'] for d in id_list]
     similarities_df = pd.DataFrame(similarities, index=ids, columns=ids)
@@ -229,12 +245,12 @@ def run_drugsimilarity(monarch_input,date,K=10,min_simil=None,input_radius=None,
     alldrug_ids = [d['id'] for d in alldrug_id_list]
     alldrug_simil_df = pd.DataFrame(alldrug_simil, index=alldrug_ids, columns=alldrug_ids)
     alldrug_simil_df.to_csv(os.path.join(drugSimil_directory, f'{disease_name_label}_{date}_alldrugSim_similarityMatrix.csv'), index=True)
-    
+
     # sort based on similarity scores (ignore identity, first element for any sorting)
     # later on remove and handle in generate_drug_edges()
     sortedSimilarities = np.argsort(-similarities, axis=1)[:, 1:K+1]
     alldrug_sorted = np.argsort(-alldrug_simil, axis=1)[:, 1:K+1]
-    
+
     # generate drug-to-drug edges
     drug_similarity = generate_drug_edges(similarities,sortedSimilarities,id_list,K,minimum=min_simil)
     drug_edges = generate_drug_edges(alldrug_simil,alldrug_sorted,alldrug_id_list,K,minimum=min_simil)
@@ -249,7 +265,7 @@ def run_drugsimilarity(monarch_input,date,K=10,min_simil=None,input_radius=None,
     edges_df.to_csv(os.path.join(drugSimil_directory, f'{disease_name_label}_{date_str}_drugSim_edges.csv'), index=False)
     drug_edges_df = pd.DataFrame(drug_edges)
     drug_edges_df.to_csv(os.path.join(drugSimil_directory, f'{disease_name_label}_{date_str}_alldrugSim_edges.csv'), index=False)
-    
+
     logging.info("CSV files saved in drug_similarity directory.")
 
     end_time = time.time()

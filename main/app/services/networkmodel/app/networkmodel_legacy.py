@@ -4,19 +4,35 @@ Created on August 3rd 2024
 @author: Niccolò Bianchi [https://github.com/NCMBianchi]
 """
 
-import sys,os,platform,datetime,logging,builtins,time,multiprocessing
+import sys
+import os
+import platform
+import datetime
+import logging
+import builtins
+import time
+import multiprocessing
+import json
+import numpy as np
+import pandas as pd
+import networkx as nx
 
-from drugapp.unique import unique_elements
-from drugapp.filepaths import initialise_base_directories, setup_service_globals
+from .unique import unique_elements
+from .filepaths import initialise_disease_directories
+
+# These global variables will be set by the calling function
+global today_directory, date_str, input_seed, input_file_path
+global disease_name_label, disease_directories, base_data_directory
+disease_name_label = 'Huntington disease'  # default value
 
 def get_network(input_nodes,input_edges,exclude=None):
     '''
     This function builds a network object from lists of nodes and edges in a
     given format. Examples:
-    
+
     NODES = [{'id': 'chembl:CHEMBL348436', 'label': 'CIRSIMARITIN'},
     {'id': 'chembl:CHEMBL1503190', 'label': 'CHEMBL1503190'},...]
-    
+
     EDGES = [[{'id': 'MONDO:0007739', 'label': 'Huntington disease'},
     {'label': 'biolink:has_mode_of_inheritance'},
     {'id': 'HP:0000006', 'label': 'Autosomal dominant inheritance'},
@@ -24,7 +40,7 @@ def get_network(input_nodes,input_edges,exclude=None):
     {'label': 'biolink:subclass_of'},
     {'id': 'MONDO:0005395', 'label': 'movement disorder'},
     {'notes': 'first_layer'}]...]
-    
+
     It can remove a given edge type in order to build a partial network: it should be
     in the URI format (e.g. 'dgidb:'), and the formula checks if it's in the entire
     relations label.
@@ -36,7 +52,7 @@ def get_network(input_nodes,input_edges,exclude=None):
     '''
 
     logging.info(f"NOW RUNNING: {current_function_name()}.")
-    
+
     G = nx.DiGraph()
 
     global node_type_dict
@@ -53,9 +69,9 @@ def get_network(input_nodes,input_edges,exclude=None):
         'biolink': '#0000ff',  # blue
         'dgidb': '#ff0000',    # red
         'SMILES': '#ff4500',   # lightred
-        'xgboost': '#00ff00'   # green 
+        'xgboost': '#00ff00'   # green
     }
-    
+
     # add nodes
     for node in input_nodes:
         if node is None:
@@ -67,28 +83,28 @@ def get_network(input_nodes,input_edges,exclude=None):
             logging.warning(f"Encountered node with missing id or label: {node}, skipping...")
             continue
         node_type = 'else'
-        
+
         for type_key, prefixes in node_type_dict.items():
             if any(node_id.startswith(prefix + ':') for prefix in prefixes):
                 node_type = type_key
                 break
-                
+
         G.add_node(node_id, label=label, node_type=node_type, colour=node_type_colours[node_type])
-    
+
     # add edges
     for edge in input_edges:
         subj_id = edge[0]['id']
         obj_id = edge[2]['id']
         rel_label = edge[1]['label']
         notes = edge[3]['notes']
-    
+
         if subj_id is None or obj_id is None or rel_label is None:
             logging.warning(f"Encountered edge with missing id or label: {edge}, skipping...")
             continue
-        
+
         if exclude is not None and exclude in rel_label:
             continue  # skip this edge if exclusion criteria match
-        
+
         rel_type = rel_label.split(':')[0]
         colour = edge_type_colours.get(rel_type, '#000000')  # default to black if not found
         G.add_edge(subj_id, obj_id, label=rel_label, notes=notes, colour=colour)
@@ -128,10 +144,10 @@ def get_embeddings(input_network,emb_t,node_type_select=None):
     '''
 
     logging.info(f"NOW RUNNING: {current_function_name()}.")
-    
+
     global network_directory, node_type_dict
     valid_node_types = set(node_type_dict.keys())
-    
+
     if node_type_select and node_type_select not in valid_node_types:
         raise ValueError(f"Invalid node_type_select: {node_type_select}. Valid options are: {valid_node_types}")
 
@@ -144,12 +160,12 @@ def get_embeddings(input_network,emb_t,node_type_select=None):
     # check if they already exist, if toggled
     if emb_t == 1 and os.path.exists(embedding_path):
         logging.info(f"Loading embeddings from existing file: {embedding_path}")
-        
+
         with open(embedding_path, "rb") as file:
             output_embeddings = pickle.load(file)
 
     # otherwise compute
-    else:   
+    else:
         # (eventually) filter nodes
         if node_type_select:
             nodes_to_include = [node for node in input_network.nodes() if input_network.nodes[node].get('node_type') == node_type_select]
@@ -185,10 +201,10 @@ def get_embeddings_with_NS(input_network,emb_t,node_type_select=None):
     '''
 
     logging.info(f"NOW RUNNING: {current_function_name()}.")
-    
+
     global network_with_NS_directory, node_type_dict
     valid_node_types = set(node_type_dict.keys())
-    
+
     if node_type_select and node_type_select not in valid_node_types:
         raise ValueError(f"Invalid node_type_select: {node_type_select}. Valid options are: {valid_node_types}")
 
@@ -201,12 +217,12 @@ def get_embeddings_with_NS(input_network,emb_t,node_type_select=None):
     # check if they already exist, if toggled
     if emb_t == 1 and os.path.exists(embedding_path):
         logging.info(f"Loading embeddings from existing file: {embedding_path}")
-        
+
         with open(embedding_path, "rb") as file:
             output_embeddings = pickle.load(file)
 
     # otherwise compute
-    else:   
+    else:
         # (eventually) filter nodes
         if node_type_select:
             nodes_to_include = [node for node in input_network.nodes() if input_network.nodes[node].get('node_type') == node_type_select]
@@ -240,12 +256,12 @@ def is_interaction_present_with_NS(gene_id, drug_id, edges_df):
         ((edges_df['subject_id'] == gene_id) & (edges_df['object_id'] == drug_id) & (edges_df['relation'] != 'biolink:valid_negative_association'))
         | ((edges_df['subject_id'] == drug_id) & (edges_df['object_id'] == gene_id) & (edges_df['relation'] != 'biolink:valid_negative_association'))
     ).any()
-    
+
     valid_negative_interaction = (
         ((edges_df['subject_id'] == gene_id) & (edges_df['object_id'] == drug_id) & (edges_df['relation'] == 'biolink:valid_negative_association'))
         | ((edges_df['subject_id'] == drug_id) & (edges_df['object_id'] == gene_id) & (edges_df['relation'] == 'biolink:valid_negative_association'))
     ).any()
-    
+
     if positive_interaction:
         return 1
     elif valid_negative_interaction:
@@ -280,7 +296,7 @@ def fuse_embeddings(gene_embedding_dict, drug_embedding_dict, alldrug_embedding_
     # CSV file paths
     train_df_path = os.path.join(network_directory, f'{disease_name_label}_{date_str}_training_df.csv')
     predict_df_path = os.path.join(network_directory, f'{disease_name_label}_{date_str}_prediction_df.csv')
-    
+
     # check if already present, if toggled:
     if emb_t == 1 and os.path.exists(train_df_path) and os.path.exists(predict_df_path):
         logging.info(f"Loading training and prediction dataframes from existing files: {train_df_path} and {predict_df_path}")
@@ -367,7 +383,7 @@ def fuse_embeddings_with_NS(gene_embedding_dict, drug_embedding_dict, alldrug_em
     # CSV file paths
     train_df_path = os.path.join(network_with_NS_directory, f'{disease_name_label}_{date_str}_training_df_with_NS.csv')
     predict_df_path = os.path.join(network_with_NS_directory, f'{disease_name_label}_{date_str}_prediction_df_with_NS.csv')
-    
+
     # check if already present, if toggled:
     if emb_t == 1 and os.path.exists(train_df_path) and os.path.exists(predict_df_path):
         logging.info(f"Loading training and prediction dataframes from existing files: {train_df_path} and {predict_df_path}")
@@ -430,11 +446,11 @@ def fuse_embeddings_with_NS(gene_embedding_dict, drug_embedding_dict, alldrug_em
 
 def ml_prediction(train_df,predict_df,param_t,input_jobs=None,depth=None,input_seed=None):
     '''
-    This function builds a supervised learning model using as training data 
+    This function builds a supervised learning model using as training data
     the network of interactions between biological associations (via 'Monarch.py'),
     gene-to-drug associations (via 'DGIdb.py'), and drug-to-drug similarity (via
     'drug_similarity.py') –to then predict new interactions.
-    
+
     :param train_df: dataframe of (gene, drug, embedding, class) used for training.
     :param predict_df: dataframe of (gene, drug, embedding, class) used for prediction.
     :param param_t: 1 to look for existing optimised parameter file to load instead of performing
@@ -539,7 +555,7 @@ def ml_prediction(train_df,predict_df,param_t,input_jobs=None,depth=None,input_s
         n_s = 2  # number of splits
         n_r = 1  # number of repeats
         n_i = 1  # number of iterations
-    
+
     xgb_model_hyp = XGBClassifier(objective='multi:softmax', eval_metric='mlogloss', num_class=len(unique_classes), random_state=input_seed, n_jobs=input_jobs)
 
     rskf = RepeatedStratifiedKFold(n_splits=n_s, n_repeats=n_r, random_state=input_seed)
@@ -558,7 +574,7 @@ def ml_prediction(train_df,predict_df,param_t,input_jobs=None,depth=None,input_s
     best_params = randomized_search.best_params_
     best_score = randomized_search.best_score_
     xgb_model_hyp = randomized_search.best_estimator_
-    
+
     xgb_model_hyp.set_params(**best_params)
 
     # report best parameters and best model (scores)
@@ -616,11 +632,11 @@ def ml_prediction(train_df,predict_df,param_t,input_jobs=None,depth=None,input_s
 
 def ml_prediction_with_NS(train_df, predict_df, param_t, input_jobs=None, depth=None, input_seed=None):
     '''
-    This function builds a supervised learning model using as training data 
+    This function builds a supervised learning model using as training data
     the network of interactions between biological associations (via 'Monarch.py'),
     gene-to-drug associations (via 'DGIdb.py'), and drug-to-drug similarity (via
     'drug_similarity.py') –to then predict new interactions.
-    
+
     :param train_df: dataframe of (gene, drug, embedding, class) used for training.
     :param predict_df: dataframe of (gene, drug, embedding, class) used for prediction.
     :param param_t: 1 to look for existing optimised parameter file to load instead of performing
@@ -824,10 +840,10 @@ def extract_id_label(href):
     :param href: long string for 'id' and 'label' combined
     :return: 'id', and 'label' short strings
     '''
-    
+
     id_match = re.search(r'<a href="([^"]+)">', href)
     label_match = re.search(r'<a href="[^"]+">([^<]+)</a>', href)
-    
+
     if id_match and label_match:
         return id_match.group(1), label_match.group(1)
     else:
@@ -839,8 +855,8 @@ def filter_rank_drugs(predict_df,prob_threshold=0.65,cluster_threshold=0.8,over_
     '''
     This function filters predicted drug-gene interactions based on probability
     and ranks drugs based on their interactions with genes.
-    
-    :param predict_df: dataframe containing predictions with columns 
+
+    :param predict_df: dataframe containing predictions with columns
         ['drug', 'gene', 'predicted_interaction', 'prob']
     :param prob_threshold: probability threshold for filtering predictions
     :param cluster_threshold: cluster threshold for ranking drugs
@@ -849,16 +865,16 @@ def filter_rank_drugs(predict_df,prob_threshold=0.65,cluster_threshold=0.8,over_
     '''
 
     logging.info(f"NOW RUNNING: {current_function_name()}.")
-    
+
     global nodes
-    
+
     # filter the dataframe
     filt_df = predict_df[(predict_df['predicted_interaction'] == 1) & (predict_df['prob'] >= prob_threshold)]
-    
+
     # remove any drug already present in 'nodes'
     nodes_set = {node['id'] for node in nodes}
     new_df = filt_df[~filt_df['drug'].isin(nodes_set)]
-    
+
     # rank drugs based on how many genes each drug interacts with
     drug_counts = new_df['drug'].value_counts()
     max_count = drug_counts.max()
@@ -867,17 +883,17 @@ def filter_rank_drugs(predict_df,prob_threshold=0.65,cluster_threshold=0.8,over_
         ranked_drugs = drug_counts[drug_counts >= threshold_count].index.tolist()
     elif over_under == 0:
         ranked_drugs = drug_counts[drug_counts <= threshold_count].index.tolist()
-    
+
     # create the ranked list with counts
     ranked_list = []
     for drug_href in ranked_drugs:
         drug_id, drug_label = extract_id_label(drug_href)
         if drug_id and drug_label:
             ranked_list.append({'id': drug_id, 'label': drug_label, 'count': drug_counts[drug_href]})
-    
+
     # create a ranked dataframe
     ranked_df = new_df[new_df['drug'].isin(ranked_drugs)]
-    
+
     # build the list of new 'edges'
     id_to_label = {node['id']: node['label'] for node in nodes}
     predict_edges = []
@@ -886,7 +902,7 @@ def filter_rank_drugs(predict_df,prob_threshold=0.65,cluster_threshold=0.8,over_
         drug_href = row['drug']
         gene_id, gene_label = extract_id_label(gene_href)
         drug_id, drug_label = extract_id_label(drug_href)
-        
+
         edge = [
             {'id': gene_id, 'label': gene_label},
             {'label': 'xgboost:has_association'},
@@ -894,7 +910,7 @@ def filter_rank_drugs(predict_df,prob_threshold=0.65,cluster_threshold=0.8,over_
             {'notes': row['prob']}
         ]
         predict_edges.append(edge)
-    
+
     return ranked_list, predict_edges
 
 
@@ -906,10 +922,10 @@ def absolute_value(val, sizes):
     :param sizes: list of sizes for pie chart segments.
     :return: formatted string.
     '''
-    
+
     total = sum(sizes)
     absolute = int(val / 100. * total)
-    
+
     return f'{absolute}\n({val:.1f}%)'
 
 
@@ -920,7 +936,7 @@ def run_network_model(monarch_input,date,run_jobs=None,run_depth=None,run_seed=N
 
     :param monarch_input: the input seed from the run_monarch() step.
     :param date: the date of creation of the disease graph.
-    :param run_jobs: any value that would override default input_jobs=(num_cores//2) in 
+    :param run_jobs: any value that would override default input_jobs=(num_cores//2) in
         ml_prediction().
     :param run_depth: any value that would override default depth='full' in ml_prediction().
     :param run_seed: any value that would override default random_seed=123 in ml_prediction().
@@ -936,9 +952,9 @@ def run_network_model(monarch_input,date,run_jobs=None,run_depth=None,run_seed=N
     '''
 
     start_time = time.time()
-    
+
     logging.info(f"NOW RUNNING: {current_function_name()} following 'drug_similarity({monarch_input},{today},min_simil={input_min_simil})'.")
-    
+
     global nodes, edges, drug_nodes, drug_edges
 
     node_type_dict = {
@@ -947,16 +963,16 @@ def run_network_model(monarch_input,date,run_jobs=None,run_depth=None,run_seed=N
         'phenotype': ['HP'],
         'drug': ['chembl', 'wikidata']
     }
-    
+
     network_directory = disease_directories['network_directory']
 
     # generate networks for biological associations and drug database
     embedding_start_time = time.time()
     logging.info('Embeddings are being generated, be patient.')
-    
+
     full_network = get_network(nodes,edges)
     partial_alldrug_network = get_network(drug_nodes,drug_edges,exclude='dgidb:')
-    
+
     drug_embeddings = get_embeddings(full_network,emb_toggle,node_type_select='drug')
     alldrug_embeddings = get_embeddings(partial_alldrug_network,emb_toggle,node_type_select='drug')
     gene_embeddings = get_embeddings(full_network,emb_toggle,node_type_select='gene')
@@ -987,7 +1003,7 @@ def run_network_model(monarch_input,date,run_jobs=None,run_depth=None,run_seed=N
     pie_chart_path = os.path.join(network_directory, f'{disease_name_label}_{date_str}_interaction_pie_chart.png')
     plt.savefig(pie_chart_path, transparent=True)
     plt.close()
-    
+
     # generate prediction probability distribution plot
     interaction_df = predicted_df[predicted_df['predicted_interaction'] == 1]
     interaction_probs = interaction_df['prob']
@@ -1011,7 +1027,7 @@ def run_network_model(monarch_input,date,run_jobs=None,run_depth=None,run_seed=N
     ranked_drug_list, predicted_edges = filter_rank_drugs(predicted_df,prob_threshold=prob_input,cluster_threshold=clust_input, over_under=ou_toggle)
     for ranked_drug_elem in ranked_drug_list:
         logging.info(f"{ranked_drug_elem['count']} new edge(s) for drug {ranked_drug_elem['id']}.")
-    
+
     full_edges = edges + drug_edges + predicted_edges
     full_nodes = [edge[0] for edge in full_edges] + [edge[2] for edge in full_edges]
     full_nodes = unique_elements(full_nodes)
@@ -1021,7 +1037,7 @@ def run_network_model(monarch_input,date,run_jobs=None,run_depth=None,run_seed=N
     full_edges_df.to_csv(os.path.join(network_directory, f'{disease_name_label}_{date_str}_fullnetwork_edges.csv'), index=False)
     full_nodes_df = pd.DataFrame(full_nodes)
     full_nodes_df.to_csv(os.path.join(network_directory, f'{disease_name_label}_{date_str}_fullnetwork_nodes.csv'), index=False)
-    
+
     logging.info("CSV files saved in network directory.")
 
     end_time = time.time()
@@ -1029,7 +1045,7 @@ def run_network_model(monarch_input,date,run_jobs=None,run_depth=None,run_seed=N
     minutes = int(duration // 60)  # convert seconds to whole minutes
     seconds = int(duration % 60)  # get the remaining seconds
     logging.info(f"'network_model.py' run finished in {minutes} minutes and {seconds} seconds.")
-    
+
     return full_edges, full_nodes, ranked_drug_list, plot_paths
 
 
@@ -1040,7 +1056,7 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
 
     :param monarch_input: the input seed from the run_monarch() step.
     :param date: the date of creation of the disease graph.
-    :param run_jobs: any value that would override default input_jobs=(num_cores//2) in 
+    :param run_jobs: any value that would override default input_jobs=(num_cores//2) in
         ml_prediction().
     :param run_depth: any value that would override default depth='full' in ml_prediction_with_NS().
     :param run_seed: any value that would override default random_seed=123 in ml_prediction_with_NS().
@@ -1056,9 +1072,9 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
     '''
 
     start_time = time.time()
-    
+
     logging.info(f"NOW RUNNING: {current_function_name()} following 'drug_similarity({monarch_input},{today},min_simil={input_min_simil})'.")
-    
+
     global nodes, edges, drug_nodes, drug_edges
 
     node_type_dict = {
@@ -1067,16 +1083,16 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
         'phenotype': ['HP'],
         'drug': ['chembl', 'wikidata']
     }
-    
+
     network_with_NS_directory = disease_directories['NSnetwork_directory']
 
     # generate networks for biological associations and drug database
     embedding_start_time = time.time()
     logging.info('Embeddings are being generated, be patient.')
-    
+
     full_network = get_network(nodes,edges)
     partial_alldrug_network = get_network(drug_nodes,drug_edges,exclude='dgidb:')
-    
+
     drug_embeddings = get_embeddings_with_NS(full_network,emb_toggle,node_type_select='drug')
     alldrug_embeddings = get_embeddings_with_NS(partial_alldrug_network,emb_toggle,node_type_select='drug')
     gene_embeddings = get_embeddings_with_NS(full_network,emb_toggle,node_type_select='gene')
@@ -1107,7 +1123,7 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
     pie_chart_path = os.path.join(network_with_NS_directory, f'{disease_name_label}_{date_str}_interaction_pie_chart.png')
     plt.savefig(pie_chart_path, transparent=True)
     plt.close()
-    
+
     # generate prediction probability distribution plot
     interaction_df = predicted_df[predicted_df['predicted_interaction'] == 1]
     interaction_probs = interaction_df['prob']
@@ -1131,7 +1147,7 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
     ranked_drug_list, predicted_edges = filter_rank_drugs(predicted_df,prob_threshold=prob_input,cluster_threshold=clust_input,over_under=ou_toggle)
     for ranked_drug_elem in ranked_drug_list:
         logging.info(f"{ranked_drug_elem['count']} new edge(s) for drug {ranked_drug_elem['id']}.")
-    
+
     full_edges = edges + drug_edges + predicted_edges
     full_nodes = [edge[0] for edge in full_edges] + [edge[2] for edge in full_edges]
     full_nodes = unique_elements(full_nodes)
@@ -1141,7 +1157,7 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
     full_edges_df.to_csv(os.path.join(network_with_NS_directory, f'{disease_name_label}_{date_str}_fullnetwork_edges.csv'), index=False)
     full_nodes_df = pd.DataFrame(full_nodes)
     full_nodes_df.to_csv(os.path.join(network_directory, f'{disease_name_label}_{date_str}_fullnetwork_nodes.csv'), index=False)
-    
+
     logging.info("CSV files saved in network directory.")
 
     end_time = time.time()
@@ -1149,5 +1165,5 @@ def run_network_model_with_NS(monarch_input,date,run_jobs=None,run_depth=None,ru
     minutes = int(duration // 60)  # convert seconds to whole minutes
     seconds = int(duration % 60)  # get the remaining seconds
     logging.info(f"'network_model.py' run finished in {minutes} minutes and {seconds} seconds.")
-    
+
     return full_edges, full_nodes, ranked_drug_list, plot_paths

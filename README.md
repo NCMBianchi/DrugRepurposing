@@ -24,9 +24,9 @@ So far, **versions 2025.0.1** and **2025.0.2** add the [OMIM conversion tool](ht
 
 A backup version of the single Docker app is available in the **back-2025.0.2 branch**.
 
-**Versions 2025.0.3**, **2025.0.4** and **2025.0.5** introduced the Docker Swarm directory architecture for distributed services, that will allow for scalability and queues in runs. A `drugapp-launcher.sh` script was be added. It allows to either build the docker images and launch the containers (*i.e.* ```druapp-launcher.sh --build```) or remove them (*i.e.* ```drugapp-launcher.sh --remove```). Such command has to be executable beforehand with ```chmod +x drugapp-launcher.sh```.
+**Versions 2025.0.3** through **2025.0.6** introduce the Docker Swarm directory architecture for distributed services, that will allow for scalability and queues in runs. A `drugapp-launcher.sh` script was be added. It allows to either build the docker images and launch the containers (*i.e.* ```druapp-launcher.sh --build```) or remove them (*i.e.* ```drugapp-launcher.sh --remove```). Such command has to be executable beforehand with ```chmod +x drugapp-launcher.sh```.
 
-The next step to complete the transition to Docker Swarm distributed services require the update of specific services' Python files, as well as adding *\_wait_and_fetch_results()* function to fully pass data between services within the ```servicerun.py``` file.
+The next step is to fully test the functionality of distributed services with a small (real or artificial) network ahead of adding the new alternatives for the algorithm for negative samples generation based on centrality measures, and for the ML prediction based on graph neural networks (_i.e._ GNN, via the `PyG` package).
 
 ## PIPELINE: Jupyter Notebook (Niccolò Bianchi)
 The entire pipeline can be launched within the Jupyter Notebook. A full run dataset is available on [dropbox](https://www.dropbox.com/scl/fi/prvqajjau227741z5ve91/data.7z?rlkey=qjumdz9r93y0yv6mhc21a7bir&st=jqsfgypj&dl=0).

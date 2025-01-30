@@ -1,18 +1,30 @@
 """
-MONARCH MODULE FOR DISTRIBUTED SERVICES: MAKES API CALL AND ITERATES THROUGH DEGREES OF DISTANCE
-Created on JANUARY 27TH 2025
+MONARCH MODULE: MAKES API CALL AND ITERATES THROUGH DEGREES OF DISTANCE
+Created on August 3rd 2024
 @author: Niccolò Bianchi [https://github.com/NCMBianchi]
 """
 
-import sys,os,platform,datetime,logging,builtins,time,multiprocessing
-
-from unique import unique_elements
-from filepaths import initialise_disease_directories, setup_service_globals
-
-import requests
+import sys
+import os
+import platform
+import datetime
+import logging
+import builtins
+import time
+import multiprocessing
 import json
-from unittest.mock import Mock
+import requests
 import pandas as pd
+import inspect
+from unittest.mock import Mock
+
+from .unique import unique_elements
+from .filepaths import initialise_disease_directories
+
+# These global variables will be set by the calling function
+global today_directory, date_str, input_seed, input_file_path
+global disease_name_label, disease_directories, base_data_directory
+disease_name_label = 'Huntington disease'  # default value
 
 def hit_monarch_api(seed='MONDO:0007739',rows=2000,direct_true=1):
     """
@@ -134,6 +146,54 @@ def hit_monarch_api(seed='MONDO:0007739',rows=2000,direct_true=1):
         logging.error(f"Failed to fetch IN edges: {r_in.status_code} - {r_in.reason}")
 
     return r_out, r_in, disease_id, disease_name, disease_directories
+
+
+def unique_elements(nonUnique_list):
+    """
+    Short function that remove duplicate elements.
+    If the list contains nodes, it will simply convert it into a set{}.
+    If the list contains edges, it will remove also edges where subject and object
+    are inverted, therefore not being recognised as the same by Python.
+
+    :param nonUnique_list: biomedical entities list, where each entity is either a
+        node or an edge in association networks.
+    :return: list of the same biomedical entities without duplicates.
+    """
+
+    logging.info(f"NOW RUNNING: {current_function_name()} with seed list {nonUnique_list[:2]}.")
+    logging.info(f"Initial list size: {len(nonUnique_list)}")
+
+    # if nonUnique_list is empty
+    if not nonUnique_list:
+        return []
+
+    if isinstance(nonUnique_list[0], dict):
+        # Handle list of nodes
+        nodes_set = set(tuple(sorted(node.items())) for node in nonUnique_list)
+        unique_list = [dict(node) for node in nodes_set]
+
+    elif len(nonUnique_list[0]) == 4 and isinstance(nonUnique_list[0], list):
+        # Handle list of edges
+        unique_list = []
+        seen_edges = set()
+        for edge in nonUnique_list:
+            subj_id = edge[0]['id']
+            obj_id = edge[2]['id']
+            norm_edge = tuple(sorted([subj_id, obj_id]))
+            if norm_edge not in seen_edges:
+
+                # locally store the simplified/normalised edge for parsing
+                seen_edges.add(norm_edge)
+
+                # return the actual full edge
+                unique_list.append(edge)
+
+    else:
+        raise ValueError("Input is not recognised.")
+
+    logging.info(f"Final list size: {len(unique_list)} ({len(nonUnique_list)-len(unique_list)} removed)")
+
+    return unique_list
 
 
 def json_reverse(json_dict):
@@ -285,17 +345,3 @@ def run_monarch(input_id = 'MONDO:0007739'):
     logging.info(f"'Monarch.py' run finished in {minutes} minutes and {seconds} seconds.")
 
     return unique_nodes, unique_edges, disease_id_label, disease_name_label, disease_dir
-
-def main():
-    # Logging setup
-    logging.basicConfig(level=logging.INFO)
-
-    try:
-        # Run the discovery
-        run_monarch(input_seed='MONDO:0007739', base_directory='/tmp')
-    except Exception as e:
-        logging.error(f"Monarch service failed: {e}")
-        sys.exit(1)
-
-if __name__ == "__main__":
-    main()

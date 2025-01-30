@@ -4,379 +4,387 @@ Created on January 22nd 2024
 @author: Niccolò Bianchi [https://github.com/NCMBianchi]
 """
 
-import docker
-import uuid
-import logging
 import os
-import requests
 import json
-from typing import Dict, Any, Tuple, List
+import time
+import logging
+from typing import Dict, Any, Optional, Tuple
+import uuid
+import redis
+import multiprocessing
+import importlib
+import traceback
 
 import queue_manager
 
-import Monarch_legacy
-import dgidb_legacy
-import drugsimilarity_legacy
-import negsamples_legacy
-import networkmodel_legacy
+import Monarch_fallback
+import dgidb_fallback
+import drugsimilarity_fallback
+import negsamples_fallback
+import networkmodel_fallback
 
-class BaseServiceOrchestrator:
-    def __init__(self, input_seed: str, date: str, base_directory: str):
-        self.docker_client = docker.from_env()
-        self.input_seed = input_seed
-        self.date = date
-        self.base_directory = base_directory
-        self.service_name = f"{self.__class__.__name__.lower().replace('serviceorchestrator', '')}-{uuid.uuid4().hex[:8]}"
-        self.network_name = 'drugrepurposing_default'
-
-    def create_service(self, image: str, env: Dict[str, str] = None) -> Dict[str, Any]:
+class ServiceOrchestrator:
+    def __init__(self, redis_host='localhost', redis_port=6379):
         """
-        Dynamically create a Docker microservice
+        Initialize the service orchestrator with Redis connection
 
-        :param image: Docker image name
-        :param env: Environment variables dictionary
-        :return: Dictionary with service details
+        :param redis_host: Redis server host
+        :param redis_port: Redis server port
         """
+        self.redis_client = redis.Redis(host=redis_host, port=redis_port, decode_responses=True)
+        self.logger = logging.getLogger(__name__)
+        self.queue_manager = queue_manager.service_queue_manager
+
+    def _generate_request_id(self) -> str:
+        """
+        Generate a unique request identifier
+
+        :return: Unique request ID
+        """
+        return str(uuid.uuid4())
+
+    def enqueue_service_request(self, service_name: str, request_params: Dict[str, Any]) -> str:
+        """
+        Enqueue a service request and return a request ID
+
+        :param service_name: Name of the service (e.g., 'monarch', 'dgidb')
+        :param request_params: Dictionary of request parameters
+        :return: Unique request ID
+        """
+
+        # First, check with queue manager if service can be launched
+        launch_status = self.queue_manager.request_service_instance(
+            service_name,
+            request_params
+        )
+
+        if not launch_status['can_launch']:
+            # If cannot launch immediately, add additional queueing logic
+            self.logger.info(f"Service {service_name} queued. Position: {launch_status.get('queue_position', 'N/A')}")
+
+        request_id = self._generate_request_id()
+
+        # Prepare request payload
+        request_payload = {
+            'request_id': request_id,
+            'service_name': service_name,
+            'params': request_params,
+            'status': 'pending',
+            'timestamp': time.time(),
+            'attempts': 0
+        }
+
+        # Store request in Redis queue
+        queue_key = f'service_queue:{service_name}'
+        self.redis_client.rpush(queue_key, json.dumps(request_payload))
+
+        # Store request details for tracking
+        request_key = f'request:{request_id}'
+        self.redis_client.hmset(request_key, {
+            'service_name': service_name,
+            'status': 'pending',
+            'timestamp': time.time()
+        })
+
+        self.logger.info(f"Enqueued {service_name} service request: {request_id}")
+        return request_id
+
+    def _wait_and_fetch_results(
+        self,
+        request_id: str,
+        timeout: int = 300,
+        polling_interval: float = 1.0
+    ) -> Dict[str, Any]:
+        """
+        Wait for and fetch results for a given request ID
+
+        :param request_id: Unique request identifier
+        :param timeout: Maximum wait time in seconds
+        :param polling_interval: Interval between result checks
+        :return: Service request results or error information
+        """
+        request_key = f'request:{request_id}'
+        start_time = time.time()
+        service_name = None
+
         try:
-            default_env = {
-                'INPUT_SEED': self.input_seed,
-                'DATE': self.date,
-                'BASE_DIRECTORY': self.base_directory
-            }
+            # Retrieve service name before entering the loop
+            service_name = self.redis_client.hget(request_key, 'service_name')
 
-            if env:
-                default_env.update(env)
+            while time.time() - start_time < timeout:
+                # Check request status
+                request_status = self.redis_client.hget(request_key, 'status')
 
-            service = self.docker_client.services.create(
-                image=image,
-                name=self.service_name,
-                env=default_env,
-                networks=[self.network_name]
-            )
+                if request_status == 'completed':
+                    # Fetch and parse results
+                    result_key = f'result:{request_id}'
+                    result_json = self.redis_client.get(result_key)
 
-            logging.info(f"{self.__class__.__name__} service {self.service_name} created")
+                    if result_json:
+                        result = json.loads(result_json)
 
-            return {
-                'id': service.id,
-                'name': self.service_name
-            }
+                        # Clean up Redis keys
+                        self.redis_client.delete(request_key, result_key)
+
+                        # Release service instance
+                        if service_name:
+                            self.queue_manager.release_service_instance(service_name)
+
+                        return result
+
+                elif request_status == 'failed':
+                    # Fetch error information
+                    error_key = f'error:{request_id}'
+                    error_info = self.redis_client.get(error_key)
+
+                    if error_info:
+                        error_details = json.loads(error_info)
+
+                        # Clean up Redis keys
+                        self.redis_client.delete(request_key, error_key)
+
+                        # Raise error after releasing service instance
+                        if service_name:
+                            self.queue_manager.release_service_instance(service_name)
+
+                        raise RuntimeError(f"Service request failed: {error_details}")
+
+                # Wait before next poll
+                time.sleep(polling_interval)
+
+            # Timeout occurred
+            if service_name:
+                self.queue_manager.release_service_instance(service_name)
+
+            raise TimeoutError(f"Request {request_id} timed out after {timeout} seconds")
 
         except Exception as e:
-            logging.error(f"Failed to create service: {e}")
+            # Ensure service instance is released even if there's an error
+            if service_name:
+                self.queue_manager.release_service_instance(service_name)
             raise
 
-    def is_service_mode(self) -> bool:
+    def process_service_request(
+        self,
+        service_name: str,
+        request_params: Dict[str, Any],
+        timeout: int = 300
+    ) -> Dict[str, Any]:
         """
-        Determine if microservice mode is available
+        Comprehensive method to enqueue, wait for, and retrieve service results
+
+        :param service_name: Name of the service
+        :param request_params: Request parameters
+        :param timeout: Maximum wait time for request
+        :return: Service request results
         """
         try:
-            self.docker_client.ping()
-            return True
-        except:
-            return False
+            # Enqueue the request
+            request_id = self.enqueue_service_request(service_name, request_params)
 
-class MonarchServiceOrchestrator(BaseServiceOrchestrator):
-    def run(self) -> Tuple[List, List, str, str, Dict]:
+            # Wait for and fetch results
+            return self._wait_and_fetch_results(request_id, timeout)
+
+        except (TimeoutError, RuntimeError) as e:
+            self.logger.error(f"Service request error: {e}")
+            raise
+
+class ServiceWorker:
+    def __init__(self, redis_host='localhost', redis_port=6379):
         """
-        Run Monarch service discovery with queue management
+        Initialize the service worker for processing queued requests
+
+        :param redis_host: Redis server host
+        :param redis_port: Redis server port
         """
+        self.redis_client = redis.Redis(host=redis_host, port=redis_port, decode_responses=True)
+        self.logger = logging.getLogger(__name__)
+
+    def _process_single_request(self, request_data: Dict[str, Any]) -> None:
+        """
+        Process a single service request
+
+        :param request_data: Request payload dictionary
+        """
+        request_id = request_data['request_id']
+        service_name = request_data['service_name']
+        request_params = request_data['params']
+
         try:
-            # Check if service can be launched immediately
-            launch_status = queue_manager.service_queue_manager.request_service_instance(
-                'monarch', 
-                {
-                    'input_seed': self.input_seed,
-                    'date': self.date,
-                    'base_directory': self.base_directory
-                }
-            )
-            
-            if not launch_status['can_launch']:
-                raise Exception(f"Monarch service is queued. Position: {launch_status.get('queue_position', 'unknown')}")
+            # Dynamically import service request processor
+            service_module = __import__(f'{service_name}_service', fromlist=['process_service_request'])
+            result = service_module.process_service_request(request_params)
 
-            try:
-                # Local fallback
-                if not self.is_service_mode():
-                    results = run_monarch(self.input_seed)
-                    queue_manager.service_queue_manager.release_service_instance('monarch')
-                    return results
+            # Store successful result
+            result_key = f'result:{request_id}'
+            self.redis_client.set(result_key, json.dumps(result))
 
-                # Microservice mode
-                service = self.create_service(
-                    image='drugrepurposing/monarch:latest',
-                    env={'LAYERS': '3'}
-                )
+            # Update request status
+            request_key = f'request:{request_id}'
+            self.redis_client.hset(request_key, 'status', 'completed')
 
-                # Implement result retrieval mechanism
-                results = self._wait_and_fetch_results(service)
-                
-                # Always release the service instance
-                queue_manager.service_queue_manager.release_service_instance('monarch')
-                
-                return results
-
-            except Exception as e:
-                queue_manager.service_queue_manager.release_service_instance('monarch')
-                logging.error(f"Monarch service run failed: {e}")
-                return run_monarch(self.input_seed)
+            self.logger.info(f"Processed {service_name} service request: {request_id}")
 
         except Exception as e:
-            logging.error(f"Monarch service orchestration failed: {e}")
-            return run_monarch(self.input_seed)
+            # Handle and store error
+            error_key = f'error:{request_id}'
+            error_info = {
+                'service': service_name,
+                'error_type': type(e).__name__,
+                'error_message': str(e)
+            }
 
-    def _wait_and_fetch_results(self, service):
+            self.redis_client.set(error_key, json.dumps(error_info))
+
+            # Update request status
+            request_key = f'request:{request_id}'
+            self.redis_client.hset(request_key, 'status', 'failed')
+
+            self.logger.error(f"Failed to process {service_name} service request: {request_id}")
+
+    def run(self, services: Optional[list] = None):
         """
-        Wait for service completion and retrieve results
-        Placeholder method - needs actual implementation
+        Continuously run workers for specified services
+
+        :param services: List of service names to process
         """
-        # Potential implementations:
-        # 1. Check service logs
-        # 2. Use shared volume
-        # 3. Use Redis/message queue
-        # 4. Implement API endpoint in service to fetch results
-        pass
+        if services is None:
+            services = ['monarch', 'dgidb', 'drugsimilarity', 'negsamples', 'networkmodel']
 
-class DGIdbServiceOrchestrator(BaseServiceOrchestrator):
-    def run(self, nodes: List, run_layers: int) -> Tuple[List, List]:
+        workers = []
+
+        for service in services:
+            queue_key = f'service_queue:{service}'
+
+            def worker_process(queue_key=queue_key):
+                while True:
+                    # Blocking pop from Redis queue
+                    _, request_json = self.redis_client.blpop(queue_key)
+                    request_data = json.loads(request_json)
+                    self._process_single_request(request_data)
+
+            # Start worker process
+            process = multiprocessing.Process(target=worker_process)
+            process.start()
+            workers.append(process)
+
+        # Wait for all workers
+        for worker in workers:
+            worker.join()
+
+class ServiceRunner:
+    def __init__(self, base_directory='/app/data'):
+        """
+        Initialize the service runner with fallback capabilities
+
+        :param base_directory: Base directory for data storage
+        """
+        self.logger = logging.getLogger(__name__)
+        self.base_directory = base_directory
+
+    def _try_microservice_request(self, service_name: str, request_params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Attempt to run service request via microservice
+
+        :param service_name: Name of the service
+        :param request_params: Request parameters
+        :return: Service request results
+        """
         try:
-            # Check if service can be launched immediately
-            launch_status = queue_manager.service_queue_manager.request_service_instance(
-                'dgidb', 
-                {
-                    'input_seed': self.input_seed,
-                    'date': self.date,
-                    'base_directory': self.base_directory,
-                    'nodes': nodes,
-                    'run_layers': run_layers
-                }
-            )
-            
-            if not launch_status['can_launch']:
-                raise Exception(f"DGIdb service is queued. Position: {launch_status.get('queue_position', 'unknown')}")
-
-            try:
-                if not self.is_service_mode():
-                    results = run_dgidb(self.input_seed, self.date, layers=run_layers)
-                    queue_manager.service_queue_manager.release_service_instance('dgidb')
-                    return results
-
-                service = self.create_service(
-                    image='drugrepurposing/dgidb:latest',
-                    env={
-                        'LAYERS': str(run_layers),
-                        'NODES': json.dumps(nodes)
-                    }
-                )
-
-                results = self._wait_and_fetch_results(service)
-                queue_manager.service_queue_manager.release_service_instance('dgidb')
-                return results
-
-            except Exception as e:
-                queue_manager.service_queue_manager.release_service_instance('dgidb')
-                logging.error(f"DGIdb service run failed: {e}")
-                return run_dgidb(self.input_seed, self.date, layers=run_layers)
-
+            # Dynamically import service request processor
+            service_module = importlib.import_module(f'{service_name}_service')
+            return service_module.process_service_request(request_params)
+        except ImportError:
+            self.logger.warning(f"Microservice for {service_name} not found. Falling back to legacy method.")
+            return None
         except Exception as e:
-            logging.error(f"DGIdb service orchestration failed: {e}")
-            return run_dgidb(self.input_seed, self.date, layers=run_layers)
+            self.logger.error(f"Microservice request failed: {e}")
+            return None
 
-    def _wait_and_fetch_results(self, service):
-        # Placeholder implementation
-        pass
+    def _run_fallback_method(self, service_name: str, request_params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Run legacy method for the service
 
-class DrugSimilarityServiceOrchestrator(BaseServiceOrchestrator):
-    def run(self, nodes: List, input_min_simil: float) -> Tuple[List, List]:
+        :param service_name: Name of the service
+        :param request_params: Request parameters
+        :return: Service request results
+        """
         try:
-            # Check if service can be launched immediately
-            launch_status = queue_manager.service_queue_manager.request_service_instance(
-                'drugsimilarity', 
-                {
-                    'input_seed': self.input_seed,
-                    'date': self.date,
-                    'base_directory': self.base_directory,
-                    'nodes': nodes,
-                    'input_min_simil': input_min_simil
-                }
-            )
-            
-            if not launch_status['can_launch']:
-                raise Exception(f"Drug Similarity service is queued. Position: {launch_status.get('queue_position', 'unknown')}")
+            # Map service names to legacy function names
+            legacy_map = {
+                'monarch': 'run_monarch',
+                'dgidb': 'run_dgidb',
+                'drugsimilarity': 'run_drugsimilarity',
+                'negsamples': 'run_negsamples',
+                'networkmodel': 'run_networkmodel'
+            }
 
-            try:
-                if not self.is_service_mode():
-                    results = run_drugsimilarity(self.input_seed, self.date, min_simil=input_min_simil)
-                    queue_manager.service_queue_manager.release_service_instance('drugsimilarity')
-                    return results
+            # Dynamically import legacy module and function
+            legacy_module = importlib.import_module(f'{service_name}_fallback')
+            legacy_func = getattr(legacy_module, legacy_map[service_name])
 
-                service = self.create_service(
-                    image='drugrepurposing/drugsimilarity:latest',
-                    env={
-                        'MIN_SIMILARITY': str(input_min_simil),
-                        'NODES': json.dumps(nodes)
-                    }
-                )
+            # Prepare arguments for legacy function
+            monarch_input = request_params.get('monarch_input', 'MONDO:0007739')
+            date = request_params.get('date', time.strftime('%Y-%m-%d'))
 
-                results = self._wait_and_fetch_results(service)
-                queue_manager.service_queue_manager.release_service_instance('drugsimilarity')
-                return results
+            # Call legacy function with appropriate arguments
+            results = legacy_func(monarch_input, date)
 
-            except Exception as e:
-                queue_manager.service_queue_manager.release_service_instance('drugsimilarity')
-                logging.error(f"Drug Similarity service run failed: {e}")
-                return run_drugsimilarity(self.input_seed, self.date, min_simil=input_min_simil)
-
+            # Return results in a standardized format
+            return {
+                'status': 'success',
+                'results': results
+            }
         except Exception as e:
-            logging.error(f"Drug Similarity service orchestration failed: {e}")
-            return run_drugsimilarity(self.input_seed, self.date, min_simil=input_min_simil)
+            self.logger.error(f"Legacy method failed: {traceback.format_exc()}")
+            return {
+                'status': 'error',
+                'message': str(e)
+            }
 
-    def _wait_and_fetch_results(self, service):
-        # Placeholder implementation
-        pass
+    def process_service_request(
+        self,
+        service_name: str,
+        request_params: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Attempt to run service request with microservice fallback to legacy method
 
-class NegativeSamplesServiceOrchestrator(BaseServiceOrchestrator):
-    def run(self, edges: List, sim_threshold: float) -> List:
-        try:
-            # Check if service can be launched immediately
-            launch_status = queue_manager.service_queue_manager.request_service_instance(
-                'negsample', 
-                {
-                    'input_seed': self.input_seed,
-                    'date': self.date,
-                    'base_directory': self.base_directory,
-                    'edges': edges,
-                    'sim_threshold': sim_threshold
-                }
-            )
-            
-            if not launch_status['can_launch']:
-                raise Exception(f"Negative Samples service is queued. Position: {launch_status.get('queue_position', 'unknown')}")
+        :param service_name: Name of the service
+        :param request_params: Request parameters
+        :return: Service request results
+        """
+        # First, try microservice approach
+        microservice_result = self._try_microservice_request(service_name, request_params)
 
-            try:
-                if not self.is_service_mode():
-                    results = generate_negative_samples(edges, similarity_threshold=sim_threshold)
-                    queue_manager.service_queue_manager.release_service_instance('negsample')
-                    return results
+        if microservice_result:
+            return microservice_result
 
-                service = self.create_service(
-                    image='drugrepurposing/negsamples:latest',
-                    env={
-                        'SIMILARITY_THRESHOLD': str(sim_threshold),
-                        'EDGES': json.dumps(edges)
-                    }
-                )
+        # If microservice fails, fall back to legacy method
+        self.logger.warning(f"Falling back to legacy method for {service_name}")
+        return self._run_fallback_method(service_name, request_params)
 
-                results = self._wait_and_fetch_results(service)
-                queue_manager.service_queue_manager.release_service_instance('negsample')
-                return results
+def main():
+    # Configure logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
 
-            except Exception as e:
-                queue_manager.service_queue_manager.release_service_instance('negsample')
-                logging.error(f"Negative Samples service run failed: {e}")
-                return generate_negative_samples(edges, similarity_threshold=sim_threshold)
+    # Choose one primary purpose: either run workers or demonstrate service request
+    # Typically, this would be handled by separate scripts or deployment configs
 
-        except Exception as e:
-            logging.error(f"Negative Samples service orchestration failed: {e}")
-            return generate_negative_samples(edges, similarity_threshold=sim_threshold)
+    # Option 1: Run service workers
+    worker = ServiceWorker()
+    worker.run()
 
-    def _wait_and_fetch_results(self, service):
-        # Placeholder implementation
-        pass
+    # Option 2: Example service request (not typically in the same script as workers)
+    # runner = ServiceRunner()
+    # result = runner.process_service_request(
+    #     'monarch',
+    #     {'monarch_input': 'MONDO:0007739', 'date': time.strftime('%Y-%m-%d')}
+    # )
+    # print(json.dumps(result, indent=2))
 
-class NetworkModelServiceOrchestrator(BaseServiceOrchestrator):
-    def run(self, nodes: List, edges: List, drug_nodes: List, drug_edges: List,
-            negs_toggle: bool, run_depth: str, num_jobs: int, seed_input: str,
-            input_min_simil: float, sim_threshold: float) -> Tuple[List, List, List, List]:
-        try:
-            # Check if service can be launched immediately
-            launch_status = queue_manager.service_queue_manager.request_service_instance(
-                'networkmodel', 
-                {
-                    'input_seed': self.input_seed,
-                    'date': self.date,
-                    'base_directory': self.base_directory,
-                    'nodes': nodes,
-                    'edges': edges,
-                    'drug_nodes': drug_nodes,
-                    'drug_edges': drug_edges,
-                    'negs_toggle': negs_toggle,
-                    'run_depth': run_depth,
-                    'num_jobs': num_jobs,
-                    'seed_input': seed_input,
-                    'input_min_simil': input_min_simil,
-                    'sim_threshold': sim_threshold
-                }
-            )
-            
-            if not launch_status['can_launch']:
-                raise Exception(f"Network Model service is queued. Position: {launch_status.get('queue_position', 'unknown')}")
-
-            try:
-                if not self.is_service_mode():
-                    if negs_toggle:
-                        results = run_network_model_with_NS(
-                            self.input_seed, self.date, run_jobs=num_jobs,
-                            run_depth=run_depth, run_seed=seed_input
-                        )
-                    else:
-                        results = run_network_model(
-                            self.input_seed, self.date, run_jobs=num_jobs,
-                            run_depth=run_depth, run_seed=seed_input
-                        )
-                    queue_manager.service_queue_manager.release_service_instance('networkmodel')
-                    return results
-
-                env = {
-                    'NEGATIVE_SAMPLES': str(int(negs_toggle)),
-                    'DEPTH': run_depth,
-                    'JOBS': str(num_jobs),
-                    'SEED': str(seed_input),
-                    'MIN_SIMILARITY': str(input_min_simil),
-                    'SIMILARITY_THRESHOLD': str(sim_threshold),
-                    'NODES': json.dumps(nodes),
-                    'EDGES': json.dumps(edges),
-                    'DRUG_NODES': json.dumps(drug_nodes),
-                    'DRUG_EDGES': json.dumps(drug_edges)
-                }
-
-                service = self.create_service(
-                    image='drugrepurposing/networkmodel:latest',
-                    env=env
-                )
-
-                results = self._wait_and_fetch_results(service)
-                queue_manager.service_queue_manager.release_service_instance('networkmodel')
-                return results
-
-            except Exception as e:
-                queue_manager.service_queue_manager.release_service_instance('networkmodel')
-                logging.error(f"Network Model service run failed: {e}")
-
-                if negs_toggle:
-                    return run_network_model_with_NS(
-                        self.input_seed, self.date, run_jobs=num_jobs,
-                        run_depth=run_depth, run_seed=seed_input
-                    )
-                else:
-                    return run_network_model(
-                        self.input_seed, self.date, run_jobs=num_jobs,
-                        run_depth=run_depth, run_seed=seed_input
-                    )
-
-        except Exception as e:
-            logging.error(f"Network Model service orchestration failed: {e}")
-
-            if negs_toggle:
-                return run_network_model_with_NS(
-                    self.input_seed, self.date, run_jobs=num_jobs,
-                    run_depth=run_depth, run_seed=seed_input
-                )
-            else:
-                return run_network_model(
-                    self.input_seed, self.date, run_jobs=num_jobs,
-                    run_depth=run_depth, run_seed=seed_input
-                )
-
-    def _wait_and_fetch_results(self, service):
-        # Placeholder implementation
-        pass
+if __name__ == "__main__":
+    main()

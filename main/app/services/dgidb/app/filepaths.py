@@ -1,5 +1,5 @@
 """
-MAIN MODULE: FILE PATHS GENERATION 
+MAIN MODULE: FILE PATHS GENERATION
 Created on September 3rd 2024
 @author: Niccolò Bianchi [https://github.com/NCMBianchi]
 """
@@ -9,16 +9,16 @@ import os
 def initialise_base_directories(date_string):
     """
     Initialises and returns the paths for the base directory and today's directory.
-    
+
     :param date_string: A string representing the date (e.g., '2024-09-03').
     :return: A dictionary containing paths for the base directory and today's directory.
     """
-    base_data_directory = os.path.join(os.getcwd(), 'drugapp', 'data')
+    base_data_directory = os.path.join(os.getcwd(), '/app', 'data')
     today_directory = os.path.join(base_data_directory, date_string)
-    
+
     # Create today's directory if it doesn't exist
     os.makedirs(today_directory, exist_ok=True)
-    
+
     return {
         'base_data_directory': base_data_directory,
         'today_directory': today_directory
@@ -27,7 +27,7 @@ def initialise_base_directories(date_string):
 def initialise_disease_directories(today_directory, disease_name, date_string):
     """
     Initialises and returns the paths for the disease-specific directory and Monarch directory.
-    
+
     :param today_directory: The directory for today's date.
     :param disease_name: The name of the disease.
     :param date_string: The date string (for archival purposes).
@@ -60,7 +60,7 @@ def initialise_disease_directories(today_directory, disease_name, date_string):
 def setup_service_globals(directory, date, seed, service_name):
     """
     Generic function to setup global variables for all services.
-    
+
     :param directory: The today_directory path
     :param date: The date string
     :param seed: The input seed
@@ -68,21 +68,20 @@ def setup_service_globals(directory, date, seed, service_name):
     :param tuple: (today_directory, date_str, input_seed, input_file_path)
     """
     global today_directory, date_str, input_seed, input_file_path, disease_name_label
-    
+
     today_directory = directory
     date_str = date
     input_seed = seed
-    
+
     # Set up input_file_path
     input_file_path = os.path.join(today_directory, 'inputs.txt')
-    
+
     # Set disease_name_label if needed (for certain services)
     if service_name in ['drugsim', 'networkmodel']:
         disease_name_label = 'Huntington disease'  # or get from payload
-    
+
     return_tuple = (today_directory, date_str, input_seed, input_file_path)
     if service_name in ['drugsim', 'networkmodel']:
         return_tuple += (disease_name_label,)
-    
-    return return_tuple
 
+    return return_tuple

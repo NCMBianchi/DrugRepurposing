@@ -17,13 +17,7 @@ from unique import *
 from queue_manager import *
 
 # for Docker micro services implementation
-from servicerun import (
-    MonarchServiceOrchestrator,
-    DGIdbServiceOrchestrator,
-    DrugSimilarityServiceOrchestrator,
-    NegativeSamplesServiceOrchestrator,
-    NetworkModelServiceOrchestrator
-)
+from servicerun import ServiceOrchestrator
 
 ## PLATFORM INFO
 python_executable = sys.executable
@@ -149,35 +143,45 @@ def config():
         try:
             # Monarch Service
             monarch_launch_status = service_queue_manager.request_service_instance(
-                'monarch', 
+                'monarch',
                 {
                     'input_seed': input_seed,
                     'date': date_str,
                     'base_directory': base_directories['today_directory']
                 }
             )
-            
+            monarch_instance_id = monarch_launch_status['instance_id']
+
             if not monarch_launch_status['can_launch']:
-                flash(f"Monarch service is currently busy. You are in queue position {monarch_launch_status.get('queue_position', 'unknown')}. " 
+                flash(f"Monarch service is currently busy. You are in queue position {monarch_launch_status.get('queue_position', 'unknown')}. "
                       f"Active instances: {monarch_launch_status['active_instances']}/{monarch_launch_status['max_instances']}")
                 return render_template('queue_wait.html', service='Monarch', status=monarch_launch_status)
-            
-            monarch_orchestrator = MonarchServiceOrchestrator(
-                input_seed=input_seed,
-                date=date_str,
-                base_directory=base_directories['today_directory']
-            )
+
+            monarch_orchestrator = ServiceOrchestrator()
             try:
-                nodes, edges, disease_name_id, disease_name_label, disease_directories = monarch_orchestrator.run()
+                result = monarch_orchestrator.process_service_request('monarch', {
+                    'input_seed': input_seed,
+                    'date': date_str,
+                    'base_directory': base_directories['today_directory']
+                })
+
+                # Unpack the result
+                nodes = result['nodes']
+                edges = result['edges']
+                disease_name_id = result.get('disease_name_id')
+                disease_name_label = result.get('disease_name_label')
+                disease_directories = result.get('disease_directories')
+                service_queue_manager.release_service_instance('monarch', monarch_instance_id)
+
             except Exception as e:
-                service_queue_manager.release_service_instance('monarch')
+                service_queue_manager.release_service_instance('monarch', monarch_instance_id)
                 logging.error(f"Monarch service failed: {e}")
                 flash("Monarch service encountered an error. Please try again.")
                 return render_template('home.html', form=form)
-            
+
             # DGIdb Service
             dgidb_launch_status = service_queue_manager.request_service_instance(
-                'dgidb', 
+                'dgidb',
                 {
                     'input_seed': input_seed,
                     'date': date_str,
@@ -186,34 +190,39 @@ def config():
                     'run_layers': run_layers
                 }
             )
-            
+            dgidb_instance_id = dgidb_launch_status['instance_id']
+
             if not dgidb_launch_status['can_launch']:
-                # Release previously acquired services
-                service_queue_manager.release_service_instance('monarch')
-                
-                flash(f"DGIdb service is currently busy. You are in queue position {dgidb_launch_status.get('queue_position', 'unknown')}. " 
+                flash(f"DGIdb service is currently busy. You are in queue position {dgidb_launch_status.get('queue_position', 'unknown')}. "
                       f"Active instances: {dgidb_launch_status['active_instances']}/{dgidb_launch_status['max_instances']}")
                 return render_template('queue_wait.html', service='DGIdb', status=dgidb_launch_status)
-            
-            dgidb_orchestrator = DGIdbServiceOrchestrator(
-                input_seed=input_seed,
-                date=date_str,
-                base_directory=base_directories['today_directory']
-            )
+
+            dgidb_orchestrator = ServiceOrchestrator()
             try:
-                nodes, edges, drug_nodes = dgidb_orchestrator.run(nodes, run_layers)
+                result = dgidb_orchestrator.process_service_request('dgidb', {
+                    'input_seed': input_seed,
+                    'date': date_str,
+                    'base_directory': base_directories['today_directory'],
+                    'nodes': nodes,
+                    'run_layers': run_layers
+                })
+
+                # Unpack the result
+                nodes = result['nodes']
+                edges = result['edges']
+                drug_nodes = result['drug_nodes']
+                service_queue_manager.release_service_instance('dgidb', dgidb_instance_id)
+
             except Exception as e:
-                # Release previously acquired services
-                service_queue_manager.release_service_instance('monarch')
-                service_queue_manager.release_service_instance('dgidb')
-                
+                service_queue_manager.release_service_instance('dgidb', dgidb_instance_id)
+
                 logging.error(f"DGIdb service failed: {e}")
                 flash("DGIdb service encountered an error. Please try again.")
                 return render_template('home.html', form=form)
-            
+
             # Drug Similarity Service
             drugsim_launch_status = service_queue_manager.request_service_instance(
-                'drugsimilarity', 
+                'drugsimilarity',
                 {
                     'input_seed': input_seed,
                     'date': date_str,
@@ -222,36 +231,38 @@ def config():
                     'input_min_simil': input_min_simil
                 }
             )
-            
+            drugsim_instance_id = drugsim_launch_status['instance_id']
+
             if not drugsim_launch_status['can_launch']:
-                # Release previously acquired services
-                service_queue_manager.release_service_instance('monarch')
-                service_queue_manager.release_service_instance('dgidb')
-                
-                flash(f"Drug Similarity service is currently busy. You are in queue position {drugsim_launch_status.get('queue_position', 'unknown')}. " 
+                flash(f"Drug Similarity service is currently busy. You are in queue position {drugsim_launch_status.get('queue_position', 'unknown')}. "
                       f"Active instances: {drugsim_launch_status['active_instances']}/{drugsim_launch_status['max_instances']}")
                 return render_template('queue_wait.html', service='Drug Similarity', status=drugsim_launch_status)
-            
-            drugsim_orchestrator = DrugSimilarityServiceOrchestrator(
-                input_seed=input_seed,
-                date=date_str,
-                base_directory=base_directories['today_directory']
-            )
+
+            drugsim_orchestrator = ServiceOrchestrator()
             try:
-                edges, drug_edges = drugsim_orchestrator.run(nodes, input_min_simil)
+                result = drugsim_orchestrator.process_service_request('drugsimilarity', {
+                    'input_seed': input_seed,
+                    'date': date_str,
+                    'base_directory': base_directories['today_directory'],
+                    'nodes': nodes,
+                    'input_min_simil': input_min_simil
+                })
+
+                # Unpack the result
+                edges = result['edges']
+                drug_edges = result['drug_edges']
+                service_queue_manager.release_service_instance('drugsimilarity', drugsim_instance_id)
+
             except Exception as e:
-                # Release previously acquired services
-                service_queue_manager.release_service_instance('monarch')
-                service_queue_manager.release_service_instance('dgidb')
-                service_queue_manager.release_service_instance('drugsimilarity')
-                
+                service_queue_manager.release_service_instance('drugsimilarity', drugsim_instance_id)
+
                 logging.error(f"Drug Similarity service failed: {e}")
                 flash("Drug Similarity service encountered an error. Please try again.")
                 return render_template('home.html', form=form)
-            
+
             ## DRUG PREDICTION
             network_model_launch_status = service_queue_manager.request_service_instance(
-                'networkmodel', 
+                'networkmodel',
                 {
                     'input_seed': input_seed,
                     'date': date_str,
@@ -263,28 +274,19 @@ def config():
                     'negs_toggle': negs_toggle
                 }
             )
-            
+            network_model_instance_id = network_model_launch_status['instance_id']
+
             if not network_model_launch_status['can_launch']:
-                # Release previously acquired services
-                service_queue_manager.release_service_instance('monarch')
-                service_queue_manager.release_service_instance('dgidb')
-                service_queue_manager.release_service_instance('drugsimilarity')
-                
-                flash(f"Network Model service is currently busy. You are in queue position {network_model_launch_status.get('queue_position', 'unknown')}. " 
+                flash(f"Network Model service is currently busy. You are in queue position {network_model_launch_status.get('queue_position', 'unknown')}. "
                       f"Active instances: {network_model_launch_status['active_instances']}/{network_model_launch_status['max_instances']}")
                 return render_template('queue_wait.html', service='Network Model', status=network_model_launch_status)
-            
-            network_model_orchestrator = NetworkModelServiceOrchestrator(
-                input_seed=input_seed,
-                date=date_str,
-                base_directory=base_directories['today_directory']
-            )
-            
+
+            network_model_orchestrator = ServiceOrchestrator()
             try:
                 if negs_toggle == 1:
                     # Negative Samples Service
                     negsamples_launch_status = service_queue_manager.request_service_instance(
-                        'negsample', 
+                        'negsample',
                         {
                             'input_seed': input_seed,
                             'date': date_str,
@@ -293,39 +295,35 @@ def config():
                             'sim_threshold': sim_threshold
                         }
                     )
-                    
+                    negsamples_instance_id = negsamples_launch_status['instance_id']
+
                     if not negsamples_launch_status['can_launch']:
-                        # Release previously acquired services
-                        service_queue_manager.release_service_instance('monarch')
-                        service_queue_manager.release_service_instance('dgidb')
-                        service_queue_manager.release_service_instance('drugsimilarity')
-                        service_queue_manager.release_service_instance('networkmodel')
-                        
-                        flash(f"Negative Samples service is currently busy. You are in queue position {negsamples_launch_status.get('queue_position', 'unknown')}. " 
+                        flash(f"Negative Samples service is currently busy. You are in queue position {negsamples_launch_status.get('queue_position', 'unknown')}. "
                               f"Active instances: {negsamples_launch_status['active_instances']}/{negsamples_launch_status['max_instances']}")
                         return render_template('queue_wait.html', service='Negative Samples', status=negsamples_launch_status)
-                    
-                    negsamples_orchestrator = NegativeSamplesServiceOrchestrator(
-                        input_seed=input_seed,
-                        date=date_str,
-                        base_directory=base_directories['today_directory']
-                    )
+
+                    negsamples_orchestrator = ServiceOrchestrator()
                     try:
-                        valid_negative_edges = negsamples_orchestrator.run(edges, sim_threshold)
-                        edges = edges + valid_negative_edges
-                        edges = unique_elements(edges)
+                        result = negsamples_orchestrator.process_service_request('negsamples', {
+                            'input_seed': input_seed,
+                            'date': date_str,
+                            'base_directory': base_directories['today_directory'],
+                            'edges': edges,
+                            'sim_threshold': sim_threshold
+                        })
+
+                        # Unpack the result
+                        valid_negative_edges = result['valid_negative_edges']
+                        service_queue_manager.release_service_instance('negsample', negsamples_instance_id)
+
                     except Exception as e:
                         # Release all previously acquired services
-                        service_queue_manager.release_service_instance('monarch')
-                        service_queue_manager.release_service_instance('dgidb')
-                        service_queue_manager.release_service_instance('drugsimilarity')
-                        service_queue_manager.release_service_instance('networkmodel')
-                        service_queue_manager.release_service_instance('negsample')
-                        
+                        service_queue_manager.release_service_instance('negsample', negsamples_instance_id)
+
                         logging.error(f"Negative Samples service failed: {e}")
                         flash("Negative Samples service encountered an error. Please try again.")
                         return render_template('home.html', form=form)
-                
+
                 # Run Network Model
                 network_edges, network_nodes, ranked_drugs, plots = network_model_orchestrator.run(
                     nodes=nodes,
@@ -339,24 +337,18 @@ def config():
                     input_min_simil=input_min_simil,
                     sim_threshold=sim_threshold
                 )
-                
-                # Successfully completed - release all service instances
-                service_queue_manager.release_service_instance('monarch')
-                service_queue_manager.release_service_instance('dgidb')
-                service_queue_manager.release_service_instance('drugsimilarity')
-                service_queue_manager.release_service_instance('networkmodel')
-                if negs_toggle == 1:
-                    service_queue_manager.release_service_instance('negsample')
-                
+
+                # Successfully completed - release the 'networkmodel' service
+                service_queue_manager.release_service_instance('networkmodel', network_model_instance_id)
+
             except Exception as e:
-                # Release all previously acquired services
+                # Release the 'networkmodel' service
+                service_queue_manager.release_service_instance('networkmodel', network_model_instance_id)
+
                 service_queue_manager.release_service_instance('monarch')
                 service_queue_manager.release_service_instance('dgidb')
                 service_queue_manager.release_service_instance('drugsimilarity')
-                service_queue_manager.release_service_instance('networkmodel')
-                if negs_toggle == 1:
-                    service_queue_manager.release_service_instance('negsample')
-                
+
                 logging.error(f"Network Model service failed: {e}")
                 flash("Network Model service encountered an error. Please try again.")
                 return render_template('home.html', form=form)

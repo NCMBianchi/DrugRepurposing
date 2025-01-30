@@ -4,26 +4,25 @@ Created on August 3rd 2024
 @author: Niccolò Bianchi [https://github.com/NCMBianchi]
 """
 
-import sys,os,platform,datetime,logging,builtins,time,multiprocessing
-
-from drugapp.filepaths import initialise_base_directories, initialise_disease_directories, setup_service_globals
-from drugapp.unique import unique_elements
-
-import requests
+import sys
+import os
+import platform
+import datetime
+import logging
+import builtins
+import time
+import multiprocessing
 import json
-from unittest.mock import Mock
+import requests
 import pandas as pd
 
-def json_reverse(json_dict):
-    """
-    Short function that converts calls turned into JSON files by the json() function
-    into a request.Response object
-    """
-    json_file = Mock()
-    json_file.json.return_value = json_dict
-    json_file.status_code = 200
-    json_file.ok = True
-    return json_file
+from .unique import unique_elements
+from .filepaths import initialise_disease_directories
+
+# These global variables will be set by the calling function
+global today_directory, date_str, input_seed, input_file_path
+global disease_name_label, disease_directories, base_data_directory
+disease_name_label = 'Huntington disease'  # default value
 
 def hit_dgidb_api(gene_name=None, gene_id=None, max_retries=3):
     """
@@ -51,7 +50,7 @@ def hit_dgidb_api(gene_name=None, gene_id=None, max_retries=3):
 
     # GraphQL API endpoint and query
     dgidb_link = 'https://dgidb.org/api/graphql'
-    
+
     if gene_name and gene_id:
         query = """
         {
@@ -204,14 +203,14 @@ def run_dgidb(monarch_input,date,layers = 3):
 
     with open(input_file_path, 'a') as file:
         file.write(f"Degrees of distance from the Disease ID considered for DGIdb: {layers}\n\n")
-    
+
     logging.info(f"NOW RUNNING: {current_function_name()} following 'run_monarch({monarch_input})'.")
 
     global nodes
     global edges
 
     dgidb_directory = os.path.join(today_directory, f'{disease_name_label} ({date_str})', 'dgidb')
-    
+
     # initialise gene-to-drug list
     drug_edges = []
 
@@ -238,12 +237,12 @@ def run_dgidb(monarch_input,date,layers = 3):
         query_nodes = [node for node in nodes if node['id'] in node_ids]
 
     logging.info(f"{len(query_nodes)} nodes and {len(query_edges)} edges from 'run_monarch({monarch_input})'.")
-    
+
     valid_prefixes = ['flybase:', 'wormbase:', 'mgi:', 'hgnc:', 'ensembl:', 'zfin:']
 
     total_nodes = len(query_nodes)
     error_count_504 = 0
-    
+
     for node in query_nodes:
         node_name = node['label']
         node_id = node['id']
@@ -315,7 +314,7 @@ def run_dgidb(monarch_input,date,layers = 3):
             all_drugs = [{'id': interaction['drug']['conceptId'], 'label': interaction['drug']['name']} for gene in all_genes for interaction in gene.get('interactions', []) if 'conceptId' in interaction['drug'] and 'name' in interaction['drug']]
         else:
             all_drugs = []
-    
+
     # save the unique nodes and edges as CSV
     nodes_df = pd.DataFrame(unique_nodes)
     nodes_df.to_csv(os.path.join(dgidb_directory, f'{disease_name_label}_{date_str}_dgidb_nodes.csv'), index=False)
@@ -325,7 +324,7 @@ def run_dgidb(monarch_input,date,layers = 3):
     # save the DGIdb nodes
     all_drugs_df = pd.DataFrame(all_drugs)
     all_drugs_df.to_csv(all_drug_path, index=False)
-    
+
     logging.info("CSV files saved in DGIdb directory.")
 
     end_time = time.time()
@@ -335,5 +334,5 @@ def run_dgidb(monarch_input,date,layers = 3):
     logging.info(f"'DGIdb.py' run finished in {minutes} minutes and {seconds} seconds.")
 
     logging.info(f"{error_count_504} out of a total of {total_nodes} gene nodes encountered 'HTTP Error 504: Gateway Time-out'.")
-    
+
     return unique_nodes, unique_edges, all_drugs
