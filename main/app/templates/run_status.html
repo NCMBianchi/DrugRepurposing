@@ -1,0 +1,160 @@
+{% extends "layout.html" %} {% block content %}
+<div class="container" data-run-id="{{ run_id }}">
+    <div class="row">
+        <!-- Left Column: Icon -->
+        <div class="col-md-2 d-flex align-items-start">
+            <img
+                src="{{ url_for('static', filename='images/DrugRepurposing-ICON-2b.svg') }}"
+                alt="Drug Repurposing Icon"
+                style="max-width: 100%"
+            />
+        </div>
+
+        <!-- Middle Column: Run Status -->
+        <div class="col-md-8">
+            <h1>Run Status</h1>
+
+            <!-- Advanced Progress Bar -->
+            <div class="progress run-progress mb-4">
+                {% set stages_order = ['monarch', 'dgidb', 'drugsimilarity',
+                'negsample', 'networkmodel'] %} {% for stage_name in
+                stages_order %} {% set stage = stages|selectattr('name',
+                'equalto', stage_name)|first %}
+                <div class="progress-stage" style="width: 20%">
+                    <div class="stage-marker" data-stage="{{ stage_name }}">
+                        <div class="triangle"></div>
+                        <div class="stage-label">
+                            {% if stage %} {% if stage.status == 'completed' %}
+                            {{ stage_name|replace('_', ' ')|title }} ({{
+                            stage.runtime }}) {% elif stage.status == 'running'
+                            %} Running: {{ stage_name|replace('_', ' ')|title }}
+                            {% elif stage.status == 'skipped' and stage_name ==
+                            'negsample' %} SKIPPED {% else %} {{
+                            stage_name|replace('_', ' ')|title }} {% endif %} {%
+                            else %} {{ stage_name|replace('_', ' ')|title }} {%
+                            endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Run Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Run ID:</strong> {{ run_id }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Disease ID:</strong> {{ disease_id }}
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <strong>Start Time:</strong>
+                            <span
+                                id="start-time"
+                                data-start-time="{{ start_time }}"
+                            >
+                                {{ start_time }}
+                            </span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Run Time:</strong>
+                            <span id="run-time">0s</span>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <strong>Overall Status:</strong>
+                            <span
+                                id="overall-status"
+                                class="badge {% if overall_status == 'running' %}badge-info{% elif overall_status == 'stopped' %}badge-warning{% elif overall_status == 'completed' %}badge-success{% else %}badge-secondary{% endif %}"
+                            >
+                                {{ overall_status|upper }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="run-actions text-center">
+                {% if overall_status == 'running' %}
+                <form
+                    method="POST"
+                    action="{{ url_for('stop_run_route', run_id=run_id) }}"
+                    class="d-inline"
+                    id="stop-run-form"
+                >
+                    <button
+                        type="submit"
+                        id="stop-run-button"
+                        class="btn btn-warning mr-3"
+                    >
+                        <i class="fas fa-stop-circle"></i> Stop Run
+                    </button>
+                </form>
+                {% endif %}
+                <form
+                    method="POST"
+                    action="{{ url_for('delete_run_route', run_id=run_id) }}"
+                    class="d-inline"
+                    id="delete-run-form"
+                >
+                    <button
+                        type="submit"
+                        id="delete-run-button"
+                        class="btn btn-danger"
+                        onclick="return confirm('Are you sure you want to delete this run?');"
+                    >
+                        <i class="fas fa-trash"></i> Delete Run
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Column: Current Runs Link -->
+        <div class="col-md-2 d-flex justify-content-center align-items-start">
+            <a href="{{ url_for('current_runs') }}" class="log-in-box">
+                <p class="m-0">CURRENT RUNS</p>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .run-progress {
+        height: 40px;
+        position: relative;
+        background-color: #e9ecef;
+    }
+    .progress-stage {
+        position: relative;
+        height: 100%;
+        display: inline-block;
+        background-color: #e9ecef;
+    }
+    .stage-marker {
+        position: absolute;
+        bottom: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+    }
+    .triangle {
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-bottom: 10px solid #13505b;
+    }
+    .stage-label {
+        margin-top: 5px;
+        font-size: 0.8em;
+        white-space: nowrap;
+    }
+</style>
+{% endblock content %}

@@ -1,20 +1,27 @@
-{% extends "layout.html" %}
-{% block content %}
+{% extends "layout.html" %} {% block content %}
 
 <div class="container">
     <div class="row">
-
-
         <!-- Left Column: Icon -->
-        <div class="col-md-2 d-flex align-items-start" data-toggle="tooltip" title="A MSc project by Niccolò Bianchi, based on the works of Carmen Reep and Nuria Queralt Rosinach.">
-            <img src="{{ url_for('static', filename='images/DrugRepurposing-ICON-2b.svg') }}" alt="Drug Repurposing Icon" style="max-width: 100%;">
+        <div
+            class="col-md-2 d-flex align-items-start"
+            data-toggle="tooltip"
+            title="A MSc project by Niccolò Bianchi, based on the works of Carmen Reep and Nuria Queralt Rosinach."
+        >
+            <img
+                src="{{ url_for('static', filename='images/DrugRepurposing-ICON-2b.svg') }}"
+                alt="Drug Repurposing Icon"
+                style="max-width: 100%"
+            />
         </div>
 
         <!-- Middle Column: Form -->
         <div class="col-md-8 text-center">
             <h1>Drug Repurposing</h1>
-            <p>Fill in the details below to create a new disease graph.<br>
-            <b>Note: this may take a while. Please be patient.</b></p>
+            <p>
+                Fill in the details below to create a new disease graph.<br />
+                <b>Note: this may take a while. Please be patient.</b>
+            </p>
 
             <div class="custom-padding"></div>
 
@@ -24,23 +31,28 @@
 
                     <div class="form-row">
                         <!-- Date Override Toggle -->
-                        <div class="form-group col-md-3 text-center checkbox-container">
+                        <div
+                            class="form-group col-md-3 text-center checkbox-container"
+                        >
                             {{ form.date_t.label(class="form-control-label") }}
                             {{ form.date_t(class="form-control") }}
                         </div>
 
                         <!-- Date Override Fields -->
                         <div class="form-group col-md-3 text-center">
-                            {{ form.date_OR_day.label(class="form-control-label") }}
-                            {{ form.date_OR_day(class="form-control") }}
+                            {{
+                            form.date_OR_day.label(class="form-control-label")
+                            }} {{ form.date_OR_day(class="form-control") }}
                         </div>
                         <div class="form-group col-md-3 text-center">
-                            {{ form.date_OR_month.label(class="form-control-label") }}
-                            {{ form.date_OR_month(class="form-control") }}
+                            {{
+                            form.date_OR_month.label(class="form-control-label")
+                            }} {{ form.date_OR_month(class="form-control") }}
                         </div>
                         <div class="form-group col-md-3 text-center">
-                            {{ form.date_OR_year.label(class="form-control-label") }}
-                            {{ form.date_OR_year(class="form-control") }}
+                            {{
+                            form.date_OR_year.label(class="form-control-label")
+                            }} {{ form.date_OR_year(class="form-control") }}
                         </div>
                     </div>
 
@@ -49,21 +61,38 @@
                     <!-- OMIM ID Input -->
                     <div class="form-group text-center position-relative">
                         <div class="omim-converter-container">
-                            <label for="omim_id" class="form-control-label">OMIM to MONDO converter</label>
-                            <button class="btn btn-xs btn-outline-secondary omim-collapse-btn" type="button" data-toggle="collapse" data-target="#omimConverterContent" aria-expanded="false" aria-controls="omimConverterContent">
+                            <label for="omim_id" class="form-control-label"
+                                >OMIM to MONDO converter</label
+                            >
+                            <button
+                                class="btn btn-xs btn-outline-secondary omim-collapse-btn"
+                                type="button"
+                                data-toggle="collapse"
+                                data-target="#omimConverterContent"
+                                aria-expanded="false"
+                                aria-controls="omimConverterContent"
+                            >
                                 <span class="collapse-toggle-icon">+</span>
                             </button>
                         </div>
-                        
+
                         <div class="collapse" id="omimConverterContent">
                             <div class="input-group mt-2">
-                                <input type="text" 
-                                       id="omim_id" 
-                                       name="omim_id" 
-                                       class="form-control" 
-                                       placeholder="143100">
+                                <input
+                                    type="text"
+                                    id="omim_id"
+                                    name="omim_id"
+                                    class="form-control"
+                                    placeholder="143100"
+                                />
                                 <div class="input-group-append">
-                                    <button class="btn btn-primary" type="button" id="convert-omim-button">CONVERT</button>
+                                    <button
+                                        class="btn btn-primary"
+                                        type="button"
+                                        id="convert-omim-button"
+                                    >
+                                        CONVERT
+                                    </button>
                                 </div>
                             </div>
                             <div class="input-help-text mt-2">
@@ -71,26 +100,38 @@
                             </div>
                         </div>
                         <!-- Conversion Alert Area -->
-                        <div id="omim-alert" class="alert mt-2" style="display: none;"></div>
+                        <div
+                            id="omim-alert"
+                            class="alert mt-2"
+                            style="display: none"
+                        ></div>
                     </div>
 
                     <div class="custom-padding"></div>
 
                     <!-- Disease URI Input -->
                     <div class="form-group text-center">
-                        <label for="disease_URI" class="form-control-label">Disease URI input for drug repurposing</label>
+                        <label for="disease_URI" class="form-control-label"
+                            >Disease URI input for drug repurposing</label
+                        >
                         <div class="input-group">
-                            <input type="text" 
-                                   id="disease_URI" 
-                                   name="disease_URI" 
-                                   class="form-control" 
-                                   placeholder="MONDO:0007739">
+                            <input
+                                type="text"
+                                id="disease_URI"
+                                name="disease_URI"
+                                class="form-control"
+                                placeholder="MONDO:0007739"
+                            />
                         </div>
                         <div class="input-help-text mt-2">
                             Enter a Monarch (MONDO) Disease ID
                         </div>
                         <!-- Input Alert Area -->
-                        <div id="mondo-alert" class="alert mt-2" style="display: none;"></div>
+                        <div
+                            id="mondo-alert"
+                            class="alert mt-2"
+                            style="display: none"
+                        ></div>
                     </div>
 
                     <div class="custom-padding"></div>
@@ -98,20 +139,24 @@
                     <div class="form-row">
                         <!-- Degree of Distance -->
                         <div class="form-group col-md-3 text-center">
-                            {{ form.deg_of_dist.label(class="form-control-label") }}
-                            {{ form.deg_of_dist(class="form-control") }}
+                            {{
+                            form.deg_of_dist.label(class="form-control-label")
+                            }} {{ form.deg_of_dist(class="form-control") }}
                         </div>
 
                         <!-- Minimum Similarity -->
                         <div class="form-group col-md-3 text-center">
-                            {{ form.inp_minimum_sim.label(class="form-control-label") }}
-                            {{ form.inp_minimum_sim(class="form-control") }}
+                            {{
+                            form.inp_minimum_sim.label(class="form-control-label")
+                            }} {{ form.inp_minimum_sim(class="form-control") }}
                         </div>
 
                         <!-- Negative Samples Toggle -->
-                        <div class="form-group col-md-3 text-center checkbox-container">
-                            {{ form.ns_toggle.label(class="form-control-label") }}
-                            {{ form.ns_toggle(class="form-control") }}
+                        <div
+                            class="form-group col-md-3 text-center checkbox-container"
+                        >
+                            {{ form.ns_toggle.label(class="form-control-label")
+                            }} {{ form.ns_toggle(class="form-control") }}
                         </div>
 
                         <!-- Similarity Threshold -->
@@ -141,7 +186,11 @@
                             {{ form.ML_seed.label(class="form-control-label") }}
                             {{ form.ML_seed(class="form-control") }}
                             <!-- ML seed Alert Area -->
-                            <div id="ml-seed-alert" class="alert mt-2" style="display: none;"></div>
+                            <div
+                                id="ml-seed-alert"
+                                class="alert mt-2"
+                                style="display: none"
+                            ></div>
                         </div>
                     </div>
 
@@ -160,8 +209,8 @@
 
         <!-- Right Column: Future Log In Box -->
         <div class="col-md-2 d-flex justify-content-center align-items-start">
-            <a href="#" class="log-in-box">
-                <p class="m-0">LOG IN</p>
+            <a href="{{ url_for('current_runs') }}" class="log-in-box">
+                <p class="m-0">CURRENT RUNS</p>
             </a>
         </div>
     </div>

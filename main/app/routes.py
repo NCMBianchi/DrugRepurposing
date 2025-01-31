@@ -8,8 +8,13 @@ Created on August 3rd 2024
 import sys,os,platform,datetime,logging,builtins,time,multiprocessing
 from logger_utils import *
 
+# for run tracking
+import uuid
+import json
+import redis
+
 # for Flask App operations
-from flask import Flask, render_template, url_for, request, session, redirect
+from flask import Flask, render_template, url_for, request, session, redirect, jsonify
 from __init__ import app
 from forms import *
 from filepaths import *
@@ -24,6 +29,79 @@ python_executable = sys.executable
 python_version = platform.python_version()
 num_cores = multiprocessing.cpu_count()
 
+def save_run_metadata(run_id, metadata):
+    """Save run metadata to Redis"""
+    if redis_client:
+        redis_key = f"run:{run_id}"
+        try:
+            redis_client.hmset(redis_key, metadata)
+            ## redis_client.expire(redis_key, 86400)
+            # currently 24h, can be modified if an expiration threshold is even necessary
+        except Exception as e:
+            logging.error(f"Failed to save run metadata: {e}")
+
+def update_run_stage(run_id, stage, status):
+    """Update specific stage status in Redis"""
+    if redis_client:
+        redis_key = f"run:{run_id}"
+        try:
+            stage_metadata = {
+                "status": status,
+                "timestamp": datetime.now().isoformat(),
+                "start_time": datetime.now().isoformat() if status == "running" else None,
+                "end_time": datetime.now().isoformat() if status == "completed" else None
+            }
+            redis_client.hset(redis_key, f"stage:{stage}", json.dumps(stage_metadata))
+        except Exception as e:
+            logging.error(f"Failed to update run stage: {e}")
+
+def stop_run(run_id):
+    """Forcibly stop a running pipeline"""
+    try:
+        # Update run status in Redis
+        if redis_client:
+            redis_client.hset(f"run:{run_id}", "status", "stopped")
+
+        # Terminate associated services (you'll need to implement service termination logic)
+        # This might involve calling service_queue_manager to release instances
+        service_queue_manager.release_service_instance('monarch')
+        service_queue_manager.release_service_instance('dgidb')
+        # Add other services as needed
+
+        logging.info(f"Run {run_id} forcibly stopped")
+        return True
+    except Exception as e:
+        logging.error(f"Error stopping run {run_id}: {e}")
+        return False
+
+def delete_run(run_id):
+    """Delete run metadata and associated data"""
+    try:
+        # Get run details from Redis to locate data directory
+        if redis_client:
+            run_data = redis_client.hgetall(f"run:{run_id}")
+
+            # Extract necessary information (e.g., date, disease name)
+            date_str = run_data.get('date', datetime.now().strftime('%Y-%m-%d'))
+            disease_name = run_data.get('disease_name', 'unknown_disease')
+
+            # Construct path to run data
+            base_data_directory = os.path.join('/app', 'data')
+            run_directory = os.path.join(base_data_directory, date_str, f"{disease_name} ({date_str})")
+
+            # Recursively delete directory
+            if os.path.exists(run_directory):
+                shutil.rmtree(run_directory)
+
+            # Remove Redis entry
+            redis_client.delete(f"run:{run_id}")
+
+            logging.info(f"Run {run_id} deleted. Data removed from {run_directory}")
+            return True
+    except Exception as e:
+        logging.error(f"Error deleting run {run_id}: {e}")
+        return False
+
 @app.route("/", methods = ['GET', 'POST'])
 @app.route("/home", methods = ['GET', 'POST'])
 def config():
@@ -31,6 +109,8 @@ def config():
     form = user_input()
 
     if form.validate_on_submit():
+        # Generate unique run ID
+        run_id = str(uuid.uuid4())
 
         d_toggle = form.date_t.data  # Date override toggle
         date_OR_day = form.date_OR_day.data
@@ -140,14 +220,23 @@ def config():
         ## 'scikit-learn': the old PyPi 'sklearn' is deprecated
 
         ## NETWORK CONSTRUCTION
+        save_run_metadata(run_id, {
+            "input_seed": input_seed,
+            "start_time": datetime.now().isoformat(),
+            "disease_name": input_seed,
+            "stages": json.dumps(["monarch", "dgidb", "drugsimilarity", "negsamples", "networkmodel"])
+        })
+
         try:
             # Monarch Service
+            update_run_stage(run_id, "monarch", "pending")
             monarch_launch_status = service_queue_manager.request_service_instance(
                 'monarch',
                 {
                     'input_seed': input_seed,
                     'date': date_str,
-                    'base_directory': base_directories['today_directory']
+                    'base_directory': base_directories['today_directory'],
+                    'run_id': run_id
                 }
             )
             monarch_instance_id = monarch_launch_status['instance_id']
@@ -179,7 +268,10 @@ def config():
                 flash("Monarch service encountered an error. Please try again.")
                 return render_template('home.html', form=form)
 
+            update_run_stage(run_id, "monarch", "completed")
+
             # DGIdb Service
+            update_run_stage(run_id, "dgidb", "pending")
             dgidb_launch_status = service_queue_manager.request_service_instance(
                 'dgidb',
                 {
@@ -220,7 +312,10 @@ def config():
                 flash("DGIdb service encountered an error. Please try again.")
                 return render_template('home.html', form=form)
 
+            update_run_stage(run_id, "dgidb", "completed")
+
             # Drug Similarity Service
+            update_run_stage(run_id, "drugsimilarity", "pending")
             drugsim_launch_status = service_queue_manager.request_service_instance(
                 'drugsimilarity',
                 {
@@ -260,6 +355,8 @@ def config():
                 flash("Drug Similarity service encountered an error. Please try again.")
                 return render_template('home.html', form=form)
 
+            update_run_stage(run_id, "drugsimilarity", "completed")
+
             ## DRUG PREDICTION
             network_model_launch_status = service_queue_manager.request_service_instance(
                 'networkmodel',
@@ -285,6 +382,7 @@ def config():
             try:
                 if negs_toggle == 1:
                     # Negative Samples Service
+                    update_run_stage(run_id, "negsample", "pending")
                     negsamples_launch_status = service_queue_manager.request_service_instance(
                         'negsample',
                         {
@@ -324,7 +422,13 @@ def config():
                         flash("Negative Samples service encountered an error. Please try again.")
                         return render_template('home.html', form=form)
 
+                    update_run_stage(run_id, "negsample", "completed")
+
+                if negs_toggle == 0:
+                    update_run_stage(run_id, "negsample", "skipped")
+
                 # Run Network Model
+                update_run_stage(run_id, "networkmodel", "pending")
                 network_edges, network_nodes, ranked_drugs, plots = network_model_orchestrator.run(
                     nodes=nodes,
                     edges=edges,
@@ -353,7 +457,12 @@ def config():
                 flash("Network Model service encountered an error. Please try again.")
                 return render_template('home.html', form=form)
 
+            update_run_stage(run_id, "networkmodel", "completed")
+
         except Exception as e:
+            if redis_client:
+                redis_client.hset(f"run:{run_id}", "status", "failed")
+                redis_client.hset(f"run:{run_id}", "error", str(e))
             logging.error(f"Overall pipeline execution failed: {e}")
             flash("An unexpected error occurred during pipeline execution.")
             return render_template('home.html', form=form)
@@ -366,6 +475,237 @@ def config():
         logging.info(f"PIPELINE run finished in {minutes} minutes and {seconds} seconds.")
 
     return render_template('home.html', form=form)
+
+@app.route("/stop_run/<run_id>", methods=['POST'])
+def stop_run_route(run_id):
+    """Stop a running run and show its status"""
+    try:
+        # Update run status in Redis
+        if redis_client:
+            # Retrieve existing run data
+            run_key = f"run:{run_id}"
+            run_data = redis_client.hgetall(run_key)
+
+            # Mark run as stopped
+            redis_client.hset(run_key, "status", "stopped")
+
+            # Terminate associated services
+            service_queue_manager.release_service_instance('monarch')
+            service_queue_manager.release_service_instance('dgidb')
+            # Add other services as needed
+
+            # Prepare context for run_status template
+            stages = []
+            stage_keys = [key.decode() for key in redis_client.keys(f"{run_key}:stage:*")]
+
+            for stage_key in stage_keys:
+                stage_name = stage_key.split(':')[-1]
+                stage_info = json.loads(redis_client.hget(run_key, stage_key))
+                stages.append({
+                    'name': stage_name,
+                    'status': stage_info['status'],
+                    'timestamp': stage_info['timestamp']
+                })
+
+            context = {
+                'run_id': run_id,
+                'disease_id': run_data.get('input_seed', 'Unknown'),
+                'start_time': run_data.get('start_time', 'N/A'),
+                'stages': stages,
+                'overall_status': 'stopped'
+            }
+
+            logging.info(f"Run {run_id} forcibly stopped")
+            return render_template('run_status.html', **context)
+
+        flash("Unable to stop run: Redis unavailable")
+        return redirect(url_for('current_runs'))
+
+    except Exception as e:
+        logging.error(f"Error stopping run {run_id}: {e}")
+        flash(f"Error stopping run: {e}")
+        return redirect(url_for('current_runs'))
+
+@app.route("/delete_run/<run_id>", methods=['POST'])
+def delete_run_route(run_id):
+    """Delete run metadata and associated data"""
+    try:
+        if redis_client:
+            # Get run details from Redis to locate data directory
+            run_data = redis_client.hgetall(f"run:{run_id}")
+
+            # Extract necessary information
+            date_str = run_data.get('date', datetime.now().strftime('%Y-%m-%d'))
+            disease_name = run_data.get('input_seed', 'unknown_disease')
+
+            # Construct path to run data
+            base_data_directory = os.path.join('/app', 'data')
+            run_directory = os.path.join(base_data_directory, date_str, f"{disease_name} ({date_str})")
+
+            # Recursively delete directory
+            if os.path.exists(run_directory):
+                shutil.rmtree(run_directory)
+
+            # Remove Redis entry
+            redis_client.delete(f"run:{run_id}")
+
+            logging.info(f"Run {run_id} deleted. Data removed from {run_directory}")
+            return render_template('run_deleted.html', run_id=run_id)
+
+    except Exception as e:
+        logging.error(f"Error deleting run {run_id}: {e}")
+        flash(f"Error deleting run: {e}")
+        return redirect(url_for('current_runs'))
+
+@app.route("/current_runs")
+def current_runs():
+    """List all current/recent runs"""
+    try:
+        # Try to connect to Redis if not already connected
+        if 'redis_client' not in globals() or redis_client is None:
+            try:
+                redis_client = redis.Redis(
+                    host=os.environ.get('REDIS_HOST', 'localhost'),
+                    port=int(os.environ.get('REDIS_PORT', 6379)),
+                    db=int(os.environ.get('REDIS_DB', 0)),
+                    decode_responses=True
+                )
+                redis_client.ping()  # Test connection
+            except Exception as e:
+                # If Redis connection fails, log the error and proceed with an empty list
+                logging.warning(f"Redis connection failed: {e}")
+                return render_template('current_runs.html', runs=[])
+
+        # Find all run keys in Redis
+        run_keys = redis_client.keys("run:*")
+
+        runs = []
+        for key in run_keys:
+            run_id = key.decode().split(':')[1]
+            run_data = redis_client.hgetall(key)
+
+            # Basic processing to prepare run data for template
+            run_info = {
+                'id': run_id,
+                'input_seed': run_data.get('input_seed', 'Unknown'),
+                'start_time': run_data.get('start_time', 'N/A'),
+                'status': run_data.get('status', 'running')
+            }
+            runs.append(run_info)
+
+        return render_template('current_runs.html', runs=runs)
+
+    except Exception as e:
+        # Fallback to empty runs list if any unexpected error occurs
+        logging.error(f"Error in current_runs: {e}")
+        return render_template('current_runs.html', runs=[])
+
+@app.route("/run_status/<run_id>")
+def run_status(run_id):
+    """Detailed status for a specific run"""
+    if not redis_client:
+        flash("Redis service unavailable")
+        return render_template('home.html')
+
+    # Retrieve run data from Redis
+    run_key = f"run:{run_id}"
+    run_data = redis_client.hgetall(run_key)
+
+    if not run_data:
+        flash("Run not found")
+        return redirect(url_for('current_runs'))
+
+    # Process stage information
+    stages = []
+    stage_keys = [key.decode() for key in redis_client.keys(f"{run_key}:stage:*")]
+
+    for stage_key in stage_keys:
+        stage_name = stage_key.split(':')[-1]
+        stage_info = json.loads(redis_client.hget(run_key, stage_key))
+        runtime = None
+        if stage_info['start_time'] and stage_info['end_time']:
+            start = datetime.fromisoformat(stage_info['start_time'])
+            end = datetime.fromisoformat(stage_info['end_time'])
+            runtime = f"{(end - start).total_seconds():.2f}s"
+
+        stages.append({
+            'name': stage_name,
+            'status': stage_info['status'],
+            'timestamp': stage_info['timestamp'],
+            'runtime': runtime
+        })
+
+    # Compute partial runtime
+    total_run_time = (datetime.now() - overall_start_time).total_seconds()
+    run_time_display = f"{total_run_time:.2f}s" if total_run_time < 600 else f"{int(total_run_time // 60)} min"
+
+    # Template context
+    context = {
+        'run_id': run_id,
+        'disease_id': run_data.get('input_seed', 'Unknown'),
+        'start_time': run_data.get('start_time', 'N/A'),
+        'run_time': run_time_display,
+        'stages': stages,
+        'overall_status': run_data.get('status', 'running')
+    }
+
+    return render_template('run_status.html', **context)
+
+@app.route("/run_status_update/<run_id>")
+def run_status_update(run_id):
+    """
+    Provide dynamic updates for a specific run status
+    Returns JSON with current stage and overall status
+    """
+    if not redis_client:
+        return jsonify({
+            'error': 'Redis service unavailable',
+            'overall_status': 'error'
+        }), 500
+
+    # Retrieve run data from Redis
+    run_key = f"run:{run_id}"
+    run_data = redis_client.hgetall(run_key)
+
+    if not run_data:
+        return jsonify({
+            'error': 'Run not found',
+            'overall_status': 'error'
+        }), 404
+
+    # Process stage information
+    stages = []
+    stage_keys = [key.decode() for key in redis_client.keys(f"{run_key}:stage:*")]
+
+    for stage_key in stage_keys:
+        stage_name = stage_key.split(':')[-1]
+        try:
+            stage_info = json.loads(redis_client.hget(run_key, stage_key))
+
+            # Compute runtime if stage is completed
+            runtime = None
+            if stage_info['start_time'] and stage_info['end_time']:
+                start = datetime.fromisoformat(stage_info['start_time'])
+                end = datetime.fromisoformat(stage_info['end_time'])
+                runtime = f"{(end - start).total_seconds():.2f}s"
+
+            stages.append({
+                'name': stage_name,
+                'status': stage_info['status'],
+                'timestamp': stage_info['timestamp'],
+                'runtime': runtime
+            })
+        except (TypeError, json.JSONDecodeError) as e:
+            logging.error(f"Error processing stage {stage_name}: {e}")
+
+    # Prepare response
+    response_data = {
+        'run_id': run_id,
+        'overall_status': run_data.get('status', 'running').decode('utf-8'),
+        'stages': stages
+    }
+
+    return jsonify(response_data)
 
 @app.route("/about")
 def about():

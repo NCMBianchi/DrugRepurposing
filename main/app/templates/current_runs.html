@@ -1,0 +1,151 @@
+{% extends "layout.html" %} {% block content %}
+<div class="container">
+    <div class="row">
+        <!-- Left Column: Icon -->
+        <div class="col-md-2 d-flex align-items-start">
+            <img
+                src="{{ url_for('static', filename='images/DrugRepurposing-ICON-2b.svg') }}"
+                alt="Drug Repurposing Icon"
+                style="max-width: 100%"
+            />
+        </div>
+
+        <!-- Right Column: Current Runs -->
+        <div class="col-md-10">
+            <h1>Current Runs</h1>
+
+            <div class="runs-container">
+                {% if runs %} {% for run in runs %}
+                <div
+                    class="run-card {% if run.status == 'running' %}running{% else %}completed{% endif %}"
+                >
+                    <div class="run-header">
+                        <div class="run-disease-id">{{ run.input_seed }}</div>
+                        <div class="run-current-step">
+                            {% if run.status == 'running' %}
+                            <!-- Determine current stage logic would be implemented here -->
+                            Monarch {% else %} Completed {% endif %}
+                        </div>
+                        <div class="run-time">{{ run.start_time }}</div>
+                    </div>
+                    <div class="run-progress">
+                        <div class="progress">
+                            {% if run.status == 'running' %}
+                            <div
+                                class="progress-bar"
+                                role="progressbar"
+                                style="width: 20%"
+                                aria-valuenow="20"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                            ></div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <a
+                        href="{{ url_for('run_status', run_id=run.id) }}"
+                        class="run-details-link"
+                    >
+                        View Run Details
+                    </a>
+                </div>
+                {% endfor %} {% else %}
+                <div class="no-runs-card">
+                    <div class="run-header">
+                        <div class="run-label">DISEASE ID</div>
+                        <div class="run-label">STATUS</div>
+                        <div class="run-label">TIME</div>
+                    </div>
+                    <div class="run-progress empty">
+                        <div class="progress">
+                            <div
+                                class="progress-bar"
+                                role="progressbar"
+                                style="width: 0%"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                            ></div>
+                        </div>
+                    </div>
+                    <div class="no-runs-message">No runs in progress</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .runs-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .run-card,
+    .no-runs-card {
+        background-color: #28a745;
+        color: white;
+        border-radius: 5px;
+        overflow: hidden;
+        transition: background-color 0.3s ease;
+    }
+
+    .run-card:hover {
+        background-color: #febe76;
+    }
+
+    .no-runs-card {
+        background-color: #6c757d;
+    }
+
+    .run-header {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 15px;
+    }
+
+    .run-label {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .run-progress {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .progress {
+        height: 5px;
+        margin: 0;
+    }
+
+    .progress-bar {
+        background-color: #13505b;
+    }
+
+    .no-runs-card .progress-bar {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .run-details-link {
+        display: block;
+        text-align: center;
+        padding: 10px;
+        color: white;
+        text-decoration: none;
+        background-color: rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease;
+    }
+
+    .run-details-link:hover {
+        background-color: rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+
+    .no-runs-message {
+        text-align: center;
+        padding: 20px;
+        color: rgba(255, 255, 255, 0.7);
+    }
+</style>
+{% endblock content %}

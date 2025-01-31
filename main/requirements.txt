@@ -18,6 +18,8 @@ werkzeug==2.0.1
 nest-asyncio
 gensim
 aiohttp
+redis
+hiredis
 
 # Docker and distributed systems support
 docker==6.1.2
