@@ -1,86 +1,142 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
 
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <!-- Favicon for iOS Safari and Classic Browsers -->
+        <link
+            rel="apple-touch-icon"
+            sizes="180x180"
+            href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}"
+        />
+        <link
+            rel="shortcut icon"
+            href="{{ url_for('static', filename='icons/favicon.ico') }}"
+        />
 
-    <!-- Favicon for iOS Safari and Classic Browsers -->
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
-    
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
+        <!-- Bootstrap CSS -->
+        <link
+            rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+            integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="{{ url_for('static', filename='css/main.css') }}"
+        />
 
-    {% if title %}
+        {% if title %}
         <title>Drug Repurposing - {{ title }}</title>
-    {% else %}
+        {% else %}
         <title>Drug Repurposing</title>
-    {% endif %}
-</head>
+        {% endif %}
+    </head>
 
-<body>
-    <main role="main" class="container">
-      <div class="row">
-        <div class="col-md-12">
-          {% block content %}{% endblock %}
-        </div>
-      </div>
-    </main>
+    <body>
+        <main role="main" class="container">
+            <div class="row align-items-center w-100">
+                <div class="col-md-12">{% block content %}{% endblock %}</div>
+            </div>
+        </main>
 
-    <footer>
-      <p class="text-muted small">
-        Font "Source Code Pro" by Adobe, licensed under the <a href="https://openfontlicense.org" target="_blank">SIL Open Font License</a>.<br>
-        Icon image by Niccolò Bianchi. © [2024] All rights reserved.
-      </p>
-    </footer>
+        <footer>
+            <p class="text-muted small">
+                Font "Source Code Pro" by Adobe, licensed under the
+                <a href="https://openfontlicense.org" target="_blank"
+                    >SIL Open Font License</a
+                >.<br />
+                Icon image by
+                <a href="https://www.behance.net/NCMBianchi" target="_blank"
+                    >Niccolò Bianchi</a
+                >. © [2024] All rights reserved.<br />
+                A MSc project by
+                <a
+                    href="https://github.com/NCMBianchi/DrugRepurposing"
+                    target="_blank"
+                    >Niccolò Bianchi</a
+                >, based on the works of
+                <a
+                    href="https://github.com/carmenreep/DrugRepurposing"
+                    target="_blank"
+                    >Carmen Reep</a
+                >
+                and
+                <a
+                    href="https://github.com/NuriaQueralt/bioknowledge-reviewer"
+                    target="_blank"
+                    >Nuria Queralt Rosinach</a
+                >.
+            </p>
+        </footer>
 
-    <!-- Core JavaScript dependencies -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <!-- Core JavaScript dependencies -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script
+            src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"
+        ></script>
 
-    <!-- OMIM conversion scripts-->
-    <script src="{{ url_for('static', filename='js/mapper.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/mapper_helper.js') }}"></script>
+        <!-- OMIM conversion scripts-->
+        <script src="{{ url_for('static', filename='js/mapper.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/mapper_helper.js') }}"></script>
 
-    <!-- input checker script for 'Disease URI' and 'ML seed'-->
-    <script src="{{ url_for('static', filename='js/input_checker.js') }}"></script>
+        <!-- input checker script for 'Disease URI' and 'ML seed'-->
+        <script src="{{ url_for('static', filename='js/input_checker.js') }}"></script>
 
-    <!-- Additional page functionality -->
-    <script src="{{ url_for('static', filename='js/dynamic_sim_t.js') }}"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        $('[data-toggle="tooltip"]').tooltip();
-    });
-    </script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Toggle +/- icon when collapse is triggered
-        const collapseToggleButtons = document.querySelectorAll('[data-toggle="collapse"]');
-        
-        collapseToggleButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const icon = this.querySelector('.collapse-toggle-icon');
-                const target = document.querySelector(this.dataset.target);
-                
-                if (target.classList.contains('show')) {
-                    icon.textContent = '+';
-                } else {
-                    icon.textContent = '-';
-                }
+        <!-- Additional page functionality -->
+        <script src="{{ url_for('static', filename='js/dynamic_sim_t.js') }}"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                $('[data-toggle="tooltip"]').tooltip();
             });
-        });
-    });
-    </script>
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Toggle +/- icon when collapse is triggered
+                const collapseToggleButtons = document.querySelectorAll(
+                    '[data-toggle="collapse"]',
+                );
 
-    <!-- Local fallback scripts (commented out for now)
+                collapseToggleButtons.forEach((button) => {
+                    button.addEventListener("click", function () {
+                        const icon = this.querySelector(
+                            ".collapse-toggle-icon",
+                        );
+                        const target = document.querySelector(
+                            this.dataset.target,
+                        );
+
+                        if (target.classList.contains("show")) {
+                            icon.textContent = "+";
+                        } else {
+                            icon.textContent = "-";
+                        }
+                    });
+                });
+            });
+        </script>
+
+        <!-- Local fallback scripts (commented out for now)
     <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script> -->
-
-</body>
+    </body>
 </html>

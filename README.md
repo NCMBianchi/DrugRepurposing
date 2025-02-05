@@ -24,9 +24,21 @@ So far, **versions 2025.0.1** and **2025.0.2** add the [OMIM conversion tool](ht
 
 Both the Jupyter Notebook from version 2024.1.5 and the single Docker app are available in the **v2025.0.2-legacy** release.
 
-**Versions 2025.0.3** through **2025.0.7** introduce the Docker Swarm directory architecture for distributed services, that will allow for scalability and queues in runs. A `drugapp-launcher.sh` script was be added. It allows to either build the docker images and launch the containers (*i.e.* ```druapp-launcher.sh --build```) or remove them (*i.e.* ```drugapp-launcher.sh --remove```). Such command has to be executable beforehand with ```chmod +x drugapp-launcher.sh```. Additional static pages `run_status.html` and `current_runs.html` have been added to allow for UI navigation of concurrent runs in the app. The `status_update.js` script handles runtime display.
+**Versions 2025.0.3** through **2025.0.7** introduce the Docker Swarm directory architecture for distributed services, that will allow for scalability and queues in runs. A `drugapp-launcher.sh` script was be added. It allows to either build the docker images and launch the containers:
 
-The next step is to fully test the functionality of distributed services with a small (real or artificial) network ahead of adding the new alternatives for the algorithm for negative samples generation based on centrality measures, and for the ML prediction based on graph neural networks (_i.e._ GNN, via the `PyG` package).
+```
+druapp-launcher.sh --build
+```
+
+Or remove them:
+
+```
+drugapp-launcher.sh --remove
+```
+
+Such command has to be executable beforehand with ```chmod +x drugapp-launcher.sh```. Additional static pages `run_status.html` and `current_runs.html` have been added to allow for UI navigation of concurrent runs in the app. The `status_update.js` script handles runtime display.
+
+**Version 2025.0.8** pushes some UI changes in the `.css` and `.html` files. The next step is to fully test the functionality of distributed services with a small (real or artificial) network ahead of adding the new alternatives for the algorithm for negative samples generation based on centrality measures, and for the ML prediction based on graph neural networks (_i.e._ GNN, via the `PyG` package): the **v2025.0.8** release contains the initial Jupyter Notebook (*i.e.* `jupyter-notebook-2025.ipynb`) for these improvements. I am currently re-writing some of the existing Python modules (*e.g.* `Monarch.py`) to simplify them and generate a streamline script to then test the alternatives steps. Changes to these modules will then be pushed also to the Docker Image modules (*e.g.* `Monarch_service.py` and `Monarch_fallback.py`) later on.
 
 ## PIPELINE: Jupyter Notebook (Niccolò Bianchi)
 The entire pipeline can be launched within the Jupyter Notebook. A full run dataset is available on [dropbox](https://www.dropbox.com/scl/fi/prvqajjau227741z5ve91/data.7z?rlkey=qjumdz9r93y0yv6mhc21a7bir&st=jqsfgypj&dl=0).

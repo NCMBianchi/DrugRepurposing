@@ -1,45 +1,48 @@
 @font-face {
-  font-family: 'Source Code Pro';
-  src: url('/static/fonts/SourceCodePro-Regular.woff2') format('woff2'),
-       url('/static/fonts/SourceCodePro-Regular.woff') format('woff'),
-       url('/static/fonts/SourceCodePro-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
+    font-family: "Source Code Pro";
+    src:
+        url("/static/fonts/SourceCodePro-Regular.woff2") format("woff2"),
+        url("/static/fonts/SourceCodePro-Regular.woff") format("woff"),
+        url("/static/fonts/SourceCodePro-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
 }
 
 @font-face {
-  font-family: 'Source Code Pro';
-  src: url('/static/fonts/SourceCodePro-SemiBold.woff2') format('woff2'),
-       url('/static/fonts/SourceCodePro-SemiBold.woff') format('woff'),
-       url('/static/fonts/SourceCodePro-SemiBold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
+    font-family: "Source Code Pro";
+    src:
+        url("/static/fonts/SourceCodePro-SemiBold.woff2") format("woff2"),
+        url("/static/fonts/SourceCodePro-SemiBold.woff") format("woff"),
+        url("/static/fonts/SourceCodePro-SemiBold.ttf") format("truetype");
+    font-weight: 600;
+    font-style: normal;
 }
 
 @font-face {
-  font-family: 'Noto Sans';
-  src: url('/static/fonts/NotoSans-Regular.woff2') format('woff2'),
-       url('/static/fonts/NotoSans-Regular.woff') format('woff'),
-       url('/static/fonts/NotoSans-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
+    font-family: "Noto Sans";
+    src:
+        url("/static/fonts/NotoSans-Regular.woff2") format("woff2"),
+        url("/static/fonts/NotoSans-Regular.woff") format("woff"),
+        url("/static/fonts/NotoSans-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
 }
 
 @font-face {
-  font-family: 'Noto Sans';
-  src: url('/static/fonts/NotoSans-SemiBold.woff2') format('woff2'),
-       url('/static/fonts/NotoSans-SemiBold.woff') format('woff'),
-       url('/static/fonts/NotoSans-SemiBold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
+    font-family: "Noto Sans";
+    src:
+        url("/static/fonts/NotoSans-SemiBold.woff2") format("woff2"),
+        url("/static/fonts/NotoSans-SemiBold.woff") format("woff"),
+        url("/static/fonts/NotoSans-SemiBold.ttf") format("truetype");
+    font-weight: 600;
+    font-style: normal;
 }
-
 
 /* Set global background color and text color */
 body {
-  background-color: #ffffff;
-  color: #13505b;
-  margin-top: 5rem;
+    background-color: #ffffff;
+    color: #13505b;
+    margin-top: 5rem;
 }
 
 /* Align icon and login box to the top */
@@ -47,9 +50,28 @@ body {
     align-items: center !important;
 }
 
+.col-md-2.d-flex {
+    padding: 15px; /* Add some padding around the container */
+}
+
+.col-md-2.d-flex img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block; /* Removes any unwanted space below the image */
+    margin: 0 auto; /* Centers the image horizontally */
+}
+
 /* Headings custom text color */
-h1, h2, h3, h4, h5, h6 {
-  color: #13505b;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #13505b;
 }
 
 /* Form Styles */
@@ -63,14 +85,19 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Input Box Default State */
-input, textarea, select {
+input,
+textarea,
+select {
     background-color: #ffffff;
     color: #13505b;
     border: 2px solid #13505b;
     padding: 8px;
     border-radius: 4px;
 }
-/* NOTE: all sizes expressed in pixels could then be converted in PERCENTAGES
+/* NOTES: all sizes expressed in pixels could then be converted in PERCENTAGES.
+/* NOTES: I will judge during development.
+
+
 
 /* Placeholder Text Styling */
 ::placeholder {
@@ -78,7 +105,12 @@ input, textarea, select {
 }
 
 /* Input box when focused or filled */
-input:focus, textarea:focus, select:focus, input:valid, textarea:valid, select:valid {
+input:focus,
+textarea:focus,
+select:focus,
+input:valid,
+textarea:valid,
+select:valid {
     background-color: #ffffff;
     color: #13505b;
     border-color: #13505b;
@@ -101,7 +133,7 @@ input[type="checkbox"]:checked {
     background-color: #13505b;
 }
 input[type="checkbox"]:checked::before {
-    content: '✔';
+    content: "✔";
     font-size: 20px;
     position: absolute;
     top: 50%;
@@ -123,6 +155,8 @@ input[type="checkbox"]:checked::before {
     height: 100%;
 }
 /* NOTES: not currently used, but could be used in the future for better UI
+
+
 
 /* Button Styles */
 .btn {
@@ -233,6 +267,8 @@ footer {
 
 .omim-converter-container label {
     margin-right: 0.5rem;
+    display: inline-flex;
+    align-items: center;
 }
 
 .collapse-toggle-icon {
@@ -256,4 +292,82 @@ footer {
     opacity: 0;
 }
 
+.runs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
 
+.run-card,
+.no-runs-card {
+    background-color: #28a745;
+    color: white;
+    border-radius: 5px;
+    overflow: hidden;
+    transition: background-color 0.3s ease;
+}
+
+.run-card:hover {
+    background-color: #febe76;
+}
+
+.no-runs-card {
+    background-color: #6c757d;
+    // background-color: rgba(255, 255, 255, 0.2);
+}
+
+.run-header {
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+}
+
+.run-label {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.run-progress {
+    background-color: rgba(0, 0, 0, 0.1);
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+}
+
+.run-details-link {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    color: white;
+    text-decoration: none;
+    background-color: rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.run-details-link:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.no-runs-message {
+    text-align: center;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.progress {
+    width: 100%;
+    height: 60%;
+    margin: 0;
+    padding: -10% 0;
+}
+
+.progress-bar {
+    height: 60%;
+    display: flex;
+    align-items: center;
+    background-color: #13505b;
+    // background-color: rgba(255, 255, 255, 0.2);
+}

@@ -6,7 +6,12 @@
             <img
                 src="{{ url_for('static', filename='images/DrugRepurposing-ICON-2b.svg') }}"
                 alt="Drug Repurposing Icon"
-                style="max-width: 100%"
+                style="
+                    max-width: 100%;
+                    width: auto;
+                    height: auto;
+                    object-fit: contain;
+                "
             />
         </div>
 
@@ -125,6 +130,8 @@
     </div>
 </div>
 
+/* NOTES: edit during development to integrate in main.css, unless supersiding
+/* is necessary
 <style>
     .run-progress {
         height: 40px;

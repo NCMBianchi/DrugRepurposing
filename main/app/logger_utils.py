@@ -4,7 +4,7 @@ Created on August 3rd 2024
 @author: Niccolò Bianchi [https://github.com/NCMBianchi]
 """
 
-import sys,os,platform,datetime,logging,builtins,time,multiprocessing
+import sys,os,platform,datetime,logging,builtins,time,multiprocessing,inspect
 
 from importlib.metadata import version
 from importlib import import_module

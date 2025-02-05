@@ -1,6 +1,20 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2025.0.8] - 2025-02-05
+### Changed
+- Consolidated CSS styles from individual HTML files into main.css
+- Fixed advancement bar height in current_runs.html
+- Fixed OMIM-conversion wrapper uncollapse button positioning in home.html
+
+### Removed
+- Unused df_style.css from static/css
+- Unused about.html template 
+- Cached Python files from app/__pycache__
+
+### Known Issues
+- Certain Python files in the 2025.0.2-legacy release
+
 ## [2025.0.7] - 2025-01-31
 ### Added
 - CHANGELOG.md to track changes (also retroactively)
