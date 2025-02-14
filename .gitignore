@@ -2,6 +2,7 @@ NOT_TO_PUSH/
 .DS_Store
 ./app/drugapp/data/2024-07-31/logfile.log
 DrugRepurposing_legacy.tar.gz
+jupyter-notebook
 jupyter-notebook.tar.gz
 jupyter-notebook-2025
 jupyter-notebook-2025.tar.gz

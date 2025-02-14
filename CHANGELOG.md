@@ -1,7 +1,17 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2025.0.9] - 2025-02-14
+### Released
+- jupyter-notebook-2025.tar.gz: updated pipeline up to the negative samples step
+
+### Changed
+- .gitignore file to avoid also uncompressed folders
+
 ## [2025.0.8] - 2025-02-05
+### Released
+- jupyter-notebook-2025.tar.gz: updated pipeline up to the DGIdb step
+
 ### Changed
 - Consolidated CSS styles from individual HTML files into main.css
 - Fixed advancement bar height in current_runs.html
@@ -14,6 +24,11 @@ All notable changes to this project will be documented in this file.
 
 ### Known Issues
 - Certain Python files in the 2025.0.2-legacy release
+
+## [2025.0.2-legacy] - 2025-01-31
+### Released
+- DrugRepurposing_legacy.tar.gz: Docker image with working base UI
+- jupyter-notebook.tar.gz: Jupyter Notebook with a full explanation of the pipeline
 
 ## [2025.0.7] - 2025-01-31
 ### Added
