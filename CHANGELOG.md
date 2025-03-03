@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2025.0.10] - 2025-03-03
+### Released
+- jupyter-notebook-2025.tar.gz: updated complete pipeline with XGBoost
+
 ## [2025.0.9] - 2025-02-14
 ### Released
 - jupyter-notebook-2025.tar.gz: updated pipeline up to the negative samples step
