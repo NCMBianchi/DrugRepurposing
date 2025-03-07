@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2025.0.11] - 2025-03-07
+### Released
+- jupyter-notebook-2025.tar.gz: updated complete pipeline with XGBoost and PyG
+
+### Known Issues
+- the default similarity threshold (i.e. 0.65) to filter the predicted drug is too for the Torch-geometric GNN model
+
 ## [2025.0.10] - 2025-03-03
 ### Released
 - jupyter-notebook-2025.tar.gz: updated complete pipeline with XGBoost
