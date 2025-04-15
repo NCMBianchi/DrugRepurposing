@@ -1,8 +1,8 @@
 # DrugRepurposing
 
-This ongoing project focuses on developing a <b>modular</b> and <b>automated</b> drug-repurposing pipeline that builds on the huge potential of [Knowledge Graphs](https://en.wikipedia.org/wiki/Knowledge_graph) and Machine Learning (ML) predictions.
+![BANNER](https://github.com/user-attachments/assets/e237ef0f-4b7c-42f3-b7e1-724e1b68aacf)
 
-![BANNER]()
+This ongoing project focuses on developing a <b>modular</b> and <b>automated</b> drug-repurposing pipeline that builds on the huge potential of [Knowledge Graphs](https://en.wikipedia.org/wiki/Knowledge_graph) and Machine Learning (ML) predictions.
 
 It is based on my [MSc thesis](https://www.dropbox.com/scl/fi/6vzgfld7riqb19hm5wj6u/DRUG_REPURPOSING-thesis.pdf?rlkey=y9xm7zuxm4q035byvhe496m9k&dl=0) ([datasets from a reference full run](https://www.dropbox.com/scl/fi/prvqajjau227741z5ve91/DRUG_REPURPOSING-data.7z?rlkey=qjumdz9r93y0yv6mhc21a7bir&dl=0)), forked from [Carmen Reep's work](https://github.com/carmenreep/DrugRepurposing) which elaborated over [Núria Queralt-Rosinach's 'bioknowledge-reviewer' tool](https://github.com/NuriaQueralt/bioknowledge-reviewer). The `python_scripts` folder contains the latest versions of the functions for the pipeline. My main contrinutions to the project are:
 - adding semantically-valid negative samples via the `negsamples.py` scripts, inspired by [Nicolas Hubert's 'semantic-lossfunc' project](https://github.com/nicolas-hbt/semantic-lossfunc) ([Hubert et al. 2023](https://arxiv.org/abs/2301.05601)).
@@ -23,12 +23,12 @@ The `jupyter-notebook-2025.ipynb` notebook takes a set of parameters (<i>e.g.</i
 ### [COMPLETED] [ML iterative predictions in Jupyter Notebook: testing and comparison]()
 The `network-generator.ipynb` notebook builds a smaller sub-network provided of a bigger network based on centrality measure distribution, while `test-runs.ipynb` and `parse-runs.ipynb` are used to evaluate prediction efficiency and consistency across runs with different parameters.
 
-![parse-runs-2]()
+![parse-runs-2](https://github.com/user-attachments/assets/60b54529-8b3f-458c-a3a0-489bf8920754)
 
 ### [ONGOING] [Scalable and modular iterative pipeline in Docker-compose]()
 Pipeline functionalities are split in several modules that manage 1-2 `.py` scripts, and such modules are then implemented in multiple instances of Docker containers built by Docker-compose and managed by a `Celery_app` container for cueing and data transfer. This also allows for further parallelisation and resource optimisation. The end result will be merged with the FlaskApp-based web UI docker.
 
-![GITHUB_update-20250103-2](https://github.com/user-attachments/assets/cd844433-c210-4791-94b4-ec6acc236cf3)
+![GITHUB_update-20250407-1](https://github.com/user-attachments/assets/2444141e-0b9c-4b5b-afff-f819e9b6444e)
 
 ### [PAUSED] [FlaskApp-based Web UI in Docker]()
 All the files within `app/services/`, `app/static/` and `app/templates/` are fully working, but the pipeline functionalities are outdated and will be updated once the Docker-compose modular version is finished.
