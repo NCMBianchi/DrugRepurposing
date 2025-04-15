@@ -1,12 +1,37 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2025.0.12] - 2025-04-15
+### Added
+- MIT license in LICENSE.txt
+- relevant figures
+- python_scripts folder containing the latest version of the modules' .py scripts
+
+### Modified
+- updated README.md to report updated findings
+- updated .gitignore file
+
+### Removed
+- docker-compose.yml now in the docker-no-ui.tar.gz release
+- drugapp-launcher.sh now in the docker-no-ui.tar.gz release
+- font-licenses now in the docker-no-ui.tar.gz release
+- main now in the docker-no-ui.tar.gz release
+- LICENSE.md' empty file
+
+### Released
+- jupyter-notebook-2025.tar.gz: additional .ipynb notebooks to generate a smaller artificial network and to compare results from pipeline runs with different parameters
+- docker-ui.tar.gz: files in the repository up tuni version 2025.0.11, focusing on the FlaskApp web UI in Docker, ahead of the addition of PyG and iterative runs
+- docker-no-ui.tar.gz: initial release of the docker compose version to perform bulk runs in full module parallelisation –still not complete
+
+### Known Issues
+- the 'celery_app' moduel in docker-no-ui.tar.gz does not launch the pipeline properly after docker-compose.yml correctly creates the various containers
+
 ## [2025.0.11] - 2025-03-07
 ### Released
 - jupyter-notebook-2025.tar.gz: updated complete pipeline with XGBoost and PyG
 
 ### Known Issues
-- the default similarity threshold (i.e. 0.65) to filter the predicted drug is too for the Torch-geometric GNN model
+- the default similarity threshold (i.e. 0.65) to filter the predicted drug is too low for the Torch-geometric GNN model
 
 ## [2025.0.10] - 2025-03-03
 ### Released

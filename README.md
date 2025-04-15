@@ -1,65 +1,43 @@
 # DrugRepurposing
 
-![README_image-1_bis](https://github.com/NCMBianchi/DrugRepurposing/assets/111352723/7db18469-0998-42f7-8bb2-23ee2af35f3c)
+This ongoing project focuses on developing a <b>modular</b> and <b>automated</b> drug-repurposing pipeline that builds on the huge potential of [Knowledge Graphs](https://en.wikipedia.org/wiki/Knowledge_graph) and Machine Learning (ML) predictions.
 
-## 2025 UPDATES: scalability (iterations of dockerised modules), additional neural network ML option, batch runs
+![BANNER]()
 
-Here's how the tool works in its 2024.1.5 release:
+It is based on my [MSc thesis](https://www.dropbox.com/scl/fi/6vzgfld7riqb19hm5wj6u/DRUG_REPURPOSING-thesis.pdf?rlkey=y9xm7zuxm4q035byvhe496m9k&dl=0) ([datasets from a reference full run](https://www.dropbox.com/scl/fi/prvqajjau227741z5ve91/DRUG_REPURPOSING-data.7z?rlkey=qjumdz9r93y0yv6mhc21a7bir&dl=0)), forked from [Carmen Reep's work](https://github.com/carmenreep/DrugRepurposing) which elaborated over [Núria Queralt-Rosinach's 'bioknowledge-reviewer' tool](https://github.com/NuriaQueralt/bioknowledge-reviewer). The `python_scripts` folder contains the latest versions of the functions for the pipeline. My main contrinutions to the project are:
+- adding semantically-valid negative samples via the `negsamples.py` scripts, inspired by [Nicolas Hubert's 'semantic-lossfunc' project](https://github.com/nicolas-hbt/semantic-lossfunc) ([Hubert et al. 2023](https://arxiv.org/abs/2301.05601)).
+- fixing minor internal and external coding issues (<i>i.e.</i> database API calls, unsupported package [pyRDF2vec](https://pypi.org/project/pyrdf2vec/), computation of drug-to-drug edges based on [RDkit](https://www.rdkit.org/docs/index.html) and 2048-bit feature similarity
+- adding Torch-geomtric as an alternative ML model (<i>i.e.</i> `networkmodel_pyg.py`) for gene-to-drug edge prediction, along with XGBoost (<i>i.e.</i> `networkmodel_xgb.py`)
+- adapting the node embedding via [Node2vec](https://github.com/eliorc/node2vec) step to accomodate for different ML methods (<i>i.e.</i> `embeddings_xgb.py` and `embeddings_pyg.py`)
+- implementing the iteration of ML predictions with different seed inputs to improve prediction efficiency and consistency by pooling the results and ranking them based on prediction probability and occurrence across runs, which is the <b>topic of an upcoming publication</b> ([draft abstract](https://www.dropbox.com/scl/fi/em4b9mfybq5q7txjpb6ug/ABSTRACT-drug_repurposing.pdf?rlkey=5vi8ipmi8pub5rfgedmdfhvar&dl=0))
 
-![GITHUB_update-20250103-1](https://github.com/user-attachments/assets/88773663-84a1-422f-bf92-1e0a926bcf2d)
 
-I am currently developing a new version of the tool that allows for:
-- **scalability**, so that if this tool would ever be implemented in a server and multiple users would access it, they could all run their queries cuncurrently and avoid long cues as the modules that require more time would exist in multiple copies with their own dedicated core
-- a new ML approach based on **graphic neural networks** (GNNs) so that the user could choose from a dropdown menu whether to run a gradient boosting method (*i.e.* with Python package `XGboost`) or a neural network method (*i.e.* with Python package `PyG`, a.k.a. PyTorch Geometric)
-- **batch runs**, so that the user can launch a series of *n* runs with different seeds and obtain a distribution of results from the gene-to-drug prediction, and determine which of the repurposed drugs were returned by the most runs: this is meant to solve the issue of having a certain range of variability based on the seed for the ML step, altough running times will then be much longer
+## Relevant Releases
+Different aspects of the project are available in the releases sections. Below summaries of the most relevant ones.
 
-Here's how the new tool will be in its future 2025.1.0 release:
+### [COMPLETED] [Fully functioning drug-repurposing pipeline in Jupyter Notebook](https://github.com/NCMBianchi/DrugRepurposing/releases/tag/v2025.0.11)
+The `jupyter-notebook-2025.ipynb` notebook takes a set of parameters (<i>e.g.</i> disease ID, similarity threshold, ML method) and then automatically performs all the steps returning a list of repurposed drugs based on predicted gene-to-drug edges.
+
+![IMAGE-release_20250307](https://github.com/user-attachments/assets/314d7bc3-33ee-473a-8780-24faf3962253)
+
+### [COMPLETED] [ML iterative predictions in Jupyter Notebook: testing and comparison]()
+The `network-generator.ipynb` notebook builds a smaller sub-network provided of a bigger network based on centrality measure distribution, while `test-runs.ipynb` and `parse-runs.ipynb` are used to evaluate prediction efficiency and consistency across runs with different parameters.
+
+![parse-runs-2]()
+
+### [ONGOING] [Scalable and modular iterative pipeline in Docker-compose]()
+Pipeline functionalities are split in several modules that manage 1-2 `.py` scripts, and such modules are then implemented in multiple instances of Docker containers built by Docker-compose and managed by a `Celery_app` container for cueing and data transfer. This also allows for further parallelisation and resource optimisation. The end result will be merged with the FlaskApp-based web UI docker.
 
 ![GITHUB_update-20250103-2](https://github.com/user-attachments/assets/cd844433-c210-4791-94b4-ec6acc236cf3)
 
-These changes will be tested on a smaller artificial network –based on Huntington's Disease, but with limited number of nodes compared to the original 61K nodes in the network in my [2024 MSc thesis](https://www.dropbox.com/scl/fi/6vzgfld7riqb19hm5wj6u/DRUG_REPURPOSING_thesis_Premium.pdf?rlkey=y9xm7zuxm4q035byvhe496m9k&dl=0)– to determine if different methods lead to a higher prediction rate. Other than the two ML appraoches described above, I will also test whether other methods of generating semantically valid negative samples lead to better results.
+### [PAUSED] [FlaskApp-based Web UI in Docker]()
+All the files within `app/services/`, `app/static/` and `app/templates/` are fully working, but the pipeline functionalities are outdated and will be updated once the Docker-compose modular version is finished.
 
-### Intermediate Updates
-So far, **versions 2025.0.1** and **2025.0.2** add the [OMIM conversion tool](https://github.com/NCMBianchi/OMIM-converter) I developed to turn Monarch Initiative's IDs for diseases, genes and phenotypes (*i.e* respectively `MONDO:`, `HGNC:` and `PH:`) into OMIM IDs and viceversa. For the purpose of this tool, I only implemented the OMIM-to-MONDO conversion: if a user inputs the OMIM for their disease of interest, the conversion tool will fill the input box with the desired Monarch Initiative ID that is accepted by Monarch V3 API as queries. Such conversion box is collapsable. Moreover, a custom .js now checks that manual inputs (*i.e.* `Disease URI` and `ML seed`) are in the correct format before launching the run.
-
-Both the Jupyter Notebook from version 2024.1.5 and the single Docker app are available in the **v2025.0.2-legacy** release.
-
-**Versions 2025.0.3** through **2025.0.7** introduce the Docker Swarm directory architecture for distributed services, that will allow for scalability and queues in runs. A `drugapp-launcher.sh` script was be added. It allows to either build the docker images and launch the containers:
-
-```
-druapp-launcher.sh --build
-```
-
-Or remove them:
-
-```
-drugapp-launcher.sh --remove
-```
-
-Such command has to be executable beforehand with ```chmod +x drugapp-launcher.sh```. Additional static pages `run_status.html` and `current_runs.html` have been added to allow for UI navigation of concurrent runs in the app. The `status_update.js` script handles runtime display.
-
-**Version 2025.0.8** pushes some UI changes in the `.css` and `.html` files. The next step is to fully test the functionality of distributed services with a small (real or artificial) network ahead of adding the new alternatives for the algorithm for negative samples generation based on centrality measures, and for the ML prediction based on graph neural networks (_i.e._ GNN, via the `PyG` package): **v2025.0.8** and **v2025.0.9** releases contain the initial Jupyter Notebook (*i.e.* `jupyter-notebook-2025.ipynb`) for these improvements. I am currently re-writing some of the existing Python modules (*e.g.* `Monarch.py`) to simplify them and generate a streamline script to then test the alternatives steps. I also added a few additional scripts in `utils` just for the Jupyter Notebook. **v2025.0.10** and **v2025.0.11** releass implement the full pipeline for XGBoost and PyG: the resulting prediction though returns many more drugs than the XGBoost original model: instead of about 10 drugs, Torch-geometric's GNN model returns about 1000 drugs above the default filtering parameters (*i.e* similarity = 0.65, cluster = 0.8). I will then test with more stringent thresholds for that model.
-
-I will then push these changes to the Docker Image modules (*e.g.* `Monarch_service.py` and `Monarch_fallback.py`), to test parallelisation via the Docker Swarm structure.
-
-## PIPELINE: Jupyter Notebook (Niccolò Bianchi)
-The entire pipeline can be launched within the Jupyter Notebook. A full run dataset is available on [dropbox](https://www.dropbox.com/scl/fi/prvqajjau227741z5ve91/data.7z?rlkey=qjumdz9r93y0yv6mhc21a7bir&st=jqsfgypj&dl=0).
-
-My major contributions to the project are:
-1. updating scripts that interacted with database APIs (<i>i.e.</i> Monarch Initiative, DGIdb)
-2. fixing issue with defunct Python packages (<i>e.g.</i> pyRDF2vec)
-3. changing the code for the training, testing ang prediction steps in order to make the prediction on drugs that are not only those already part of the network of nodes associated to the disease of interest, in ```networkmodel.py```
-4. adding a step that computes negative triples, in ```negsamples.py```
-5. updating the training, testing and prediction steps accordingly, in ```networkmodel.py```
-
-![Huntington disease_2024-07-31_full_network_plot_with_NS](https://github.com/user-attachments/assets/eed9bbfc-5168-4a6b-a19c-ba7b2e91c25e)
+![DRUGAPP_home-4-EDIT](https://github.com/user-attachments/assets/74c5c9e7-d4f9-4fc2-8c9c-483c72c075d7)
 
 ## Aknowledgements
-### LUMC and LIACS (NL)
-[Carmen Reep](https://www.researchgate.net/profile/Carmen-Reep), [Núria Queralt-Rosinach](https://www.researchgate.net/scientific-contributions/Nuria-Queralt-Rosinach-2198951627), [Katy J. Wolstencroft](https://www.researchgate.net/profile/Katy-Wolstencroft), [Armel Lefebvre](https://0-scholar-google-com.brum.beds.ac.uk/citations?user=O363fEMAAAAJ&hl=en), [Marco Spruit](https://scholar.google.com/citations?user=GFvyyeAAAAAJ), [Mireia Palou Tort](https://nl.linkedin.com/in/mireia-palou-tort-295909198)
+<b>LUMC and LIACS (NL)</b> [Carmen Reep](https://www.researchgate.net/profile/Carmen-Reep), [Núria Queralt-Rosinach](https://www.researchgate.net/scientific-contributions/Nuria-Queralt-Rosinach-2198951627), [Katy J. Wolstencroft](https://www.researchgate.net/profile/Katy-Wolstencroft), [Armel Lefebvre](https://0-scholar-google-com.brum.beds.ac.uk/citations?user=O363fEMAAAAJ&hl=en), [Marco Spruit](https://scholar.google.com/citations?user=GFvyyeAAAAAJ), [Mireia Palou Tort](https://nl.linkedin.com/in/mireia-palou-tort-295909198); <b>Politecnico di Milano, DEIB (IT</b> [Rosario M. Piro](https://scholar.google.com/citations?user=HuNyLrcAAAAJ); <b>non-acaedemic</b> [Nicolas Hubert](https://scholar.google.com/citations?user=nHtB06wAAAAJ).
 
-### Politecnico di Milano (IT)
-[Rosario M. Piro](https://scholar.google.com/citations?user=HuNyLrcAAAAJ)
+## License
+This project is licensed under the MIT License. Feel free to use and modify the code as per your needs.
 
-### SWAT4HCLS
-Presentation by Carmen Reep on the original work this fork repository is based on: [Automated drug repurposing workflow for rare diseases](https://youtu.be/RsfUrRhZAso?si=Og1z1RdPaukpPIbP)
