@@ -20,17 +20,17 @@ The `jupyter-notebook-2025.ipynb` notebook takes a set of parameters (<i>e.g.</i
 
 ![IMAGE-release_20250307](https://github.com/user-attachments/assets/314d7bc3-33ee-473a-8780-24faf3962253)
 
-### [COMPLETED] [ML iterative predictions in Jupyter Notebook: testing and comparison]()
+### [COMPLETED] [ML iterative predictions in Jupyter Notebook: testing and comparison](https://github.com/NCMBianchi/DrugRepurposing/releases/tag/v2025.0.12)
 The `network-generator.ipynb` notebook builds a smaller sub-network provided of a bigger network based on centrality measure distribution, while `test-runs.ipynb` and `parse-runs.ipynb` are used to evaluate prediction efficiency and consistency across runs with different parameters.
 
 ![parse-runs-2](https://github.com/user-attachments/assets/60b54529-8b3f-458c-a3a0-489bf8920754)
 
-### [ONGOING] [Scalable and modular iterative pipeline in Docker-compose]()
+### [ONGOING] [Scalable and modular iterative pipeline in Docker-compose](https://github.com/NCMBianchi/DrugRepurposing/releases/tag/v2025.0.12-docker-compose)
 Pipeline functionalities are split in several modules that manage 1-2 `.py` scripts, and such modules are then implemented in multiple instances of Docker containers built by Docker-compose and managed by a `Celery_app` container for cueing and data transfer. This also allows for further parallelisation and resource optimisation. The end result will be merged with the FlaskApp-based web UI docker.
 
 ![GITHUB_update-20250407-1](https://github.com/user-attachments/assets/2444141e-0b9c-4b5b-afff-f819e9b6444e)
 
-### [PAUSED] [FlaskApp-based Web UI in Docker]()
+### [PAUSED] [FlaskApp-based Web UI in Docker](https://github.com/NCMBianchi/DrugRepurposing/releases/tag/v2025.0.12-docker-ui)
 All the files within `app/services/`, `app/static/` and `app/templates/` are fully working, but the pipeline functionalities are outdated and will be updated once the Docker-compose modular version is finished.
 
 ![DRUGAPP_home-4-EDIT](https://github.com/user-attachments/assets/74c5c9e7-d4f9-4fc2-8c9c-483c72c075d7)
