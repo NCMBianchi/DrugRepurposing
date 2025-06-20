@@ -1,8 +1,8 @@
 # DrugRepurposing
 
-This ongoing project focuses on developing a <b>modular</b> and <b>automated</b> drug-repurposing pipeline that builds on the huge potential of [Knowledge Graphs](https://en.wikipedia.org/wiki/Knowledge_graph) and Machine Learning (ML) predictions.
+![BANNER](https://github.com/user-attachments/assets/e237ef0f-4b7c-42f3-b7e1-724e1b68aacf)
 
-![BANNER]()
+This ongoing project focuses on developing a <b>modular</b> and <b>automated</b> drug-repurposing pipeline that builds on the huge potential of [Knowledge Graphs](https://en.wikipedia.org/wiki/Knowledge_graph) and Machine Learning (ML) predictions.
 
 It is based on my [MSc thesis](https://www.dropbox.com/scl/fi/6vzgfld7riqb19hm5wj6u/DRUG_REPURPOSING-thesis.pdf?rlkey=y9xm7zuxm4q035byvhe496m9k&dl=0) ([datasets from a reference full run](https://www.dropbox.com/scl/fi/prvqajjau227741z5ve91/DRUG_REPURPOSING-data.7z?rlkey=qjumdz9r93y0yv6mhc21a7bir&dl=0)), forked from [Carmen Reep's work](https://github.com/carmenreep/DrugRepurposing) which elaborated over [Núria Queralt-Rosinach's 'bioknowledge-reviewer' tool](https://github.com/NuriaQueralt/bioknowledge-reviewer). The `python_scripts` folder contains the latest versions of the functions for the pipeline. My main contrinutions to the project are:
 - adding semantically-valid negative samples via the `negsamples.py` scripts, inspired by [Nicolas Hubert's 'semantic-lossfunc' project](https://github.com/nicolas-hbt/semantic-lossfunc) ([Hubert et al. 2023](https://arxiv.org/abs/2301.05601)).
@@ -20,23 +20,23 @@ The `jupyter-notebook-2025.ipynb` notebook takes a set of parameters (<i>e.g.</i
 
 ![IMAGE-release_20250307](https://github.com/user-attachments/assets/314d7bc3-33ee-473a-8780-24faf3962253)
 
-### [COMPLETED] [ML iterative predictions in Jupyter Notebook: testing and comparison]()
+### [COMPLETED] [ML iterative predictions in Jupyter Notebook: testing and comparison](https://github.com/NCMBianchi/DrugRepurposing/releases/tag/v2025.0.12)
 The `network-generator.ipynb` notebook builds a smaller sub-network provided of a bigger network based on centrality measure distribution, while `test-runs.ipynb` and `parse-runs.ipynb` are used to evaluate prediction efficiency and consistency across runs with different parameters.
 
-![parse-runs-2]()
+![parse-runs-2](https://github.com/user-attachments/assets/60b54529-8b3f-458c-a3a0-489bf8920754)
 
-### [ONGOING] [Scalable and modular iterative pipeline in Docker-compose]()
+### [ONGOING] [Scalable and modular iterative pipeline in Docker-compose](https://github.com/NCMBianchi/DrugRepurposing/releases/tag/v2025.0.12-docker-compose)
 Pipeline functionalities are split in several modules that manage 1-2 `.py` scripts, and such modules are then implemented in multiple instances of Docker containers built by Docker-compose and managed by a `Celery_app` container for cueing and data transfer. This also allows for further parallelisation and resource optimisation. The end result will be merged with the FlaskApp-based web UI docker.
 
-![GITHUB_update-20250103-2](https://github.com/user-attachments/assets/cd844433-c210-4791-94b4-ec6acc236cf3)
+![GITHUB_update-20250407-1](https://github.com/user-attachments/assets/2444141e-0b9c-4b5b-afff-f819e9b6444e)
 
-### [PAUSED] [FlaskApp-based Web UI in Docker]()
+### [PAUSED] [FlaskApp-based Web UI in Docker](https://github.com/NCMBianchi/DrugRepurposing/releases/tag/v2025.0.12-docker-ui)
 All the files within `app/services/`, `app/static/` and `app/templates/` are fully working, but the pipeline functionalities are outdated and will be updated once the Docker-compose modular version is finished.
 
 ![DRUGAPP_home-4-EDIT](https://github.com/user-attachments/assets/74c5c9e7-d4f9-4fc2-8c9c-483c72c075d7)
 
 ## Aknowledgements
-<b>LUMC and LIACS (NL)</b> [Carmen Reep](https://www.researchgate.net/profile/Carmen-Reep), [Núria Queralt-Rosinach](https://www.researchgate.net/scientific-contributions/Nuria-Queralt-Rosinach-2198951627), [Katy J. Wolstencroft](https://www.researchgate.net/profile/Katy-Wolstencroft), [Armel Lefebvre](https://0-scholar-google-com.brum.beds.ac.uk/citations?user=O363fEMAAAAJ&hl=en), [Marco Spruit](https://scholar.google.com/citations?user=GFvyyeAAAAAJ), [Mireia Palou Tort](https://nl.linkedin.com/in/mireia-palou-tort-295909198); <b>Politecnico di Milano, DEIB (IT</b> [Rosario M. Piro](https://scholar.google.com/citations?user=HuNyLrcAAAAJ); <b>non-acaedemic</b> [Nicolas Hubert](https://scholar.google.com/citations?user=nHtB06wAAAAJ).
+<b>LUMC and LIACS (NL)</b> [Carmen Reep](https://www.researchgate.net/profile/Carmen-Reep), [Núria Queralt-Rosinach](https://www.researchgate.net/scientific-contributions/Nuria-Queralt-Rosinach-2198951627), [Katy J. Wolstencroft](https://www.researchgate.net/profile/Katy-Wolstencroft), [Armel Lefebvre](https://0-scholar-google-com.brum.beds.ac.uk/citations?user=O363fEMAAAAJ&hl=en), [Marco Spruit](https://scholar.google.com/citations?user=GFvyyeAAAAAJ), [Mireia Palou Tort](https://nl.linkedin.com/in/mireia-palou-tort-295909198); <b>Politecnico di Milano, DEIB (IT)</b> [Rosario M. Piro](https://scholar.google.com/citations?user=HuNyLrcAAAAJ); <b>non-acaedemic</b> [Nicolas Hubert](https://scholar.google.com/citations?user=nHtB06wAAAAJ).
 
 ## License
 This project is licensed under the MIT License. Feel free to use and modify the code as per your needs.
