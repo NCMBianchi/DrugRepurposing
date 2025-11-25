@@ -25,6 +25,17 @@ The `network-generator.ipynb` notebook builds a smaller sub-network provided of 
 
 ![parse-runs-2](https://github.com/user-attachments/assets/60b54529-8b3f-458c-a3a0-489bf8920754)
 
+### [COMPLETED] [Additional Validation Notebooks for the core scripts]()
+We implemented new notebooks to validate the subset network (<i>i.e.</i> `network-generator-validation.ipynb`) used in iteration-consensus runs, and  our approach to generate negative samples compared to other methods (<i>i.e.</i> `GCN_negsamples-ablation.ipynb`). We also implemented new notebooks to assess the prediction metrics (<i>e.g.</i> `XGB_raw_10it-evalmetrics.ipynb`) and the overlap of predictions (<i>e.g.</i> `networkmodel-convergence-full.ipynb`) between different models and methods.
+
+![]()
+
+### [COMPLETED] [No-UI Docker Image to run all the notebooks]()
+This Docker Image (~110MB) allows to create a Container via Docker Compose that installs the correct version of Python and all dependencies to run all the notebooks and core scripts in a fully isolated environment.
+Datasets from our own runs of the notebooks and scripts (~45GB) are available on Zenodo: []().
+
+![]()
+
 ### [ONGOING] [Scalable and modular iterative pipeline in Docker-compose](https://github.com/NCMBianchi/DrugRepurposing/releases/tag/v2025.0.12-docker-compose)
 Pipeline functionalities are split in several modules that manage 1-2 `.py` scripts, and such modules are then implemented in multiple instances of Docker containers built by Docker-compose and managed by a `Celery_app` container for cueing and data transfer. This also allows for further parallelisation and resource optimisation. The end result will be merged with the FlaskApp-based web UI docker.
 

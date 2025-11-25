@@ -9,4 +9,10 @@ docker_no_ui
 docker_no_ui.tar.gz
 docker_ui
 docker_ui.tar.gz
+drug-repurposing-docker-v2025.1.0/
+drug-repurposing-docker-v2025.1.0.tar.gz
+data/
+__pycache__/
 Icon?
+/*.ipynb
+/.ipynb_checkpoints/
