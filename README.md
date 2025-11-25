@@ -25,10 +25,10 @@ The `network-generator.ipynb` notebook builds a smaller sub-network provided of 
 
 ![parse-runs-2](https://github.com/user-attachments/assets/60b54529-8b3f-458c-a3a0-489bf8920754)
 
-### [COMPLETED] [Additional Validation Notebooks for the core scripts]()
+### [COMPLETED] [Additional validation Notebooks for the core scripts](https://github.com/NCMBianchi/DrugRepurposing/releases/tag/v2025.1.0)
 We implemented new notebooks to validate the subset network (<i>i.e.</i> `network-generator-validation.ipynb`) used in iteration-consensus runs, and  our approach to generate negative samples compared to other methods (<i>i.e.</i> `GCN_negsamples-ablation.ipynb`). We also implemented new notebooks to assess the prediction metrics (<i>e.g.</i> `XGB_raw_10it-evalmetrics.ipynb`) and the overlap of predictions (<i>e.g.</i> `networkmodel-convergence-full.ipynb`) between different models and methods.
 
-![]()
+![release_notebooks-1](https://github.com/user-attachments/assets/937444a9-6cd3-4a29-8b15-17067d0bfb31)
 
 ### [COMPLETED] [No-UI Docker Image to run all the notebooks]()
 This Docker Image (~110MB) allows to create a Container via Docker Compose that installs the correct version of Python and all dependencies to run all the notebooks and core scripts in a fully isolated environment.
